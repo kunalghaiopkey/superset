@@ -127,6 +127,34 @@ if os.getenv("CYPRESS_CONFIG") == "true":
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden
 #
+
+from authlib.integrations.flask_client import OAuth
+from flask_appbuilder.security.manager import AUTH_OAUTH
+
+AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+          'name': 'keycloak',
+   'icon': 'fa-address-card',  # Optional, for UI
+   'token_key': 'access_token',  # The token name in the response
+   'remote_app': {
+       'client_id': 'ssts-api',
+       'client_secret': 'I3oHbXEUvGFw7hGDtB8txO6ar3r1Fnvl',
+       'api_base_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/',
+       'client_kwargs': {
+           'scope': 'openid profile email',
+       },
+       'request_token_url': None,
+       'access_token_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/token',
+       'authorize_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/auth',
+   },
+    }
+]
+
+# Optional: redirect unauthorized users
+AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION_ROLE = "Admin"
+
 try:
     import superset_config_docker
     from superset_config_docker import *  # noqa

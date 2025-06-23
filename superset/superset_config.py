@@ -1,0 +1,1 @@
+AUTH_TYPE = AUTH_DB
