@@ -63,10 +63,10 @@ export class Theme {
 
   private static readonly defaultTokens = {
     // Brand
-    brandLogoAlt: 'Apache Superset',
-    brandLogoUrl: '/static/assets/images/superset-logo-horiz.png',
+    brandLogoAlt: 'Opkey BI-Studio',
+    brandLogoUrl: '/static/assets/images/opkey/opkey.png',
     brandLogoMargin: '18px',
-    brandLogoHref: 'https://supserset.apache.org',
+    brandLogoHref: '/opkeyone',
     brandLogoHeight: '24px',
 
     // Default colors
