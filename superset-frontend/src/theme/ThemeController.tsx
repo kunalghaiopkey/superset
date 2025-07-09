@@ -215,8 +215,19 @@ export class ThemeController {
         newConfig.algorithm = 'default';
         break;
     }
-
-    this.themeObject.setConfig(newConfig);
+    let obj = {
+      "token": {
+        "colorBgBase": "#8a3737",
+        "colorPrimary": "#fa8c16",
+        "colorInfo": "#fa8c16"
+      }
+    }
+    console.log(newConfig)
+    console.error(newConfig)
+    let theme = { ...newConfig, ...obj }
+    console.log(theme)
+    console.error(theme)
+    this.themeObject.setConfig(theme);
   }
 
   private persist(): void {
