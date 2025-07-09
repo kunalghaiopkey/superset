@@ -123,37 +123,7 @@ if os.getenv("CYPRESS_CONFIG") == "true":
 
     sys.path.pop(0)
 
-#
-# Optionally import superset_config_docker.py (which will have been included on
-# the PYTHONPATH) in order to allow for local settings to be overridden
-#
 
-from authlib.integrations.flask_client import OAuth
-from flask_appbuilder.security.manager import AUTH_OAUTH
-
-AUTH_TYPE = AUTH_OAUTH
-OAUTH_PROVIDERS = [
-    {
-          'name': 'keycloak',
-   'icon': 'fa-address-card',  # Optional, for UI
-   'token_key': 'access_token',  # The token name in the response
-   'remote_app': {
-       'client_id': 'ssts-api',
-       'client_secret': 'I3oHbXEUvGFw7hGDtB8txO6ar3r1Fnvl',
-       'api_base_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/',
-       'client_kwargs': {
-           'scope': 'openid profile email',
-       },
-       'request_token_url': None,
-       'access_token_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/token',
-       'authorize_url': 'https://sstsauth.dev.opkeyone.com/realms/KC_SSTS_Auth/protocol/openid-connect/auth',
-   },
-    }
-]
-
-# Optional: redirect unauthorized users
-AUTH_USER_REGISTRATION = True
-AUTH_USER_REGISTRATION_ROLE = "Admin"
 
 try:
     import superset_config_docker
@@ -164,3 +134,99 @@ try:
     )
 except ImportError:
     logger.info("Using default Docker config...")
+    
+    
+    
+    
+# SECRET_KEY = 'FF74184563DCA713F5673A3EB35D9'
+# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION_ROLE = "OpkeyRole"
+PUBLIC_ROLE_LIKE_GAMMA = True
+ENABLE_PROXY_FIX = True
+# SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SAMESITE = "Lax"
+
+
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///superset.db'  # Or your production DB
+# SQLALCHEMY_TRACK_MODIFICATIONS = False
+# SQLALCHEMY_POOL_RECYCLE = 3600
+# SQLALCHEMY_ENGINE_OPTIONS = {
+    # "pool_pre_ping": True,
+# }
+    
+    
+
+
+FEATURE_FLAGS = {
+    "DASHBOARD_NATIVE_FILTERS_SET": True,
+    "EMBEDDABLE_CHARTS": True,
+    "VERSIONED_EXPORT": True,
+    "DASHBOARD_NATIVE_FILTERS": True,
+    "DASHBOARD_CROSS_FILTERS": True,
+    "ENABLE_TEMPLATE_PROCESSING": True,
+    "EMBEDDED_SUPERSET": True,
+    "DRILL_TO_DETAIL": True,
+    "ALERT_REPORTS": True,
+    "SCHEDULED_QUERIES": True,
+    "ENABLE_EXPLORE_DRAG_AND_DROP": True,
+    "ENABLE_DATASET_RENAMING":True,
+    "ENABLE_REACT_CRUD_VIEWS":True,
+    "TAGGING_SYSTEM":True,
+    "ENABLE_GLOBAL_ASYNC_QUERIES":True,
+    "ENABLE_CUSTOM_COLOR_SCHEMES": True,
+    "ENABLE_FILTER_BOX": True,
+    "OMNIBAR": True,
+
+}
+
+FAB_ADD_SECURITY_API = True
+
+ENABLE_RECAPTCHA = False
+RECAPTCHA_PUBLIC_KEY = ""
+RECAPTCHA_PRIVATE_KEY = ""
+
+
+# EMAIL_NOTIFICATIONS = True
+# SMTP_HOST = "localhost"
+# SMTP_PORT = 25
+# SMTP_USER = "user"
+# SMTP_PASSWORD = "password"
+# SMTP_MAIL_FROM = "superset@example.com"
+
+
+# ENABLE_TIME_ROTATE = True
+# LOG_FORMAT = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
+# LOG_LEVEL = "DEBUG"
+
+
+DEFAULT_LANGUAGE = "en"
+APP_NAME = "Opkey BI-Studio"
+APP_ICON = "/static/assets/images/opkey.png"
+FAVICONS = [{"href": "/static/assets/images/favicon.ico"}]
+WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
+# DEFAULT_FEATURE_FLAGS = {}
+
+ROW_LIMIT = 50000
+SQL_MAX_ROW = 1000000
+MAX_TABLE_NAMES = 3000
+# CSV_EXPORT = {"encoding": "utf-8"}
+# LOG_RETENTION = 30
+
+
+# UPLOAD_FOLDER = '/app/uploads/'
+# IMG_UPLOAD_FOLDER = '/app/uploads/images/'
+# CSV_EXPORT = {"encoding": "utf-8"}
+
+
+# CACHE_CONFIG = {
+    # 'CACHE_TYPE': 'redis',
+    # 'CACHE_DEFAULT_TIMEOUT': 300,
+    # 'CACHE_KEY_PREFIX': 'superset_',
+    # 'CACHE_REDIS_URL': 'redis://localhost:6379/0'
+# }
+
+# DATA_CACHE_CONFIG = CACHE_CONFIG
+# FILTER_STATE_CACHE_CONFIG = CACHE_CONFIG
+# EXPLORE_FORM_DATA_CACHE_CONFIG = CACHE_CONFIG
+
+
