@@ -146,6 +146,10 @@ ENABLE_PROXY_FIX = True
 # SESSION_COOKIE_SECURE = True
 # SESSION_COOKIE_SAMESITE = "Lax"
 
+# Allow both OAuth and DB login
+AUTH_ROLES_SYNC_AT_LOGIN = True
+
+
 
 # SQLALCHEMY_DATABASE_URI = 'sqlite:///superset.db'  # Or your production DB
 # SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -176,6 +180,7 @@ FEATURE_FLAGS = {
     "ENABLE_CUSTOM_COLOR_SCHEMES": True,
     "ENABLE_FILTER_BOX": True,
     "OMNIBAR": True,
+      "ALLOW_MULTIPLE_AUTH_PROVIDERS": True,
 
 }
 
@@ -204,9 +209,20 @@ RECAPTCHA_PRIVATE_KEY = ""
 
 DEFAULT_LANGUAGE = "en"
 APP_NAME = "Opkey BI-Studio"
-APP_ICON = "https://cdn.myopkey.com/IconImages/OpkeyLogin/opkeyLogoWhite.png"
-FAVICONS = [{"href": "/static/assets/images/favicon.ico"}]
+APP_ICON = "/static/assets/images/opkey/opkey.png"
+FAVICONS = [{"href": "/static/assets/images/opkey/favicon/favicon.ico"}]
 WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
+
+# Setting it to '/' would take the user to '/superset/welcome/'
+LOGO_TARGET_PATH = '/bistudio'
+
+# Specify tooltip that should appear when hovering over the App Icon/Logo
+LOGO_TOOLTIP = "Opkey BI-Studio"
+
+# Specify any text that should appear to the right of the logo
+LOGO_RIGHT_TEXT = "Opkey BI-Studio"
+
+
 # DEFAULT_FEATURE_FLAGS = {}
 
 ROW_LIMIT = 50000
@@ -233,6 +249,4 @@ MAX_TABLE_NAMES = 3000
 # EXPLORE_FORM_DATA_CACHE_CONFIG = CACHE_CONFIG
 
 SAMPLES_ROLE_CONFIG = None
-
-
 
