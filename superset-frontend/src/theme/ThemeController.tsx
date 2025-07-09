@@ -216,12 +216,61 @@ export class ThemeController {
         break;
     }
     let obj = {
-      "token": {
-        "colorBgBase": "#8a3737",
-        "colorPrimary": "#fa8c16",
-        "colorInfo": "#fa8c16"
-      }
+
+  "components": {
+
+    "Button": {
+
+      "colorPrimary": "rgb(17,97,115)",
+
+      "colorPrimaryHover": "rgb(17,97,115)",
+
+      "contentFontSize": 16,
+
+      "defaultHoverBorderColor": "rgb(208,213,221)"
+
+    },
+
+    "Typography": {
+
+      "colorLinkHover": "rgb(9,88,217)"
+
+    },
+
+    "Checkbox": {
+
+      "colorPrimaryHover": "rgb(230,251,254)",
+
+      "colorPrimary": "rgb(230,251,254)",
+
+      "colorWhite": "rgb(17,97,115)",
+
+      "colorBorder": "rgb(28,124,146)"
+
+    },
+
+    "Tabs": {
+
+      "inkBarColor": "rgb(17,97,115)",
+
+      "itemSelectedColor": "rgb(17,97,115)",
+
+      "itemHoverColor": "rgb(17,97,115)"
+
     }
+
+  },
+
+  "token": {
+
+    "colorPrimary": "#023444",
+
+    "colorInfo": "#023444"
+
+  }
+
+}
+ 
     console.log(newConfig)
     console.error(newConfig)
     let theme = { ...newConfig, ...obj }
