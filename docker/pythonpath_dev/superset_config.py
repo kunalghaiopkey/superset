@@ -224,6 +224,18 @@ LOGO_RIGHT_TEXT = "Opkey BI-Studio"
 
 
 # DEFAULT_FEATURE_FLAGS = {}
+DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
+    {{ ... }}
+    THEME_ALLOW_THEME_EDITOR_BETA = True,
+}
+THEME = {
+  "colorBgBase": "#008000",       # Full base background color (green)
+  "colorBgContainer": "#008000",  # Containers (e.g., dashboards, charts)
+  "colorPrimary": "#ffffff",      # Optional: keep text/buttons readable
+  "colorText": "#ffffff",         # White text on green background
+  "fontFamily": "Poppins, sans-serif",
+}
+
 
 ROW_LIMIT = 50000
 SQL_MAX_ROW = 1000000
