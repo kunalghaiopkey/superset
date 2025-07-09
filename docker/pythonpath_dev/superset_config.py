@@ -180,6 +180,9 @@ FEATURE_FLAGS = {
 }
 
 FAB_ADD_SECURITY_API = True
+SHOW_STACKTRACE = False
+
+
 
 ENABLE_RECAPTCHA = False
 RECAPTCHA_PUBLIC_KEY = ""
@@ -201,7 +204,7 @@ RECAPTCHA_PRIVATE_KEY = ""
 
 DEFAULT_LANGUAGE = "en"
 APP_NAME = "Opkey BI-Studio"
-APP_ICON = "/static/assets/images/opkey.png"
+APP_ICON = "https://cdn.myopkey.com/IconImages/OpkeyLogin/opkeyLogoWhite.png"
 FAVICONS = [{"href": "/static/assets/images/favicon.ico"}]
 WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
 # DEFAULT_FEATURE_FLAGS = {}
@@ -228,5 +231,8 @@ MAX_TABLE_NAMES = 3000
 # DATA_CACHE_CONFIG = CACHE_CONFIG
 # FILTER_STATE_CACHE_CONFIG = CACHE_CONFIG
 # EXPLORE_FORM_DATA_CACHE_CONFIG = CACHE_CONFIG
+
+SAMPLES_ROLE_CONFIG = None
+
 
 
