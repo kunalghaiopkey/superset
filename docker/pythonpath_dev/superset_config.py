@@ -341,15 +341,9 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     # Allow metrics and columns to be grouped into (potentially nested) folders in the
     # chart builder
     "DATASET_FOLDERS": False,
-    "THEME_ALLOW_THEME_EDITOR_BETA": True,
+    "THEME_ALLOW_THEME_EDITOR_BETA": False,
 }
-THEME = {
-  "colorBgBase": "#008000",       # Full base background color (green)
-  "colorBgContainer": "#008000",  # Containers (e.g., dashboards, charts)
-  "colorPrimary": "#ffffff",      # Optional: keep text/buttons readable
-  "colorText": "#ffffff",         # White text on green background
-  "fontFamily": "Poppins, sans-serif",
-}
+THEME = { }
 
 
 ROW_LIMIT = 50000
