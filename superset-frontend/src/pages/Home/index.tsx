@@ -136,17 +136,17 @@ const WelcomeContainer = styled.div`
     >span {
       display: flex;
       align-items: center;
+
+      .anticon {
+        svg {
+          color: ${({ theme }) => theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+        }
+      }
     }
   }
 
   .ant-btn-variant-link {
     color: ${({ theme }) => theme.components?.Layout?.colorLink || theme.colorLink};
-  }
-
-  .anticon {
-    svg {
-      color: ${({ theme }) => theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
-    }
   }
 
   .ant-card-meta-description {
