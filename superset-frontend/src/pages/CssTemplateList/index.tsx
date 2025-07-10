@@ -216,7 +216,7 @@ function CssTemplatesList({
     subMenuButtons.push({
       name: t('Bulk select'),
       onClick: toggleBulkSelect,
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
     });
   }
 

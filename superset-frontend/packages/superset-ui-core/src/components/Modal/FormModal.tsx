@@ -85,7 +85,7 @@ export function FormModal({
       footer={
         <>
           <Button
-            buttonStyle="secondary"
+            buttonStyle="tertiary"
             data-test="modal-cancel-button"
             onClick={handleClose}
           >

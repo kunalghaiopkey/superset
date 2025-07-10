@@ -446,7 +446,7 @@ function AlertList({
     subMenuButtons.push({
       name: t('Bulk select'),
       onClick: toggleBulkSelect,
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
       'data-test': 'bulk-select-toggle',
     });
   }

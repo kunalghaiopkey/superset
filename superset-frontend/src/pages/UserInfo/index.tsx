@@ -127,7 +127,7 @@ export function UserInfo({ user }: { user: UserWithPermissionsAndRoles }) {
           {t('Reset my password')}
         </>
       ),
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
       onClick: () => {
         openModal(ModalType.ResetPassword);
       },

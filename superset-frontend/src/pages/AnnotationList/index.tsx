@@ -250,7 +250,7 @@ function AnnotationList({
   subMenuButtons.push({
     name: t('Bulk select'),
     onClick: toggleBulkSelect,
-    buttonStyle: 'secondary',
+    buttonStyle: 'tertiary',
     'data-test': 'annotation-bulk-select',
   });
 

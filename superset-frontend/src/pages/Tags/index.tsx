@@ -320,7 +320,7 @@ function TagList(props: TagListProps) {
   if (canDelete) {
     subMenuButtons.push({
       name: t('Bulk select'),
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
       'data-test': 'bulk-select',
       onClick: toggleBulkSelect,
     });

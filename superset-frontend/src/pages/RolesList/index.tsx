@@ -289,7 +289,7 @@ function RolesList({ addDangerToast, addSuccessToast, user }: RolesListProps) {
       {
         name: t('Bulk select'),
         onClick: toggleBulkSelect,
-        buttonStyle: 'secondary',
+        buttonStyle: 'tertiary',
       },
     );
   }
