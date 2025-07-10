@@ -579,13 +579,13 @@ const RightMenu = ({
           {!navbarRight.user_is_anonymous && [
             <Menu.Divider key="user-divider" />,
             <Menu.ItemGroup key="user-section" title={t('User')}>
-              {navbarRight.user_info_url && (
+              {/* {navbarRight.user_info_url && (
                 <Menu.Item key="info">
                   <Typography.Link href={navbarRight.user_info_url}>
                     {t('Info')}
                   </Typography.Link>
                 </Menu.Item>
-              )}
+              )} */}
               <Menu.Item key="logout" onClick={handleLogout}>
                 <Typography.Link href={navbarRight.user_logout_url}>
                   {t('Logout')}
