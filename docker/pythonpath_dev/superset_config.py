@@ -345,6 +345,15 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
 }
 THEME = { }
 
+ENVIRONMENT_TAG_CONFIG = {
+    "variable": "SUPERSET_ENV",
+    "values": {
+        "debug":{},
+        "development": {},
+        "production": {},
+    },
+}
+
 
 ROW_LIMIT = 50000
 SQL_MAX_ROW = 1000000

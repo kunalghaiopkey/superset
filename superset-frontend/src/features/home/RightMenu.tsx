@@ -64,13 +64,7 @@ import {
 
 const extensionsRegistry = getExtensionsRegistry();
 
-const versionInfoStyles = (theme: SupersetTheme) => css`
-  padding: ${theme.sizeUnit * 1.5}px ${theme.sizeUnit * 4}px
-    ${theme.sizeUnit * 4}px ${theme.sizeUnit * 7}px;
-  color: ${theme.colors.grayscale.base};
-  font-size: ${theme.fontSizeXS}px;
-  white-space: nowrap;
-`;
+
 
 const styledDisabled = (theme: SupersetTheme) => css`
   color: ${theme.colors.grayscale.light1};
@@ -588,33 +582,7 @@ const RightMenu = ({
               </Menu.Item>
             </Menu.ItemGroup>,
           ]}
-          {(navbarRight.version_string || navbarRight.version_sha) && [
-            <Menu.Divider key="version-info-divider" />,
-            <Menu.ItemGroup key="about-section" title={t('About')}>
-              <div className="about-section">
-                {navbarRight.show_watermark && (
-                  <div css={versionInfoStyles}>
-                    {t('Powered by Apache Superset')}
-                  </div>
-                )}
-                {navbarRight.version_string && (
-                  <div css={versionInfoStyles}>
-                    {t('Version')}: {navbarRight.version_string}
-                  </div>
-                )}
-                {navbarRight.version_sha && (
-                  <div css={versionInfoStyles}>
-                    {t('SHA')}: {navbarRight.version_sha}
-                  </div>
-                )}
-                {navbarRight.build_number && (
-                  <div css={versionInfoStyles}>
-                    {t('Build')}: {navbarRight.build_number}
-                  </div>
-                )}
-              </div>
-            </Menu.ItemGroup>,
-          ]}
+       
         </StyledSubMenu>
         {navbarRight.show_language_picker && (
           <LanguagePicker
@@ -657,11 +625,7 @@ const RightMenu = ({
           <span>&nbsp;</span>
         </>
       )}
-      {navbarRight.user_is_anonymous && (
-        <StyledAnchor href={navbarRight.user_login_url}>
-          <Icons.LoginOutlined /> {t('Login')}
-        </StyledAnchor>
-      )}
+    
       <TelemetryPixel
         version={navbarRight.version_string}
         sha={navbarRight.version_sha}
