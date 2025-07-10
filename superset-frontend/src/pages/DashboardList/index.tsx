@@ -687,7 +687,7 @@ function DashboardList(props: DashboardListProps) {
   if (canDelete || canExport) {
     subMenuButtons.push({
       name: t('Bulk select'),
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
       'data-test': 'bulk-select',
       onClick: toggleBulkSelect,
     });

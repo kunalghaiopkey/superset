@@ -638,7 +638,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
     buttonArr.push({
       name: t('Bulk select'),
       onClick: toggleBulkSelect,
-      buttonStyle: 'secondary',
+      buttonStyle: 'tertiary',
     });
   }
 
