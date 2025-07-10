@@ -118,26 +118,37 @@ const StyledSubMenu = styled(SubMenu)`
     }
 
     &.ant-menu-submenu {
-      .ant-menu-submenu-title {
-        color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
-
-        .anticon {
-          svg {
-            color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+      &.ant-menu-submenu-horizontal {
+        .ant-menu-submenu-title , .ant-menu-title-content {
+          color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+  
+          .anticon {
+            svg {
+              color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+            }
+          }
+  
+          + span {
+            .ant-btn {
+              color: red;
+            } 
           }
         }
-
-        + span {
-          .ant-btn {
-            color: red;
-          } 
+  
+        &:hover {
+          &::after {
+            border-bottom-width: 3px !important;
+            border-bottom-color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+          }
         }
       }
 
-      &:hover {
-        &::after {
-          border-bottom-width: 3px !important;
-          border-bottom-color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+
+      &.ant-menu-submenu-vertical {
+        &.ant-menu-submenu-active {
+          .ant-menu-title-content {
+            color: rgba(0,0,0,0.88);
+          }
         }
       }
     }
