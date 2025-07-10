@@ -178,6 +178,38 @@ const StyledTable = styled(AntTable as FC<AntTableProps>)<{ height?: number }>(
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #344054;
+      font-size: 0.8125rem;
+
+      a , span {
+        color: #344054;
+        font-size: 0.8125rem;
+      }
+      
+      &.ant-table-cell-row-hover {
+        background-color: #f6feff !important;
+      }
+
+      &.ant-table-column-sort {
+        background-color: transparent !important;
+      }
+    }
+
+    th.ant-table-column-sort {
+      background-color: #fafafa !important;
+    }
+
+    th.ant-table-cell {
+      font-size: 0.8125rem;
+      color: #667085 !important;
+
+      &:hover {
+        background: #fafafa !important;
+      }
+      .ant-table-column-title {
+        font-size: 0.8125rem;
+        color: #667085;
+      }
     }
 
     .ant-table-tbody > tr > td {

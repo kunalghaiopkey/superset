@@ -309,7 +309,7 @@ class RefreshIntervalModal extends PureComponent<
             <Button
               onClick={this.onCancel}
               buttonSize="small"
-              buttonStyle="secondary"
+              buttonStyle="tertiary"
             >
               {t('Cancel')}
             </Button>

@@ -241,7 +241,7 @@ const CustomModal = ({
           key="back"
           cta
           data-test="modal-cancel-button"
-          buttonStyle="secondary"
+          buttonStyle="tertiary"
           onClick={handleOnHide}
         >
           {t('Cancel')}

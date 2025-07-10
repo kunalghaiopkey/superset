@@ -55,7 +55,7 @@ const Footer: FC<FooterProps> = ({
     <>
       <Button
         key="cancel"
-        buttonStyle="secondary"
+        buttonStyle="tertiary"
         data-test="native-filter-modal-cancel-button"
         onClick={onCancel}
       >

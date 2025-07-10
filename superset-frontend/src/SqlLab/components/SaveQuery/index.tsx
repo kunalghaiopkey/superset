@@ -231,7 +231,7 @@ const SaveQuery = ({
               onClick={close}
               data-test="cancel-query"
               cta
-              buttonStyle="secondary"
+              buttonStyle="tertiary"
             >
               {t('Cancel')}
             </Button>

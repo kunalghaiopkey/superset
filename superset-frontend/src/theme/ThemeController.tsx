@@ -246,6 +246,11 @@ export class ThemeController {
         "Layout": {
           "headerBg": "rgb(2 52 68)",
           // "colorbgcontainer": "rgb(2 52 68)"
+        },
+        "Input": {
+          "activeBorderColor": "rgb(17,97,115)",
+          "hoverBorderColor": "rgb(17,97,115)",
+          "activeShadow": "0"
         }
       },
       "token": {

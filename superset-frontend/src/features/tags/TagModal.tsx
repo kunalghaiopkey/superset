@@ -274,7 +274,7 @@ const TagModal: FC<TagModalProps> = ({
         <div>
           <Button
             data-test="modal-save-dashboard-button"
-            buttonStyle="secondary"
+            buttonStyle="tertiary"
             onClick={onHide}
           >
             {t('Cancel')}
