@@ -368,9 +368,12 @@ export enum ThemeMode {
 export type SharedAntdTokens = Pick<AntdTokens, AllowedAntdTokenKeys>;
 
 /** The final shape for our custom theme object, combining old theme + shared antd + superset specifics. */
+
 export type SupersetTheme = LegacySupersetTheme &
   SharedAntdTokens &
-  SupersetSpecificTokens;
+  SupersetSpecificTokens & {
+    components?: AntdThemeConfig['components']; // ← Add this
+};
 
 export interface ThemeStorage {
   getItem(key: string): string | null;

@@ -119,9 +119,35 @@ const StyledSubMenu = styled(SubMenu)`
     }
     &.ant-menu-submenu-active {
       .ant-menu-title-content {
-        color: ${theme.colors.primary.base};
+        color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
       }
     }
+
+    &.ant-menu-submenu {
+      .ant-menu-submenu-title {
+        color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+
+        .anticon {
+          svg {
+            color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+          }
+        }
+
+        + span {
+          .ant-btn {
+            color: red;
+          } 
+        }
+      }
+
+      &:hover {
+        &::after {
+          border-bottom-width: 3px !important;
+          border-bottom-color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+        }
+      }
+    }
+    
   `}
 `;
 

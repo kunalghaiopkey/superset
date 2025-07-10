@@ -42,8 +42,14 @@ interface MenuProps {
 
 const StyledHeader = styled.header`
   ${({ theme }) => `
-      background-color: ${theme.colorBgContainer};
+      background-color: ${theme.components?.Layout?.headerBg || theme.colorBgContainer};
       z-index: 10;
+
+      .anticon {
+        svg {
+          color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+        }
+      }
 
       &:nth-last-of-type(2) nav {
         margin-bottom: 2px;
@@ -77,6 +83,36 @@ const StyledHeader = styled.header`
         }
         &:focus-visible {
           border-color: ${theme.colorPrimaryText};
+        }
+      }
+      
+      .ant-menu {
+        background-color: ${theme.components?.Layout?.headerBg || theme.colorBgContainer};
+
+        .ant-menu-item {
+          color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+
+          &:hover {
+            &::after {
+              border-bottom-width: 3px !important;
+              border-bottom-color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+            }
+          }
+          
+
+          &.ant-menu-item-selected {
+            &::after {
+              border-bottom-width: 3px !important;
+              border-bottom-color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+            }
+          }
+        }
+        &:hover {
+          .ant-menu-title-content {
+            a {
+              color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+            }
+          }
         }
       }
       .navbar-brand-text {
@@ -127,19 +163,31 @@ const { SubMenu } = MainNav;
 const StyledSubMenu = styled(SubMenu)`
   ${({ theme }) => css`
     [data-icon="caret-down"] {
-      color: ${theme.colors.grayscale.base};
+      color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
       font-size: ${theme.fontSizeXS}px;
       margin-left: ${theme.sizeUnit}px;
     }
     &.ant-menu-submenu {
+        color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
         padding: ${theme.sizeUnit * 2}px ${theme.sizeUnit * 4}px;
         display: flex;
         align-items: center;
-        height: 100%;  &.ant-menu-submenu-active {
-    .ant-menu-title-content {
-      color: ${theme.colorPrimary};
-    }
-  }
+        height: 100%;
+        border-bottom : 3px solid transparent;
+
+        &:hover {
+          border-bottom : 3px solid ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+        }
+        
+        &.ant-menu-submenu-active {
+          .ant-menu-title-content {
+            color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+          }
+        }
+
+        .ant-menu-title-content {
+          color: ${theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
+        }
   `}
 `;
 const { useBreakpoint } = Grid;

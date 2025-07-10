@@ -216,60 +216,45 @@ export class ThemeController {
         break;
     }
     let obj = {
-
-  "components": {
-
-    "Button": {
-
-      "colorPrimary": "rgb(17,97,115)",
-
-      "colorPrimaryHover": "rgb(17,97,115)",
-
-      "contentFontSize": 16,
-
-      "defaultHoverBorderColor": "rgb(208,213,221)"
-
-    },
-
-    "Typography": {
-
-      "colorLinkHover": "rgb(9,88,217)"
-
-    },
-
-    "Checkbox": {
-
-      "colorPrimaryHover": "rgb(230,251,254)",
-
-      "colorPrimary": "rgb(230,251,254)",
-
-      "colorWhite": "rgb(17,97,115)",
-
-      "colorBorder": "rgb(28,124,146)"
-
-    },
-
-    "Tabs": {
-
-      "inkBarColor": "rgb(17,97,115)",
-
-      "itemSelectedColor": "rgb(17,97,115)",
-
-      "itemHoverColor": "rgb(17,97,115)"
-
+      "components": {
+        "Button": {
+          "colorPrimary": "rgb(17,97,115)",
+          "colorPrimaryHover": "rgb(17,97,115)",
+          "contentFontSize": 16,
+          "defaultHoverBorderColor": "rgb(208,213,221)"
+        },
+        "Typography": {
+          "colorLinkHover": "rgb(9,88,217)"
+        },
+        "Checkbox": {
+          "colorPrimaryHover": "rgb(230,251,254)",
+          "colorPrimary": "rgb(230,251,254)",
+          "colorWhite": "rgb(17,97,115)",
+          "colorBorder": "rgb(28,124,146)"
+        },
+        "Tabs": {
+          "inkBarColor": "rgb(17,97,115)",
+          "itemSelectedColor": "rgb(17,97,115)",
+          "itemHoverColor": "rgb(17,97,115)"
+        },
+        "Menu": {
+          "groupTitleColor": "rgb(0,0,0)",
+          "itemHoverBg": "rgba(17,97,115,0.0784313725490196)",
+          "itemSelectedColor": "rgb(0,0,0)",
+          "itemSelectedBg": "rgba(17,97,115,0.08)"
+        },
+        "Layout": {
+          "headerBg": "rgb(2 52 68)",
+          // "colorbgcontainer": "rgb(2 52 68)"
+        }
+      },
+      "token": {
+        "colorPrimary": "#116173",
+        "colorInfo": "#116173",
+        "colorPrimaryText": "#ffffff",
+        "colorLink": "#007bff"
+      }
     }
-
-  },
-
-  "token": {
-
-    "colorPrimary": "#023444",
-
-    "colorInfo": "#023444"
-
-  }
-
-}
  
     console.log(newConfig)
     console.error(newConfig)

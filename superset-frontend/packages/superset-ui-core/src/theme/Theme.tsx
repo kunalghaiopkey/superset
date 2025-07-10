@@ -171,6 +171,11 @@ export class Theme {
       colors: {} as DeprecatedThemeColors, // Placeholder that will be filled in the second phase
     };
 
+    if (antdConfig.components) {
+      this.theme['components'] = antdConfig.components
+    }
+ 
+
     // Second phase: Now that theme is initialized, we can determine if it's dark
     // and generate the legacy colors correctly
     const systemColors = getSystemColors(tokens);

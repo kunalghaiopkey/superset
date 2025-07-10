@@ -80,6 +80,37 @@ const WelcomeContainer = styled.div`
   .ant-row.menu {
     margin-top: -15px;
 
+    .ant-menu {
+      margin-left: 20px;
+      padding-left: 0px;
+      border-bottom: 1px solid rgba(0, 0, 0, .1);
+    }
+
+    .ant-menu-item {
+      &:has(> span > .active) , :hover {
+        background-color: transparent !important;
+        color: ${({ theme }) => theme.components?.Layout?.colorPrimary || theme.colorPrimary} !important;
+
+        &::after {
+          border-bottom-width: 2px;
+          border-bottom-color:${({ theme }) => theme.components?.Layout?.colorPrimary || theme.colorPrimary};
+        }
+      }
+
+      &.ant-menu-item-selected {
+        &::after {
+          border-bottom-width: 2px;
+          border-bottom-color: ${({ theme }) => theme.components?.Layout?.colorPrimary || theme.colorPrimary};
+        }
+      }
+
+      .ant-menu-title-content {
+        color: #667085;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+    }
+
     &:after {
       content: '';
       display: block;
@@ -95,6 +126,26 @@ const WelcomeContainer = styled.div`
 
     button {
       padding: 3px 21px;
+    }
+  }
+
+  .ant-btn-variant-filled {
+    background-color: ${({ theme }) => theme.components?.Layout?.colorPrimary || theme.colorPrimary} !important;
+    color: ${({ theme }) => theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText} !important;
+
+    >span {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .ant-btn-variant-link {
+    color: ${({ theme }) => theme.components?.Layout?.colorLink || theme.colorLink};
+  }
+
+  .anticon {
+    svg {
+      color: ${({ theme }) => theme.components?.Layout?.colorPrimaryText || theme.colorPrimaryText};
     }
   }
 
