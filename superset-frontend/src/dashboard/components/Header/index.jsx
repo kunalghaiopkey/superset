@@ -667,7 +667,7 @@ const Header = () => {
             {NavExtension && <NavExtension />}
             {userCanEdit && (
               <Button
-                buttonStyle="secondary"
+                buttonStyle="tertiary"
                 onClick={() => {
                   toggleEditMode();
                   boundActionCreators.clearDashboardHistory?.(); // Resets the `past` as an empty array

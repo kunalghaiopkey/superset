@@ -49,7 +49,7 @@ export const RunQueryButton = ({
   ) : (
     <Button
       onClick={onQuery}
-      buttonStyle={chartIsStale ? 'primary' : 'secondary'}
+      buttonStyle={chartIsStale ? 'primary' : 'primary'}
       disabled={!!errorMessage}
       data-test="run-query-button"
     >
