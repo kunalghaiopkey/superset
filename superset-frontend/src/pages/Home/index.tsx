@@ -145,10 +145,6 @@ const WelcomeContainer = styled.div`
     }
   }
 
-  .ant-btn-variant-link {
-    color: ${({ theme }) => theme.components?.Layout?.colorLink || theme.colorLink};
-  }
-
   .ant-card-meta-description {
     margin-top: ${({ theme }) => theme.sizeUnit}px;
   }

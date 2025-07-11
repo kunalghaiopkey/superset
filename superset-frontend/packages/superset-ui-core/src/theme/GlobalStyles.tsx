@@ -97,6 +97,14 @@ export const GlobalStyles = () => {
         [role='button'] {
           cursor: pointer;
         }
+
+        .ant-btn-variant-link {
+          color: ${theme.colorLink} !important;
+          
+          &:hover {
+            text-decoration:underline;
+          }
+        }
       `}
     />
   );
