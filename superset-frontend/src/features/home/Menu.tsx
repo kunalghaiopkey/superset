@@ -358,6 +358,9 @@ export function Menu({
     // ---------------------------------------------------------------------------------
     return <>{link}</>;
   };
+  if (location.pathname == '/login/') {
+      return <></>
+  }
   return (
     <StyledHeader className="top" id="main-menu" role="navigation">
       <Row>
