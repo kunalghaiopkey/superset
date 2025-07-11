@@ -66,7 +66,7 @@ export class Theme {
     brandLogoAlt: 'Opkey BI-Studio',
     brandLogoUrl: '/static/assets/images/opkey/opkey.png',
     brandLogoMargin: '18px',
-    brandLogoHref: '/opkeyone',
+    brandLogoHref: '/',
     brandLogoHeight: '24px',
 
     // Default colors
