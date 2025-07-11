@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+ 
 import { SupersetClient, styled, t, css } from '@superset-ui/core';
 import {
   Button,
@@ -27,34 +27,34 @@ import {
   Typography,
   Icons,
 } from '@superset-ui/core/components';
-import { useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { capitalize } from 'lodash/fp';
 import getBootstrapData from 'src/utils/getBootstrapData';
-
+ 
 type OAuthProvider = {
   name: string;
   icon: string;
 };
-
+ 
 type OIDProvider = {
   name: string;
   url: string;
 };
-
+ 
 type Provider = OAuthProvider | OIDProvider;
-
+ 
 interface LoginForm {
   username: string;
   password: string;
 }
-
+ 
 enum AuthType {
   AuthOID = 0,
   AuthDB = 1,
   AuthLDAP = 2,
   AuthOauth = 4,
 }
-
+ 
 const StyledCard = styled(Card)`
   ${({ theme }) => css`
     width: 40%;
@@ -65,31 +65,40 @@ const StyledCard = styled(Card)`
     }
   `}
 `;
-
+ 
 const StyledLabel = styled(Typography.Text)`
   ${({ theme }) => css`
     font-size: ${theme.fontSizeSM}px;
   `}
 `;
-
+ 
 export default function Login() {
   const [form] = Form.useForm<LoginForm>();
   const [loading, setLoading] = useState(false);
-
+ 
   const bootstrapData = getBootstrapData();
-
   const authType: AuthType = bootstrapData.common.conf.AUTH_TYPE;
   const providers: Provider[] = bootstrapData.common.conf.AUTH_PROVIDERS;
   const authRegistration: boolean =
     bootstrapData.common.conf.AUTH_USER_REGISTRATION;
-
+ 
+  const oauthRef = useRef<HTMLAnchorElement | null>(null);
+ 
+  useEffect(() => {
+      console.error('Auto-clicking Keycloak login button...1',authType,oauthRef);
+    if (authType === AuthType.AuthOauth && oauthRef.current) {
+      console.error('Auto-clicking Keycloak login button...2');
+      oauthRef.current.click();
+    }
+  }, [authType]);
+ 
   const onFinish = (values: LoginForm) => {
     setLoading(true);
     SupersetClient.postForm('/login/', values, '').finally(() => {
       setLoading(false);
     });
   };
-
+ 
   const getAuthIconElement = (
     providerName: string,
   ): React.JSX.Element | undefined => {
@@ -100,13 +109,13 @@ export default function Login() {
     const IconComponent = (Icons as Record<string, React.ComponentType<any>>)[
       iconComponentName
     ];
-
+ 
     if (IconComponent && typeof IconComponent === 'function') {
       return <IconComponent />;
     }
     return undefined;
   };
-
+ 
   return (
     <Flex
       justify="center"
@@ -119,8 +128,8 @@ export default function Login() {
         {authType === AuthType.AuthOID && (
           <Flex justify="center" vertical gap="middle">
             <Form layout="vertical" requiredMark="optional" form={form}>
-              {providers.map((provider: OIDProvider) => (
-                <Form.Item<LoginForm>>
+              {(providers as OIDProvider[]).map(provider => (
+                <Form.Item<LoginForm> key={provider.name}>
                   <Button
                     href={`/login/${provider.name}`}
                     block
@@ -134,25 +143,32 @@ export default function Login() {
             </Form>
           </Flex>
         )}
+ 
         {authType === AuthType.AuthOauth && (
           <Flex justify="center" gap={0} vertical>
             <Form layout="vertical" requiredMark="optional" form={form}>
-              {providers.map((provider: OAuthProvider) => (
-                <Form.Item<LoginForm>>
+              {(providers as OAuthProvider[]).map(provider => (
+                <Form.Item<LoginForm> key={provider.name}>
                   <Button
-                    href={`/login/${provider.name}`}
                     block
                     iconPosition="start"
                     icon={getAuthIconElement(provider.name)}
                   >
-                    {t('Sign in with')} {capitalize(provider.name)}
+                    <a
+                      href={`/login/${provider.name}`}
+                      ref={provider.name === 'keycloak' ? oauthRef : undefined}
+                      style={{ color: 'inherit', textDecoration: 'none', display: 'block', width: '100%' }}
+                    >
+                      {t('Sign in with')} {capitalize(provider.name)}
+                    </a>
                   </Button>
+ 
                 </Form.Item>
               ))}
             </Form>
           </Flex>
         )}
-
+ 
         {(authType === AuthType.AuthDB || authType === AuthType.AuthLDAP) && (
           <Flex justify="center" vertical gap="middle">
             <Typography.Text type="secondary">
@@ -222,3 +238,4 @@ export default function Login() {
     </Flex>
   );
 }
+ 
