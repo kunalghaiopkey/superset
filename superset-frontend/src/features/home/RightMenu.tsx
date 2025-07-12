@@ -589,12 +589,7 @@ const RightMenu = ({
           <span>&nbsp;</span>
         </>
       )}
-      {navbarRight.user_is_anonymous && (
-        <StyledAnchor href={navbarRight.user_login_url}>
-          <i className="fa fa-fw fa-sign-in" />
-          {t('Login')}
-        </StyledAnchor>
-      )}
+
       <TelemetryPixel
         version={navbarRight.version_string}
         sha={navbarRight.version_sha}
