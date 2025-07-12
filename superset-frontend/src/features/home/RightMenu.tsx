@@ -22,7 +22,9 @@ import rison from 'rison';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useQueryParams, BooleanParam } from 'use-query-params';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
+// import { get, isEmpty } from 'lodash';
+
 
 import {
   t,
@@ -31,12 +33,12 @@ import {
   SupersetTheme,
   SupersetClient,
   getExtensionsRegistry,
-  useTheme,
+  // useTheme,
 } from '@superset-ui/core';
 import { Menu } from 'src/components/Menu';
 import { Tooltip } from 'src/components/Tooltip';
 import Icons from 'src/components/Icons';
-import Label from 'src/components/Label';
+// import Label from 'src/components/Label';
 import { findPermission } from 'src/utils/findPermission';
 import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 import {
@@ -94,9 +96,9 @@ const StyledAnchor = styled.a`
   padding-left: ${({ theme }) => theme.gridUnit}px;
 `;
 
-const tagStyles = (theme: SupersetTheme) => css`
-  color: ${theme.colors.grayscale.light5};
-`;
+// const tagStyles = (theme: SupersetTheme) => css`
+//   color: ${theme.colors.grayscale.light5};
+// `;
 
 const styledChildMenu = (theme: SupersetTheme) => css`
   &:hover {
