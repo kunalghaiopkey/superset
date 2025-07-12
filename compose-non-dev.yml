@@ -61,6 +61,8 @@ services:
         required: true
       - path: docker/.env-local # optional override
         required: false
+    environment:
+      - SUPERSET_ENV=development    
     build:
       <<: *common-build
     container_name: superset_app
