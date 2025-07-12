@@ -351,7 +351,7 @@ const RightMenu = ({
     localStorage.removeItem('redux');
   };
 
-  const theme = useTheme();
+  //const theme = useTheme();
 
   return (
     <StyledDiv align={align}>
@@ -387,7 +387,7 @@ const RightMenu = ({
           type="columnar"
         />
       )}
-      {environmentTag?.text && (
+      {/* {environmentTag?.text && (
         <Label
           css={{ borderRadius: `${theme.gridUnit * 125}px` }}
           color={
@@ -398,7 +398,7 @@ const RightMenu = ({
         >
           <span css={tagStyles}>{environmentTag.text}</span>
         </Label>
-      )}
+      )} */}
       <Menu
         selectable={false}
         mode="horizontal"
