@@ -161,6 +161,11 @@ export const GlobalStyles = () => (
         }
 
         .antd5-menu-submenu {
+          &.antd5-menu-submenu-active {
+            .antd5-menu-title-content {
+              color:#fff !important;
+            }
+          } 
           .antd5-menu-submenu-title {
             color:#fff;
 
@@ -168,13 +173,12 @@ export const GlobalStyles = () => (
               svg {
                 color:#fff;
               }
+            }
 
-              .antd5-menu-title-content {
-                .fa-plus {
-                  color: #fff !important;
-                } 
-              }
-              
+            .antd5-menu-title-content {
+              .fa.fa-plus {
+                color: #fff !important;
+              } 
             }
 
             + span {
@@ -184,12 +188,12 @@ export const GlobalStyles = () => (
             }
           }
 
-          &:hover {
-            &::after {
-              border-bottom-width: 3px !important;
-              border-bottom-color:#fff !important;
-            }
-          }
+          // &:hover {
+          //   &::after {
+          //     border-bottom-width: 3px !important;
+          //     border-bottom-color:#fff !important;
+          //   }
+          // }
         }
       }
 
