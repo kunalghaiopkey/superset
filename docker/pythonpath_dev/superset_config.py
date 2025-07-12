@@ -172,7 +172,7 @@ FAVICONS = [{"href": "/static/assets/images/opkey/favicon/favicon.ico"}]
 WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
 
 # Setting it to '/' would take the user to '/superset/welcome/'
-LOGO_TARGET_PATH = '/bistudio'
+LOGO_TARGET_PATH = ''
 
 # Specify tooltip that should appear when hovering over the App Icon/Logo
 LOGO_TOOLTIP = "Opkey BI-Studio"
