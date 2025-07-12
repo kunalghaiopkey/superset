@@ -117,17 +117,22 @@ export const GlobalStyles = () => (
         background-color: #023444 !important;
 
         .navbar-brand-text {
-        color: #fff !important;
-        margin-right:0px !important;
+          color: #fff !important;
+          margin-right:0px !important;
         }
 
         .main-nav {
           background-color: #023444;
 
-          li {
+          .antd5-menu-item {
             color:#fff;
 
+            &.antd5-menu-item-selected {
+              border-bottom: transparent !important;
+            }
+
             &:hover {
+              background-color:transparent !important;
               &::after {
                 border-bottom-width: 3px !important;
                 border-bottom-color: #fff !important;
@@ -135,7 +140,7 @@ export const GlobalStyles = () => (
             }
             
 
-            &.ant-menu-item-selected {
+            &.antd5-menu-item-selected {
               &::after {
                 border-bottom-width: 3px !important;
                 border-bottom-color:#fff !important;
@@ -143,36 +148,48 @@ export const GlobalStyles = () => (
             }
           }
           &:hover {
-            .ant-menu-title-content {
+            .antd5-menu-title-content {
               a {
                 color: #fff;
+
+                &::after {
+                  background-color: transparent !important;
+                }
               }
             }
           }
+        }
 
-          .ant-menu-submenu {
-            .ant-menu-submenu-title {
-              color:#fff;
+        .antd5-menu-submenu {
+          .antd5-menu-submenu-title {
+            color:#fff;
 
-              .anticon {
-                svg {
-                  color:#fff;
-                }
+            .anticon {
+              svg {
+                color:#fff;
               }
 
-              + span {
-                .ant-btn {
-                  color: red;
+              .antd5-menu-title-content {
+                .fa-plus {
+                  color: #fff !important;
                 } 
               }
+              
             }
 
-            &:hover {
-              &::after {
-                border-bottom-width: 3px !important;
-                border-bottom-color:#fff !important;
-              }
+            + span {
+              .ant-btn {
+                color: red;
+              } 
             }
+          }
+
+          &:hover {
+            &::after {
+              border-bottom-width: 3px !important;
+              border-bottom-color:#fff !important;
+            }
+          }
         }
       }
 
