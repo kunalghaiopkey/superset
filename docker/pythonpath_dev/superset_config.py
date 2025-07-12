@@ -133,3 +133,49 @@ try:
     )
 except ImportError:
     logger.info("Using default Docker config...")
+
+
+
+
+FEATURE_FLAGS = {
+    "DASHBOARD_NATIVE_FILTERS_SET": True,
+    "EMBEDDABLE_CHARTS": True,
+    "VERSIONED_EXPORT": True,
+    "DASHBOARD_NATIVE_FILTERS": True,
+    "DASHBOARD_CROSS_FILTERS": True,
+    "ENABLE_TEMPLATE_PROCESSING": True,
+    "EMBEDDED_SUPERSET": True,
+    "DRILL_TO_DETAIL": True,
+    "ALERT_REPORTS": True,
+    "SCHEDULED_QUERIES": True,
+    "ENABLE_EXPLORE_DRAG_AND_DROP": True,
+    "ENABLE_DATASET_RENAMING":True,
+    "ENABLE_REACT_CRUD_VIEWS":True,
+    "TAGGING_SYSTEM":True,
+    "ENABLE_GLOBAL_ASYNC_QUERIES":True,
+    "ENABLE_CUSTOM_COLOR_SCHEMES": True,
+    "ENABLE_FILTER_BOX": True,
+    "OMNIBAR": True,
+
+}
+
+FAB_ADD_SECURITY_API = True
+
+ENABLE_RECAPTCHA = False
+RECAPTCHA_PUBLIC_KEY = ""
+RECAPTCHA_PRIVATE_KEY = ""
+
+DEFAULT_LANGUAGE = "en"
+APP_NAME = "Opkey BI-Studio"
+APP_ICON = "/static/assets/images/opkey/opkey.png"
+FAVICONS = [{"href": "/static/assets/images/opkey/favicon/favicon.ico"}]
+WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
+
+# Setting it to '/' would take the user to '/superset/welcome/'
+LOGO_TARGET_PATH = '/bistudio'
+
+# Specify tooltip that should appear when hovering over the App Icon/Logo
+LOGO_TOOLTIP = "Opkey BI-Studio"
+
+# Specify any text that should appear to the right of the logo
+LOGO_RIGHT_TEXT = "Opkey BI-Studio"
