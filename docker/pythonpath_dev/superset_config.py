@@ -179,3 +179,19 @@ LOGO_TOOLTIP = "Opkey BI-Studio"
 
 # Specify any text that should appear to the right of the logo
 LOGO_RIGHT_TEXT = "Opkey BI-Studio"
+
+
+
+
+# APP_THEME = "custom_theme"
+
+# APP_THEME_OVERRIDES = {
+    # "custom_theme": {
+        # "primary-color": "#FF0000",
+        # "secondary-color": "#FF0000",
+        # "font-family-base": '"Helvetica Neue", Helvetica, Arial, sans-serif',
+        # "navbar-background-color": "#FF0000",
+        # "navbar-text-color": "#FF0000",
+        # "body-background-color": "#FF0000",
+    # }
+# }

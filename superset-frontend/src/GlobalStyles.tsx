@@ -112,6 +112,71 @@ export const GlobalStyles = () => (
       .ant-dropdown-menu-item {
         line-height: 1.5em !important;
       }
+
+      .top {
+        background-color: #023444 !important;
+
+        .navbar-brand-text {
+        color: #fff !important;
+        margin-right:0px !important;
+        }
+
+        .main-nav {
+          background-color: #023444;
+
+          li {
+            color:#fff;
+
+            &:hover {
+              &::after {
+                border-bottom-width: 3px !important;
+                border-bottom-color: #fff !important;
+              }
+            }
+            
+
+            &.ant-menu-item-selected {
+              &::after {
+                border-bottom-width: 3px !important;
+                border-bottom-color:#fff !important;
+              }
+            }
+          }
+          &:hover {
+            .ant-menu-title-content {
+              a {
+                color: #fff;
+              }
+            }
+          }
+
+          .ant-menu-submenu {
+            .ant-menu-submenu-title {
+              color:#fff;
+
+              .anticon {
+                svg {
+                  color:#fff;
+                }
+              }
+
+              + span {
+                .ant-btn {
+                  color: red;
+                } 
+              }
+            }
+
+            &:hover {
+              &::after {
+                border-bottom-width: 3px !important;
+                border-bottom-color:#fff !important;
+              }
+            }
+        }
+      }
+
+     
     `}
   />
 );
