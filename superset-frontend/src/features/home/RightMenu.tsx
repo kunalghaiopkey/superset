@@ -115,6 +115,42 @@ const StyledSubMenu = styled(SubMenu)`
       color: ${({ theme }) => theme.colors.primary.base};
     }
   }
+
+  &.antd5-menu-submenu {
+    &.antd5-menu-submenu-active {
+      .antd5-menu-title-content {
+        color:#fff !important;
+      }
+    } 
+    .antd5-menu-submenu-title {
+      color:#fff;
+
+      .anticon {
+        svg {
+          color:#fff;
+        }
+      }
+
+      .antd5-menu-title-content {
+        .fa.fa-plus {
+          color: #fff !important;
+        } 
+      }
+
+      + span {
+        .ant-btn {
+          color: red;
+        } 
+      }
+    }
+
+    // &:hover {
+    //   &::after {
+    //     border-bottom-width: 3px !important;
+    //     border-bottom-color:#fff !important;
+    //   }
+    // }
+  }
 `;
 
 const RightMenu = ({

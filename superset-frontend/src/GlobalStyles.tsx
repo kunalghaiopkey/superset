@@ -116,6 +116,10 @@ export const GlobalStyles = () => (
       .top {
         background-color: #023444 !important;
 
+        .navbar-brand {
+          max-width: 8rem !important;
+        }
+
         .navbar-brand-text {
           color: #fff !important;
           margin-right:0px !important;

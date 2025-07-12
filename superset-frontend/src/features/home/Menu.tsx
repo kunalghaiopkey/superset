@@ -42,7 +42,7 @@ interface MenuProps {
 
 const StyledHeader = styled.header`
   ${({ theme }) => `
-      background-color: ${theme.colors.grayscale.light5};
+      background-color: #023444 !important;
       margin-bottom: 2px;
       z-index: 10;
 
@@ -52,6 +52,16 @@ const StyledHeader = styled.header`
       .caret {
         display: none;
       }
+
+      .navbar-brand {
+        max-width: 8rem !important;
+      }
+
+      .navbar-brand-text {
+        color: #fff !important;
+        margin-right:0px !important;
+      }
+
       .navbar-brand {
         display: flex;
         flex-direction: column;
@@ -115,6 +125,45 @@ const StyledHeader = styled.header`
           display: none;
         }
       }
+
+      .antd5-menu {
+        background-color: #023444;
+
+        .antd5-menu-item {
+          color:#fff;
+
+          &.antd5-menu-item-selected {
+            border-bottom: transparent !important;
+          }
+
+          &:hover {
+            background-color:transparent !important;
+            &::after {
+              border-bottom-width: 3px !important;
+              border-bottom-color: #fff !important;
+            }
+          }
+          
+
+          &.antd5-menu-item-selected {
+            &::after {
+              border-bottom-width: 3px !important;
+              border-bottom-color:#fff !important;
+            }
+          }
+        }
+        &:hover {
+          .antd5-menu-title-content {
+            a {
+              color: #fff;
+
+              &::after {
+                background-color: transparent !important;
+              }
+            }
+          }
+        }
+      }
   `}
 `;
 const { SubMenu } = MainNav;
@@ -124,6 +173,42 @@ const StyledSubMenu = styled(SubMenu)`
     .antd5-menu-title-content {
       color: ${({ theme }) => theme.colors.primary.base};
     }
+  }
+
+  &.antd5-menu-submenu {
+    &.antd5-menu-submenu-active {
+      .antd5-menu-title-content {
+        color:#fff !important;
+      }
+    } 
+    .antd5-menu-submenu-title {
+      color:#fff;
+
+      .anticon {
+        svg {
+          color:#fff;
+        }
+      }
+
+      .antd5-menu-title-content {
+        .fa.fa-plus {
+          color: #fff !important;
+        } 
+      }
+
+      + span {
+        .ant-btn {
+          color: red;
+        } 
+      }
+    }
+
+    // &:hover {
+    //   &::after {
+    //     border-bottom-width: 3px !important;
+    //     border-bottom-color:#fff !important;
+    //   }
+    // }
   }
 `;
 
