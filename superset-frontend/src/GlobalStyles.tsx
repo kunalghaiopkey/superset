@@ -117,6 +117,12 @@ export const GlobalStyles = () => (
         color: ${theme.colors.grayscale.light5} !important;
         background-color: ${theme.colors.customcolor.btntheme} !important;
       }
+
+      .antd5-btn-variant-outlined {
+        color: ${theme.colors.customcolor.btntextcolor} !important;
+        background-color: ${theme.colors.grayscale.light5} !important;
+        border : 1px solid ${theme.colors.customcolor.bordercolor} !important;
+      }
     `}
   />
 );
