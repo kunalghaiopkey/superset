@@ -169,7 +169,7 @@ DEFAULT_LANGUAGE = "en"
 APP_NAME = "Opkey BI Studio"
 APP_ICON = "/static/assets/images/opkey/opkey.png"
 FAVICONS = [{"href": "/static/assets/images/opkey/favicon/favicon.ico"}]
-WELCOME_MESSAGE = "Welcome to BI Studio"
+WELCOME_MESSAGE = "Welcome to Opkey BI Studio"
 
 # Setting it to '/' would take the user to '/superset/welcome/'
 LOGO_TARGET_PATH = ''
@@ -178,7 +178,7 @@ LOGO_TARGET_PATH = ''
 LOGO_TOOLTIP = "Opkey BI Studio"
 
 # Specify any text that should appear to the right of the logo
-LOGO_RIGHT_TEXT = "BI Studio"
+# LOGO_RIGHT_TEXT = "Opkey BI Studio"
 
 
 
