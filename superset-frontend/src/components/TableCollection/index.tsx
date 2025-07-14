@@ -50,9 +50,12 @@ export const Table = styled.table`
       }
     }
     th {
-      background: ${theme.colors.grayscale.light5};
+      background: ${theme.colors.customcolor.gridheader}; 
       position: sticky;
       top: 0;
+      font-size: ${theme.typography.sizes.s}px;
+      color: ${theme.colors.customcolor.gridheadertext};
+      font-weight: ${theme.typography.weights.medium};
 
       &:first-of-type {
         padding-left: ${theme.gridUnit * 4}px;
@@ -154,7 +157,7 @@ export const Table = styled.table`
       }
 
       &:hover {
-        background-color: ${theme.colors.secondary.light5};
+        background-color: ${theme.colors.customcolor.gridrowhover};
 
         .actions {
           opacity: 1;

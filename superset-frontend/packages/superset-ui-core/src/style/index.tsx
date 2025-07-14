@@ -60,6 +60,12 @@ const defaultTheme = {
       label: '#879399',
       help: '#737373',
     },
+
+    customcolor: {
+      gridheader : '#F9FAFB',
+      gridheadertext : '#667085',
+      gridrowhover : '#F6FEFF',
+    },
     primary: {
       base: '#20A7C9',
       dark1: '#1A85A0',
