@@ -100,8 +100,12 @@ const BulkSelectWrapper = styled(Alert)`
     }
 
     .deselect-all, .tag-btn {
-      color: ${theme.colors.primary.base};
+      color: ${theme.colors.grayscale.dark2};
       margin-left: ${theme.gridUnit * 4}px;
+
+      :hover {
+        text-decoration: underline;
+      }
     }
 
     .divider {
