@@ -112,6 +112,11 @@ export const GlobalStyles = () => (
       .ant-dropdown-menu-item {
         line-height: 1.5em !important;
       }
+
+      .antd5-btn-variant-solid {
+        color: ${theme.colors.grayscale.light5} !important;
+        background-color: ${theme.colors.customcolor.btntheme} !important;
+      }
     `}
   />
 );

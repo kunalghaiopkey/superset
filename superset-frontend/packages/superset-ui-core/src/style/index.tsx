@@ -65,6 +65,7 @@ const defaultTheme = {
       gridheader : '#F9FAFB',
       gridheadertext : '#667085',
       gridrowhover : '#F6FEFF',
+      btntheme : '#116173',
     },
     primary: {
       base: '#20A7C9',
