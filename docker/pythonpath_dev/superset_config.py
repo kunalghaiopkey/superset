@@ -183,15 +183,38 @@ LOGO_RIGHT_TEXT = "Opkey BI-Studio"
 
 
 
-# APP_THEME = "custom_theme"
+# Security Flags
 
-# APP_THEME_OVERRIDES = {
-    # "custom_theme": {
-        # "primary-color": "#FF0000",
-        # "secondary-color": "#FF0000",
-        # "font-family-base": '"Helvetica Neue", Helvetica, Arial, sans-serif',
-        # "navbar-background-color": "#FF0000",
-        # "navbar-text-color": "#FF0000",
-        # "body-background-color": "#FF0000",
-    # }
+
+WTF_CSRF_ENABLED = True  # Enabled by default
+
+ENABLE_CORS = True
+
+# CORS_OPTIONS = {
+    # "origins": ["https://opkeyone.com"],
+    # "methods": ["GET", "POST"],
+    # "allow_headers": ["Content-Type", "Authorization"],
 # }
+
+# Duration of login session (in seconds)
+# PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
+
+# Force HTTPS for cookies
+SESSION_COOKIE_SECURE = True
+
+# Prevent JS access to cookies
+SESSION_COOKIE_HTTPONLY = True
+
+
+TALISMAN_ENABLED = True
+
+TALISMAN_CONFIG = {
+    "content_security_policy": {
+        "default-src": ["'self'"],
+        "img-src": ["'self'", "data:", "https:"],
+        "script-src": ["'self'", "'unsafe-inline'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+    },
+    "force_https": True,
+    "strict_transport_security": True,
+}
