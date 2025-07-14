@@ -110,13 +110,20 @@ const styledChildMenu = (theme: SupersetTheme) => css`
 const { SubMenu } = Menu;
 
 const StyledSubMenu = styled(SubMenu)`
+
   &.antd5-menu-submenu-active {
     .antd5-menu-title-content {
       color: ${({ theme }) => theme.colors.primary.base};
     }
+
+    &.antd5-menu-submenu-vertical {
+      .antd5-menu-title-content {
+        color: #000 !important;
+      }
+    }
   }
 
-  &.antd5-menu-submenu {
+  &.antd5-menu-submenu.antd5-menu-submenu-horizontal {
     &.antd5-menu-submenu-active {
       .antd5-menu-title-content {
         color:#fff !important;
