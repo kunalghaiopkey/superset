@@ -48,12 +48,25 @@ export const Table = styled.table`
       tr:first-of-type > td {
         border-top: 0;
       }
+
+      .table-row {
+        .table-cell {
+          color: ${theme.colors.customcolor.btntextcolor};
+          font-size: ${theme.typography.sizes.m}px;
+
+          span {
+            a {
+              color: ${theme.colors.customcolor.btntextcolor};
+            }
+          }
+        }
+      }
     }
     th {
       background: ${theme.colors.customcolor.gridheader}; 
       position: sticky;
       top: 0;
-      font-size: ${theme.typography.sizes.s}px;
+      font-size: ${theme.colors.customcolor.fontsize13}px;
       color: ${theme.colors.customcolor.gridheadertext};
       font-weight: ${theme.typography.weights.medium};
 

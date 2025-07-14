@@ -68,7 +68,8 @@ const defaultTheme = {
       gridselected : '#E6FBFE',
       btntheme : '#116173',
       btntextcolor: '#344054',
-      bordercolor : '#D0D5DD'
+      bordercolor : '#D0D5DD',
+      fontsize13 : 13,
     },
     primary: {
       base: '#20A7C9',
