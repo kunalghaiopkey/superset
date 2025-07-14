@@ -65,7 +65,10 @@ const defaultTheme = {
       gridheader : '#F9FAFB',
       gridheadertext : '#667085',
       gridrowhover : '#F6FEFF',
+      gridselected : '#E6FBFE',
       btntheme : '#116173',
+      btntextcolor: '#344054',
+      bordercolor : '#D0D5DD'
     },
     primary: {
       base: '#20A7C9',

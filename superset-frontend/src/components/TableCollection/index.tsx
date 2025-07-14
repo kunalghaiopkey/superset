@@ -167,10 +167,10 @@ export const Table = styled.table`
     }
 
     .table-row-selected {
-      background-color: ${theme.colors.secondary.light4};
+      background-color: ${theme.colors.customcolor.gridselected};
 
       &:hover {
-        background-color: ${theme.colors.secondary.light4};
+        background-color: ${theme.colors.customcolor.gridrowhover};
       }
     }
 
