@@ -62,6 +62,19 @@ const StyledHeader = styled.div`
         border-bottom: transparent;
       }
     }
+
+    .antd5-btn-link {
+      color: ${({ theme }) => theme.colors.customcolor.btntextcolor};
+      padding: 0 8px;
+
+      &:hover {
+        color : ${({ theme }) => theme.colors.customcolor.btntheme} !important;
+      }
+
+      .anticon {
+        font-size: ${({ theme }) => theme.typography.sizes.fs18}rem;
+      }
+    }
   }
   .nav-right-collapse {
     display: flex;
