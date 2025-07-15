@@ -156,6 +156,11 @@ const defaultTheme = {
       l: 16,
       xl: 21,
       xxl: 28,
+      fs12 : 0.86,
+      fs13 : 0.93,
+      fs14 : 1,
+      fs16 : 1.14,
+      fs18 : 1.29,
     },
   },
   zIndex: {

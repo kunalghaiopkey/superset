@@ -52,7 +52,7 @@ export const Table = styled.table`
       .table-row {
         .table-cell {
           color: ${theme.colors.customcolor.btntextcolor};
-          font-size: ${theme.typography.sizes.m}px;
+          font-size: ${theme.typography.sizes.fs14}rem;
 
           span {
             a {
@@ -66,7 +66,7 @@ export const Table = styled.table`
       background: ${theme.colors.customcolor.gridheader}; 
       position: sticky;
       top: 0;
-      font-size: ${theme.typography.sizes.m}px;
+      font-size: ${theme.typography.sizes.fs13}rem;
       color: ${theme.colors.customcolor.gridheadertext};
       font-weight: ${theme.typography.weights.medium};
 
@@ -152,7 +152,7 @@ export const Table = styled.table`
 
       .action-button {
         .anticon {
-          font-size : ${theme.typography.sizes.xl}px;
+          font-size : ${theme.typography.sizes.fs18}rem;
         }
       }
 

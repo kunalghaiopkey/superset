@@ -116,12 +116,14 @@ export const GlobalStyles = () => (
       .antd5-btn-variant-solid {
         color: ${theme.colors.grayscale.light5} !important;
         background-color: ${theme.colors.customcolor.btntheme} !important;
+        font-size : ${theme.typography.sizes.fs12}rem !important;
       }
 
       .antd5-btn-variant-outlined {
         color: ${theme.colors.customcolor.btntextcolor} !important;
         background-color: ${theme.colors.grayscale.light5} !important;
         border : 1px solid ${theme.colors.customcolor.bordercolor} !important;
+        font-size : ${theme.typography.sizes.fs12}rem !important;
       }
     `}
   />
