@@ -66,7 +66,7 @@ export const Table = styled.table`
       background: ${theme.colors.customcolor.gridheader}; 
       position: sticky;
       top: 0;
-      font-size: ${theme.colors.customcolor.fontsize13}px;
+      font-size: ${theme.typography.sizes.m}px;
       color: ${theme.colors.customcolor.gridheadertext};
       font-weight: ${theme.typography.weights.medium};
 
@@ -152,7 +152,7 @@ export const Table = styled.table`
 
       .action-button {
         .anticon {
-          font-size : ${theme.colors.customcolor.fontsize18}px;
+          font-size : ${theme.typography.sizes.xl}px;
           color: red;
         }
       }
