@@ -70,6 +70,7 @@ const defaultTheme = {
       btntextcolor: '#344054',
       bordercolor : '#D0D5DD',
       fontsize13 : 13,
+      fontsize18 : 18,
     },
     primary: {
       base: '#20A7C9',

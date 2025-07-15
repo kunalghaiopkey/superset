@@ -150,13 +150,20 @@ export const Table = styled.table`
       white-space: nowrap;
       min-width: 100px;
 
+      .action-button {
+        .anticon {
+          font-size : ${theme.colors.customcolor.fontsize18}px;
+          color: red;
+        }
+      }
+
       svg,
       i {
         margin-right: 8px;
 
         &:hover {
           path {
-            fill: ${theme.colors.primary.base};
+            fill: ${theme.colors.customcolor.btntheme};
           }
         }
       }
