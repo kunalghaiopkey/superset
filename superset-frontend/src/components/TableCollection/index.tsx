@@ -153,7 +153,6 @@ export const Table = styled.table`
       .action-button {
         .anticon {
           font-size : ${theme.typography.sizes.xl}px;
-          color: red;
         }
       }
 
