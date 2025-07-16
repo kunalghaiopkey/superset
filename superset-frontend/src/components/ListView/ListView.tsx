@@ -56,6 +56,42 @@ const ListViewStyles = styled.div`
         flex-wrap: wrap;
         column-gap: ${({ theme }) => theme.gridUnit * 6}px;
         row-gap: ${({ theme }) => theme.gridUnit * 4}px;
+
+        label {
+          font-size: ${({ theme }) => theme.typography.sizes.fs13}rem;
+          font-weight: ${({ theme }) => theme.typography.weights.bold};
+          color: ${({ theme }) => theme.colors.customcolor.btntextcolor};
+        }
+
+        .ant-input-affix-wrapper {
+          border: 1px solid #d0d5dd !important;
+
+          &:hover {
+            border: 1px solid ${({ theme }) => theme.colors.customcolor.btntheme} !important;
+          }
+
+          &.ant-input-affix-wrapper-focused {
+            outline: ${({ theme }) => theme.colors.customcolor.btntheme} auto 1px !important;
+            box-shadow: none ;
+          }
+        }
+
+        .ant-select {
+          .ant-select-selector {
+            border: 1px solid #d0d5dd !important;
+
+            &:hover {
+              border: 1px solid ${({ theme }) => theme.colors.customcolor.btntheme} !important;
+            }
+          }
+
+          &.ant-select-focused {
+            .ant-select-selector {
+              outline: ${({ theme }) => theme.colors.customcolor.btntheme} auto 1px !important;
+              box-shadow: none ;
+            }
+          }
+        }
       }
     }
 
