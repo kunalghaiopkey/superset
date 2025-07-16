@@ -69,6 +69,7 @@ const defaultTheme = {
       btntheme : '#116173',
       btntextcolor: '#344054',
       bordercolor : '#D0D5DD',
+      placeholdercolor : '#ACACAC',
     },
     primary: {
       base: '#20A7C9',

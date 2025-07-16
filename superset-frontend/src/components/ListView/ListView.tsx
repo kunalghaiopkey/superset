@@ -49,6 +49,7 @@ const ListViewStyles = styled.div`
 
     .header {
       display: flex;
+      align-items: flex-end;
       padding-bottom: ${({ theme }) => theme.gridUnit * 4}px;
 
       & .controls {
@@ -74,14 +75,40 @@ const ListViewStyles = styled.div`
             outline: ${({ theme }) => theme.colors.customcolor.btntheme} auto 1px !important;
             box-shadow: none ;
           }
+
+          .ant-input-prefix {
+            .anticon {
+              color:  ${({ theme }) => theme.colors.customcolor.btntextcolor}; 
+            }
+          }
+          
+          .ant-input {
+            font-size: ${({ theme }) => theme.typography.sizes.fs13}rem;
+          }
+
+          .ant-input::placeholder {
+            font-size: ${({ theme }) => theme.typography.sizes.fs13}rem;
+            font-weight:  ${({ theme }) => theme.typography.weights.normal};
+            color: ${({ theme }) => theme.colors.customcolor.placeholdercolor};
+          }
         }
 
         .ant-select {
           .ant-select-selector {
             border: 1px solid #d0d5dd !important;
 
+            .ant-select-selection-item {
+              font-size: ${({ theme }) => theme.typography.sizes.fs13}rem;
+            }
+
             &:hover {
               border: 1px solid ${({ theme }) => theme.colors.customcolor.btntheme} !important;
+            }
+
+            .ant-select-selection-placeholder {
+              font-size: ${({ theme }) => theme.typography.sizes.fs13}rem;
+              font-weight:  ${({ theme }) => theme.typography.weights.normal};
+              color: ${({ theme }) => theme.colors.customcolor.placeholdercolor};
             }
           }
 
@@ -89,6 +116,16 @@ const ListViewStyles = styled.div`
             .ant-select-selector {
               outline: ${({ theme }) => theme.colors.customcolor.btntheme} auto 1px !important;
               box-shadow: none ;
+            }
+          }
+
+          .ant-select-dropdown  {
+            .ant-select-item {
+              font-size : ${({ theme }) => theme.typography.sizes.fs13}rem;
+
+              &.ant-select-item-option-active {
+                background-color : ${({ theme }) => theme.colors.customcolor.gridrowhover};
+              }
             }
           }
         }
@@ -178,10 +215,12 @@ const bulkSelectColumnConfig = {
 };
 
 const ViewModeContainer = styled.div`
-  padding-right: ${({ theme }) => theme.gridUnit * 4}px;
-  margin-top: ${({ theme }) => theme.gridUnit * 5 + 1}px;
+  margin-right: ${({ theme }) => theme.gridUnit * 4}px;
+  // margin-top: ${({ theme }) => theme.gridUnit * 5 + 1}px;
   white-space: nowrap;
   display: inline-block;
+  border-radius: .25rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, .2);
 
   .toggle-button {
     display: inline-block;
@@ -189,13 +228,17 @@ const ViewModeContainer = styled.div`
     padding: ${({ theme }) => theme.gridUnit}px;
     padding-bottom: ${({ theme }) => theme.gridUnit * 0.5}px;
 
-    &:first-of-type {
-      margin-right: ${({ theme }) => theme.gridUnit * 2}px;
+    // &:first-of-type {
+    //   margin-right: ${({ theme }) => theme.gridUnit * 2}px;
+    // }
+
+    .anticon {
+      font-size : ${({ theme }) => theme.typography.sizes.xl};
     }
   }
 
   .active {
-    background-color: ${({ theme }) => theme.colors.grayscale.base};
+    background-color:${({ theme }) => theme.colors.customcolor.btntheme};
     svg {
       color: ${({ theme }) => theme.colors.grayscale.light5};
     }
