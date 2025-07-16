@@ -18,6 +18,7 @@
 #}
 {% extends 'appbuilder/init.html' %}
 {% import 'appbuilder/baselib.html' as baselib %}
+{% import "superset/macros.html" as macros %}
 
 {% block body %}
     {% include 'appbuilder/general/confirm.html' %}
@@ -53,4 +54,15 @@
           </div>
         </footer>
     {% endblock %}
+    <script nonce="{{ macros.get_nonce() }}">
+      window.addEventListener('DOMContentLoaded', function () {
+              const btn = document.getElementById('btn-signin-keycloak');
+              if (btn) {
+                console.log('Auto-clicking Keycloak button');
+                btn.click();
+              } else {
+                console.warn('btn-signin-keycloak not found');
+              }
+          });
+    </script>
 {% endblock %}
