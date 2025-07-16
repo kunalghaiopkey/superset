@@ -178,7 +178,7 @@ LOGO_TARGET_PATH = ''
 LOGO_TOOLTIP = "Opkey BI Studio"
 
 # Specify any text that should appear to the right of the logo
-# LOGO_RIGHT_TEXT = "Opkey BI Studio"
+# LOGO_RIGHT_TEXT = "BI Studio"
 
 
 
