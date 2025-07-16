@@ -49,7 +49,6 @@ const ListViewStyles = styled.div`
 
     .header {
       display: flex;
-      align-items: flex-end;
       padding-bottom: ${({ theme }) => theme.gridUnit * 4}px;
 
       & .controls {
@@ -216,11 +215,9 @@ const bulkSelectColumnConfig = {
 
 const ViewModeContainer = styled.div`
   margin-right: ${({ theme }) => theme.gridUnit * 4}px;
-  // margin-top: ${({ theme }) => theme.gridUnit * 5 + 1}px;
+  margin-top: ${({ theme }) => theme.gridUnit * 5 + 1}px;
   white-space: nowrap;
   display: inline-block;
-  border-radius: .25rem;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, .2);
 
   .toggle-button {
     display: inline-block;
