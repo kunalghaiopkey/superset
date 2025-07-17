@@ -139,6 +139,20 @@ export const GlobalStyles = () => (
           font-size: ${theme.typography.sizes.fs18}rem;
         }
       }
+
+      .echarts-tooltip {
+        table {
+          width : 100%;
+
+          tbody {
+            tr {
+              td {
+                padding: 4px;
+              }
+            }
+          }
+        }
+      }
     `}
   />
 );
