@@ -127,8 +127,8 @@ export const GlobalStyles = () => (
       }
 
       .antd5-btn-link {
-        color: ${theme.colors.customcolor.btntextcolor};
-        padding: 0 8px;
+        color: ${theme.colors.customcolor.btntextcolor} !important;
+        padding: 0 8px !important;
         border : 1px solid #d0d5dd !important;
   
         &:hover {
@@ -137,6 +137,13 @@ export const GlobalStyles = () => (
   
         .anticon {
           font-size: ${theme.typography.sizes.fs18}rem;
+        }
+      }
+
+      .antd5-btn-variant-solid , .antd5-btn-variant-outlined , .antd5-btn-link {
+        &:disabled {
+          background-color : ${theme.colors.grayscale.light2} !important;
+          color: ${theme.colors.grayscale.base} !important;
         }
       }
 
