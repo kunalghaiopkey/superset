@@ -71,7 +71,7 @@ const DashboardBuilder = lazy(
     ),
 );
 
-const originalDocumentTitle = document.title;
+// const originalDocumentTitle = document.title;
 
 type PageProps = {
   idOrSlug: string;
@@ -131,7 +131,8 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
 
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);
-  const { dashboard_title, css, id = 0 } = dashboard || {};
+  // const { dashboard_title, css, id = 0 } = dashboard || {};
+  const {  css, id = 0 } = dashboard || {};
 
   useEffect(() => {
     // mark tab id as redundant when user closes browser tab - a new id will be
@@ -199,14 +200,14 @@ export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readyToRender]);
 
-  useEffect(() => {
-    if (dashboard_title) {
-      document.title = dashboard_title;
-    }
-    return () => {
-      document.title = originalDocumentTitle;
-    };
-  }, [dashboard_title]);
+  // useEffect(() => {
+  //   if (dashboard_title) {
+  //     document.title = dashboard_title;
+  //   }
+  //   return () => {
+  //     document.title = originalDocumentTitle;
+  //   };
+  // }, [dashboard_title]);
 
   useEffect(() => {
     if (typeof css === 'string') {
