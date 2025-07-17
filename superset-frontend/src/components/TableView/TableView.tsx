@@ -89,7 +89,6 @@ const TableViewStyles = styled.div<{
     z-index: 1;
     border-bottom: ${({ theme }) =>
       `${theme.gridUnit - 2}px solid ${theme.colors.grayscale.light2}`};
-    ${({ small }) => small && `padding-bottom: 0;`}
   }
 `;
 
