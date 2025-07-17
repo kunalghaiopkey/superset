@@ -603,3 +603,89 @@ hr {
   background-image: url('../images/icons/error_solid_small_red.svg') !important;
   background-position: -2px center !important;
 }
+
+.ant-input-affix-wrapper {
+  border: 1px solid #d0d5dd !important;
+
+  &:hover {
+    border: 1px solid #116173 !important;
+  }
+
+  &.ant-input-affix-wrapper-focused {
+    outline: #116173 auto 1px !important;
+    box-shadow: none ;
+  }
+
+  .ant-input-prefix {
+    .anticon {
+      color: #344054; 
+    }
+  }
+  
+  .ant-input {
+    font-size: 0.96rem;
+  }
+
+  .ant-input::placeholder {
+    font-size: 0.96rem;
+    font-weight:  400;
+    color: #ACACAC;
+  }
+}
+
+.ant-select {
+  .ant-select-selector {
+    border: 1px solid #d0d5dd !important;
+
+    .ant-select-selection-item {
+      font-size: 0.96rem;
+    }
+
+    &:hover {
+      border: 1px solid #116173 !important;
+    }
+
+    .ant-select-selection-placeholder {
+      font-size: 0.96rem;
+      font-weight:  400;
+      color: #ACACAC;
+    }
+  }
+
+  &.ant-select-focused {
+    .ant-select-selector {
+      outline: #116173 auto 1px !important;
+      box-shadow: none ;
+    }
+  }
+
+  .ant-select-dropdown  {
+    border-radius: 8px;
+    .ant-select-item {
+      font-size : 0.96rem;
+
+      &.ant-select-item-option-active {
+        background-color : #F6FEFF;
+      }
+    }
+  }
+}
+
+.antd5-card {
+  border-top: 3px solid #116173 !important;
+  border-radius: 8px;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, .24) 0 3px 8px !important;
+  }
+
+  .card-actions {
+    .anticon.ant-dropdown-trigger {
+      font-size: 18px;
+    }
+  }
+}
+
+.ant-tag {
+  border: 1px solid transparent !important;
+}

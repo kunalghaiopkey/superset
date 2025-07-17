@@ -125,6 +125,20 @@ export const GlobalStyles = () => (
         border : 1px solid ${theme.colors.customcolor.bordercolor} !important;
         font-size : ${theme.typography.sizes.fs12}rem !important;
       }
+
+      .antd5-btn-link {
+        color: ${theme.colors.customcolor.btntextcolor};
+        padding: 0 8px;
+        border : 1px solid #d0d5dd !important;
+  
+        &:hover {
+          color : ${theme.colors.customcolor.btntheme} !important;
+        }
+  
+        .anticon {
+          font-size: ${theme.typography.sizes.fs18}rem;
+        }
+      }
     `}
   />
 );
