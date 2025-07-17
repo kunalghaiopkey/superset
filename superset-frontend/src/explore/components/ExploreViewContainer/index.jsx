@@ -107,6 +107,7 @@ const ExplorePanelContainer = styled.div`
     flex: 1;
     flex-wrap: nowrap;
     border-top: 1px solid ${theme.colors.grayscale.light2};
+    overflow: auto;
     .explore-column {
       display: flex;
       flex-direction: column;
@@ -139,6 +140,14 @@ const ExplorePanelContainer = styled.div`
       justify-content: space-between;
       .horizontal-text {
         font-size: ${theme.typography.sizes.m}px;
+      }
+
+      .action-button {
+        .anticon.collapse-icon {
+          svg {
+            color : ${theme.colors.customcolor.btntextcolor};
+          }
+        } 
       }
     }
     .no-show {

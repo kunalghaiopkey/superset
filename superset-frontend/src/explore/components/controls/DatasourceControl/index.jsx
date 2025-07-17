@@ -78,6 +78,11 @@ const Styles = styled.div`
     border-bottom: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
     padding: ${({ theme }) => 4 * theme.gridUnit}px;
     padding-right: ${({ theme }) => 2 * theme.gridUnit}px;
+
+    .anticon {
+      font-size : ${({ theme }) => theme.typography.sizes.fs18}rem;
+      color: ${({ theme }) => theme.colors.customcolor.btntextcolor};
+    }
   }
   .error-alert {
     margin: ${({ theme }) => 2 * theme.gridUnit}px;
