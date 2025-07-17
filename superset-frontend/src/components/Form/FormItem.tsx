@@ -24,8 +24,9 @@ const StyledItem = styled(Form.Item)`
     .ant-form-item-label {
       padding-bottom: ${theme.gridUnit}px;
       & > label {
-        font-size: ${theme.typography.sizes.s}px;
-        color: ${theme.colors.grayscale.base};
+        font-size: ${theme.typography.sizes.fs13}rem;
+        font-weight: ${theme.typography.weights.bold};
+        color: ${theme.colors.customcolor.btntextcolor};
 
         &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
           &::before {

@@ -132,7 +132,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
 
   return (
     <div className="ControlHeader" data-test={`${name}-header`}>
-      <div className="pull-left">
+      <div className="pull-left form-label-chart">
         <FormLabel
           css={(theme: SupersetTheme) => css`
             margin-bottom: ${theme.gridUnit * 0.5}px;
