@@ -118,7 +118,8 @@ const LeftPane = styled.div`
 
   .ant-collapse .ant-collapse-item {
     .ant-collapse-header {
-      font-size: ${({ theme }) => theme.typography.sizes.s}px;
+      font-size: ${({ theme }) => theme.typography.sizes.m}px;
+      font-weight: ${({ theme }) => theme.typography.weights.medium};
       color: ${({ theme }) => theme.colors.grayscale.base};
       padding-left: ${({ theme }) => theme.gridUnit * 2}px;
       padding-bottom: ${({ theme }) => theme.gridUnit}px;
@@ -176,12 +177,19 @@ const SelectorLabel = styled.button`
       outline: initial;
     }
 
+    &:hover {
+      background-color :${theme.colors.customcolor.listhover};
+      color: ${theme.colors.customcolor.listselectcolor} ;
+    }
+
     &.selected {
-      background-color: ${theme.colors.primary.base};
-      color: ${theme.colors.primary.light5};
+      // background-color: ${theme.colors.primary.base};
+      // color: ${theme.colors.primary.light5};
+      background-color :${theme.colors.customcolor.listhover};
+      color: ${theme.colors.customcolor.listselectcolor} ;
 
       svg {
-        color: ${theme.colors.primary.light5};
+        color: ${theme.colors.customcolor.listselectcolor};
       }
 
       &:hover {

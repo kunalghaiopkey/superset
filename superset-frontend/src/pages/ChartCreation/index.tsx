@@ -100,6 +100,10 @@ const StyledContainer = styled.div`
       & > span {
         color: ${theme.colors.grayscale.light1};
         margin-left: ${theme.gridUnit * 4}px;
+
+        a {
+          color : ${theme.colors.customcolor.linkcolor};
+        }
       }
     }
 
@@ -135,6 +139,8 @@ const StyledContainer = styled.div`
       width: ${theme.gridUnit * 5}px;
       height: ${theme.gridUnit * 5}px;
       line-height: ${theme.gridUnit * 5}px;
+      background-color: ${theme.colors.customcolor.btntheme};
+      border-color: ${theme.colors.customcolor.btntheme};
     }
 
     &&&& .antd5-steps-item-title {

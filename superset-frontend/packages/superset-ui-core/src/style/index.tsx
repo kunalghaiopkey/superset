@@ -70,6 +70,9 @@ const defaultTheme = {
       btntextcolor: '#344054',
       bordercolor : '#D0D5DD',
       placeholdercolor : '#ACACAC',
+      listhover : '#11617314',
+      listselectcolor : '#004352',
+      linkcolor : '#007BFF',
     },
     primary: {
       base: '#20A7C9',
