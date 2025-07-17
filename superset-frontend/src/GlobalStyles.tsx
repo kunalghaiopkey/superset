@@ -137,6 +137,7 @@ export const GlobalStyles = () => (
   
         .anticon {
           font-size: ${theme.typography.sizes.fs18}rem;
+          color: ${theme.colors.customcolor.btntextcolor};
         }
       }
 
