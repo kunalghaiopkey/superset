@@ -71,13 +71,16 @@ const StyledHeader = styled.div`
     float: left;
     padding-left: 10px;
   }
+
   .menu {
     background-color: ${({ theme }) => theme.colors.grayscale.light5};
+    align-items: center;
   }
 
-  .menu > .antd5-menu {
-    padding: ${({ theme }) => theme.gridUnit * 5}px
-      ${({ theme }) => theme.gridUnit * 8}px;
+  .menu .header + .antd5-menu:has(li) {
+    padding: 0.5rem;
+    background-color: ${({ theme }) => theme.colors.secondary.light4};
+    border-radius: 0.5rem;
 
     .antd5-menu-item {
       border-radius: ${({ theme }) => theme.borderRadius}px;
@@ -85,10 +88,12 @@ const StyledHeader = styled.div`
       padding: ${({ theme }) => theme.gridUnit}px
         ${({ theme }) => theme.gridUnit * 4}px;
       margin-right: ${({ theme }) => theme.gridUnit}px;
+      color: ${({ theme }) => theme.colors.customcolor.btntextcolor};
     }
     .antd5-menu-item:hover,
     .antd5-menu-item:has(> span > .active) {
-      background-color: ${({ theme }) => theme.colors.secondary.light4};
+      background-color: ${({ theme }) => theme.colors.customcolor.btntheme};
+      color : ${({ theme }) => theme.colors.grayscale.light5};
     }
   }
 
