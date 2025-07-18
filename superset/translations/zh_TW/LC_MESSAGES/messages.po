@@ -11614,7 +11614,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"This fields acts a Superset view, meaning that Superset will run a query "
+"This fields acts a Superset view, meaning that BIStudio run a query "
 "against this string as a subquery."
 msgstr "這個欄位執行 Superset 視圖時，意味着 Superset 將以子查詢的形式對字符串運行查詢。"
 
@@ -12156,17 +12156,17 @@ msgid "Unable to load dashboard"
 msgstr "增加到看板"
 
 msgid ""
-"Unable to migrate query editor state to backend. Superset will retry "
+"Unable to migrate query editor state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr "無法將查詢編輯器狀態遷移到後端。系统將稍後重試。如果此問題仍然存在，請與管理員聯繫。"
 
 msgid ""
-"Unable to migrate query state to backend. Superset will retry later. "
+"Unable to migrate query state to backend. BIStudio retry later. "
 "Please contact your administrator if this problem persists."
 msgstr "無法將查詢狀態遷移到後端。系统將稍後重試。如果此問題仍然存在，請與管理員聯繫。"
 
 msgid ""
-"Unable to migrate table schema state to backend. Superset will retry "
+"Unable to migrate table schema state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr "無法將表結構狀態遷移到後端。系统將稍後重試。如果此問題仍然存在，請與管理員聯繫。"
 
@@ -12864,7 +12864,7 @@ msgid "When only a primary metric is provided, a categorical color scale is used
 msgstr "如果只提供了一個主計量指標，则使用分類色階。"
 
 msgid ""
-"When specifying SQL, the datasource acts as a view. Superset will use "
+"When specifying SQL, the datasource acts as a view. BIStudio use "
 "this statement as a subquery while grouping and filtering on the "
 "generated parent queries."
 msgstr "指定 SQL 時，數據源會充當視圖。在對生成的父查詢進行分組和篩選時，系统將使用此語句作為子查詢。"

@@ -367,7 +367,7 @@ class OcientEngineSpec(BaseEngineSpec):
     @classmethod
     def get_cancel_query_id(cls, cursor: Any, query: Query) -> Optional[str]:
         # Return a Non-None value
-        # If None is returned, Superset will not call cancel_query
+        # If None is returned, BIStudio not call cancel_query
         return "DUMMY_VALUE"
 
     @classmethod

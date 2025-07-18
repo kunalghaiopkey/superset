@@ -197,5 +197,5 @@ def upgrade():
 def downgrade():
     # note: this upgrade is irreversible.
     # this migration removed all iframe, separator, and markup type slices,
-    # and Superset will not support these 3 viz_type anymore.
+    # and BIStudio not support these 3 viz_type anymore.
     pass

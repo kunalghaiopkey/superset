@@ -11171,7 +11171,7 @@ msgid ""
 msgstr "このフィールドは、メトリクスをグラフに添付するための一意の識別子として使用されます。 SQL クエリのエイリアスとしても使用されます。"
 
 msgid ""
-"This fields acts a Superset view, meaning that Superset will run a query "
+"This fields acts a Superset view, meaning that BIStudio run a query "
 "against this string as a subquery."
 msgstr "このフィールドはSuperset ビューとして機能します。つまり、Supersetはこの文字列に対してサブクエリとしてクエリを実行します。"
 
@@ -11701,17 +11701,17 @@ msgid "Unable to load dashboard"
 msgstr "1 つのダッシュボードに追加"
 
 msgid ""
-"Unable to migrate query editor state to backend. Superset will retry "
+"Unable to migrate query editor state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr "クエリ エディターの状態をバックエンドに移行できません。スーパーセットは後で再試行します。この問題が解決しない場合は、管理者に問い合わせてください。"
 
 msgid ""
-"Unable to migrate query state to backend. Superset will retry later. "
+"Unable to migrate query state to backend. BIStudio retry later. "
 "Please contact your administrator if this problem persists."
 msgstr "クエリ状態をバックエンドに移行できません。スーパーセットは後で再試行します。この問題が解決しない場合は、管理者に問い合わせてください。"
 
 msgid ""
-"Unable to migrate table schema state to backend. Superset will retry "
+"Unable to migrate table schema state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr "テーブル スキーマの状態をバックエンドに移行できません。スーパーセットは後で再試行します。この問題が解決しない場合は、管理者に問い合わせてください。"
 
@@ -12399,7 +12399,7 @@ msgid "When only a primary metric is provided, a categorical color scale is used
 msgstr "プライマリ メトリックのみが指定されている場合は、カテゴリカル カラー スケールが使用されます。"
 
 msgid ""
-"When specifying SQL, the datasource acts as a view. Superset will use "
+"When specifying SQL, the datasource acts as a view. BIStudio use "
 "this statement as a subquery while grouping and filtering on the "
 "generated parent queries."
 msgstr ""

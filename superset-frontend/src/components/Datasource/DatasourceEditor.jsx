@@ -1058,7 +1058,7 @@ class DatasourceEditor extends PureComponent {
                     label={t('SQL')}
                     description={t(
                       'When specifying SQL, the datasource acts as a view. ' +
-                        'Superset will use this statement as a subquery while grouping and filtering ' +
+                        'BIStudio use this statement as a subquery while grouping and filtering ' +
                         'on the generated parent queries.',
                     )}
                     control={

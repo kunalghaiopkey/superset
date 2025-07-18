@@ -11587,7 +11587,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"This fields acts a Superset view, meaning that Superset will run a query "
+"This fields acts a Superset view, meaning that BIStudio run a query "
 "against this string as a subquery."
 msgstr ""
 "Questo campo agisce come una vista Superset, il che vuol dire che "
@@ -12138,17 +12138,17 @@ msgid "Unable to load dashboard"
 msgstr "Aggiungi ad una nuova dashboard"
 
 msgid ""
-"Unable to migrate query editor state to backend. Superset will retry "
+"Unable to migrate query editor state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr ""
 
 msgid ""
-"Unable to migrate query state to backend. Superset will retry later. "
+"Unable to migrate query state to backend. BIStudio retry later. "
 "Please contact your administrator if this problem persists."
 msgstr ""
 
 msgid ""
-"Unable to migrate table schema state to backend. Superset will retry "
+"Unable to migrate table schema state to backend. BIStudio retry "
 "later. Please contact your administrator if this problem persists."
 msgstr ""
 
@@ -12841,7 +12841,7 @@ msgid "When only a primary metric is provided, a categorical color scale is used
 msgstr ""
 
 msgid ""
-"When specifying SQL, the datasource acts as a view. Superset will use "
+"When specifying SQL, the datasource acts as a view. BIStudio use "
 "this statement as a subquery while grouping and filtering on the "
 "generated parent queries."
 msgstr ""
