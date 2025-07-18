@@ -45,11 +45,15 @@ header {
   position: relative;
   display: flex;
   flex-direction: column;
+
+}
+
+body>input + #app {
   height: 100%;
   overflow: auto;
 }
 
-#app header + .antd5-layout-content {
+body>input + #app header + .antd5-layout-content {
   overflow: auto;
   height: 100%;
 }
