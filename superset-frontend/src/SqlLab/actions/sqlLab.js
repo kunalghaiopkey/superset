@@ -448,7 +448,7 @@ function migrateTable(table, queryEditorId, dispatch) {
       dispatch(
         addWarningToast(
           t(
-            'Unable to migrate table schema state to backend. BI Studio retry ' +
+            'Unable to migrate table schema state to backend. BI Studio will retry ' +
               'later. Please contact your administrator if this problem persists.',
           ),
         ),
@@ -466,7 +466,7 @@ function migrateQuery(queryId, queryEditorId, dispatch) {
       dispatch(
         addWarningToast(
           t(
-            'Unable to migrate query state to backend. BI Studio retry later. ' +
+            'Unable to migrate query state to backend. BI Studio will retry later. ' +
               'Please contact your administrator if this problem persists.',
           ),
         ),
@@ -526,7 +526,7 @@ export function syncQueryEditor(queryEditor) {
         dispatch(
           addWarningToast(
             t(
-              'Unable to migrate query editor state to backend. BI Studio retry ' +
+              'Unable to migrate query editor state to backend. BI Studio will retry ' +
                 'later. Please contact your administrator if this problem persists.',
             ),
           ),
