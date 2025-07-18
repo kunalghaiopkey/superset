@@ -90,6 +90,10 @@ const CollapsedBar = styled.div<{ offset: number }>`
       flex-direction: column;
       align-items: center;
       padding: ${theme.gridUnit * 2}px;
+
+      >.anticon  {
+        color : #344054;
+      }
     }
     svg {
       cursor: pointer;
@@ -160,7 +164,7 @@ const VerticalFilterBar: FC<VerticalBarProps> = ({
   }, [onScroll]);
 
   const tabPaneStyle = useMemo(
-    () => ({ overflow: 'auto', height, overscrollBehavior: 'contain' }),
+    () => ({ overflow: 'auto', height : 'calc(100vh - 7.8rem)', overscrollBehavior: 'contain' }),
     [height],
   );
 
