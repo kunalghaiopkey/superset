@@ -92,12 +92,13 @@ const WelcomeContainer = styled.div`
 
       .antd5-menu-item {
         border-radius: 0rem;
-        padding: 1rem 0.5rem;
+        padding: 0.5rem;
         line-height: 1.375rem;
         color: ${({ theme }) => theme.colors.customcolor.gridheadertext};
         border-bottom: 2px solid transparent;
         font-size: ${({ theme }) => theme.typography.sizes.fs14}rem;
         font-weight: ${({ theme }) => theme.typography.weights.medium};
+        margin-right: 0.5rem;
 
         &:hover , &:has(> span > .active) {
           background-color: transparent;
