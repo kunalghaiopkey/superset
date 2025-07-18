@@ -800,8 +800,25 @@ hr {
     .ant-dropdown-menu-item {
       font-size : 0.96rem;
       &:hover {
-        background-color: #F6FEFF;
+        background-color: #F6FEFF !important;
       }
     } 
+  }
+}
+
+.antd5-switch {
+  background-color: #ddd !important;
+  .antd5-switch-handle {
+    &::before {
+      background-color: #fff;
+    }
+  }
+
+  &.antd5-switch-checked {
+    .antd5-switch-handle {
+      &::before {
+        background-color: #116173 !important;
+      }
+    }
   }
 }
