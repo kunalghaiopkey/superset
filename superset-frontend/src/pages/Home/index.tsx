@@ -78,17 +78,48 @@ interface LoadingProps {
 const DEFAULT_TAB_ARR = ['2', '3'];
 
 const WelcomeContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.grayscale.light4};
+  background-color: ${({ theme }) => theme.colors.grayscale.light5};
   .ant-row.menu {
     margin-top: -15px;
-    background-color: ${({ theme }) => theme.colors.grayscale.light4};
-    &:after {
-      content: '';
-      display: block;
-      border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
-      margin: 0px ${({ theme }) => theme.gridUnit * 6}px;
+    background-color: ${({ theme }) => theme.colors.grayscale.light5};
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.customcolor.bordercolor};
+    margin-left: 1.5rem;
+
+    .antd5-menu  {
+      padding: 0px;
+
+      .antd5-menu-item {
+        border-radius: 0rem;
+        padding: 1rem 0.5rem;
+        line-height: 1.375rem;
+        color: ${({ theme }) => theme.colors.customcolor.gridheadertext};
+        border-bottom: 2px solid transparent;
+        font-size: ${({ theme }) => theme.typography.sizes.fs14}rem;
+        font-weight: ${({ theme }) => theme.typography.weights.medium};
+
+        &:hover , &:has(> span > .active) {
+          background-color: transparent;
+          color: ${({ theme }) => theme.colors.customcolor.btntheme};
+          border-bottom: 2px solid ${({ theme }) => theme.colors.customcolor.btntheme};
+        }
+      }
+    }
+
+    .nav-right {
       position: relative;
-      width: 100%;
+      padding: 0px;
+    }
+
+
+    &:after {
+      // content: '';
+      // display: block;
+      // border: 1px solid ${({ theme }) => theme.colors.grayscale.light2};
+      // margin: 0px ${({ theme }) => theme.gridUnit * 6}px;
+      // position: relative;
+      // width: 100%;
       ${mq[1]} {
         margin-top: 5px;
         margin: 0px 2px;
