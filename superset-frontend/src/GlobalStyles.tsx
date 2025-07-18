@@ -142,9 +142,11 @@ export const GlobalStyles = () => (
       }
 
       .antd5-btn-variant-solid , .antd5-btn-variant-outlined , .antd5-btn-link {
+        border-radius : 8px !important;
         &:disabled {
           background-color : ${theme.colors.grayscale.light2} !important;
           color: ${theme.colors.grayscale.base} !important;
+          opacity: 0.5 !important;
         }
       }
 
