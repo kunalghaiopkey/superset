@@ -749,45 +749,43 @@ hr {
   }
 }
 
-.btn-group {
-  .btn-default {
-    background-color: transparent !important;
-    &:hover , &:focus {
-      background-color: transparent !important;
-      box-shadow: none;
-    } 
-  }
+.btn-default {
+  background-color: #fff !important;
+  &:hover , &:focus {
+    background-color: #fff !important;
+    box-shadow: none;
+  } 
+}
 
-  .dropdown-menu {
-    border-radius: 0.5rem;
-    padding: 0px;
-    li {
-      &:first-child {
-        a {
-          border-top-left-radius: 0.5rem;
-          border-top-right-radius: 0.5rem;
-        }
-          
+.dropdown-menu {
+  border-radius: 0.5rem;
+  padding: 0px;
+  li {
+    &:first-child {
+      a {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
       }
         
-      &:last-child {
-        a {
-          border-bottom-left-radius: 0.5rem;
-          border-bottom-right-radius: 0.5rem;
-        }
+    }
+      
+    &:last-child {
+      a {
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+      }
+    }
+
+    a {
+      padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+      &:hover {
+        background-color: #F6FEFF;
+        color: #344054;
       }
 
-      a {
-        padding: 0.5rem 0.75rem 0.5rem 0.75rem;
-        &:hover {
-          background-color: #F6FEFF;
-          color: #344054;
-        }
-
-        &:focus {
-          background-color: #E6FBFE;
-          color: #344054;
-        }
+      &:focus {
+        background-color: #E6FBFE;
+        color: #344054;
       }
     }
   }
