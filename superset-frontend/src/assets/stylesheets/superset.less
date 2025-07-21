@@ -749,11 +749,27 @@ hr {
   }
 }
 
+.container.list-table-body {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+
+  .row {
+    width: 50%;
+    margin: auto;
+
+    .panel {
+      box-shadow: none;
+    }
+  }
+}
+
 .btn-default {
   background-color: #fff !important;
+  box-shadow: none !important;
   &:hover , &:focus {
     background-color: #fff !important;
-    box-shadow: none;
+    box-shadow: none !important;
   } 
 }
 
