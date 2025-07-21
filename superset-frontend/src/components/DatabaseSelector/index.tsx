@@ -48,12 +48,25 @@ const DatabaseSelectorWrapper = styled.div`
       width: 30px;
       margin-left: ${theme.gridUnit}px;
       margin-top: ${theme.gridUnit * 5}px;
+
+      .anticon {
+        color: #344054;
+        font-size: 20px;
+      }
     }
 
     .section {
       display: flex;
       flex-direction: row;
       align-items: center;
+
+      .select {
+        label {
+          font-size: 0.93rem;
+          font-weight: 600;
+          color: #344054;
+        }
+      }
     }
 
     .select {
