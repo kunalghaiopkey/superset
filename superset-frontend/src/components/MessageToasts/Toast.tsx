@@ -27,9 +27,54 @@ const ToastContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 6px 8px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  line-height: 1.5;
+
+  .anticon {
+    padding : 0px;
+    svg {
+      border: 1px solid #fff;
+      border-radius: 50%;
+      padding: 0rem;
+      width: 1.125rem;
+      height: 1.125rem;
+      path:nth-child(1) {
+        fill: transparent;
+      }
+
+      path:nth-child(2) {
+        fill: #fff;
+      }
+    }
+  }
+
+  &.toast--success {
+    border-color: #37b400;
+    background-color: #37b400;
+  }
+
+  &.toast--warning {
+    border-color: #ffc000;
+    color: black;
+    background-color: #ffc000;
+  }
+
+  &.toast--danger {
+    border-color: #f31700;
+    color: white;
+    background-color: #f31700;
+  }
+
+  &.toast--info {
+    border-color: #0058e9;
+    color: white;
+    background-color: #0058e9;
+  }
 
   span {
-    padding: 0 11px;
+    padding: 0 7px;
   }
 `;
 
