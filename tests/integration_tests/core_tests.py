@@ -602,7 +602,7 @@ class TestCore(SupersetTestCase):
         dash_id = db.session.query(Dashboard.id).first()[0]
         tbl_id = self.table_ids.get("wb_health_population")
         urls = [
-            "/superset/welcome",
+            "/home",
             f"/superset/dashboard/{dash_id}/",
             f"/explore/?datasource_type=table&datasource_id={tbl_id}",
         ]
