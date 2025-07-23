@@ -1,0 +1,4 @@
+mysqlclient
+pymysql
+authlib
+flask-compress
