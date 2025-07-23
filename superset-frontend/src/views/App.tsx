@@ -42,6 +42,8 @@ import { logEvent } from 'src/logger/actions';
 import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
+import useLicensePoller from 'src/hooks/useLicensePoller';
+
 
 setupApp();
 setupPlugins();
@@ -70,41 +72,44 @@ const LocationPathnameLogger = () => {
   return <></>;
 };
 
-const App = () => (
-  <Router>
-    <ScrollToTop />
-    <LocationPathnameLogger />
-    <RootContextProviders>
-      <GlobalStyles />
-      <Menu
-        data={bootstrapData.common.menu_data}
-        isFrontendRoute={isFrontendRoute}
-      />
-      <Switch>
-        {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
-          <Route path={path} key={path}>
-            <Suspense fallback={<Fallback />}>
-              <Layout.Content
-                css={css`
+const App = () => {
+  useLicensePoller();
+  return (
+    <Router>
+      <ScrollToTop />
+      <LocationPathnameLogger />
+      <RootContextProviders>
+        <GlobalStyles />
+        <Menu
+          data={bootstrapData.common.menu_data}
+          isFrontendRoute={isFrontendRoute}
+        />
+        <Switch>
+          {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
+            <Route path={path} key={path}>
+              <Suspense fallback={<Fallback />}>
+                <Layout.Content
+                  css={css`
                   display: flex;
                   flex-direction: column;
                 `}
-              >
-                <ErrorBoundary
-                  css={css`
+                >
+                  <ErrorBoundary
+                    css={css`
                     margin: 16px;
                   `}
-                >
-                  <Component user={bootstrapData.user} {...props} />
-                </ErrorBoundary>
-              </Layout.Content>
-            </Suspense>
-          </Route>
-        ))}
-      </Switch>
-      <ToastContainer />
-    </RootContextProviders>
-  </Router>
-);
+                  >
+                    <Component user={bootstrapData.user} {...props} />
+                  </ErrorBoundary>
+                </Layout.Content>
+              </Suspense>
+            </Route>
+          ))}
+        </Switch>
+        <ToastContainer />
+      </RootContextProviders>
+    </Router>
+  )
+};
 
 export default hot(App);

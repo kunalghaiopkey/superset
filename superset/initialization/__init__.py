@@ -227,12 +227,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         #
         # Setup regular views
         #
-        appbuilder.add_link(
-            "Home",
-            label=__("Home"),
-            href="/home/",
-            cond=lambda: bool(appbuilder.app.config["LOGO_TARGET_PATH"]),
-        )
+  
 
         appbuilder.add_view(
             DatabaseView,
