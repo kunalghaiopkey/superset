@@ -161,6 +161,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.alerts import AlertView, ReportView
         
         from superset.views.all_entities import TaggedObjectsModelView
+        from superset.views.license_error import LicenseErrorView
         from superset.views.annotations import AnnotationLayerView
         from superset.views.api import Api
         from superset.views.chart.views import SliceModelView
@@ -304,6 +305,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_view_no_menu(TagView)
         appbuilder.add_view_no_menu(ReportView)
         appbuilder.add_view_no_menu(HomeView)
+        appbuilder.add_view_no_menu(LicenseErrorView)
 
 
 
