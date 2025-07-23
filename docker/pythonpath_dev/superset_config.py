@@ -98,7 +98,7 @@ class CeleryConfig:
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
+
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
 # The base URL for the email report hyperlinks.
@@ -145,7 +145,7 @@ FEATURE_FLAGS = {
     "DASHBOARD_CROSS_FILTERS": True,
     "ENABLE_TEMPLATE_PROCESSING": True,
     "EMBEDDED_SUPERSET": True,
-    "DRILL_TO_DETAIL": True,
+    "DRILL_BY": True,
     "ALERT_REPORTS": True,
     "SCHEDULED_QUERIES": True,
     "ENABLE_EXPLORE_DRAG_AND_DROP": True,
@@ -156,6 +156,12 @@ FEATURE_FLAGS = {
     "ENABLE_CUSTOM_COLOR_SCHEMES": True,
     "ENABLE_FILTER_BOX": True,
     "OMNIBAR": True,
+    "THUMBNAILS": True,
+    "THUMBNAILS_SQLA_LISTENERS": True,
+    "ESCAPE_MARKDOWN_HTML":True,
+    "SQLLAB_BACKEND_PERSISTENCE" :True,
+    "DASHBOARD_VIRTUALIZATION" : True
+
 
 }
 
@@ -260,3 +266,5 @@ SMTP_MAIL_FROM = 'your-email@example.com'
 
 
 ENABLE_THUMBNAILS = True
+
+
