@@ -56,13 +56,22 @@
     {% endblock %}
     <script nonce="{{ macros.get_nonce() }}">
       window.addEventListener('DOMContentLoaded', function () {
-              const btn = document.getElementById('btn-signin-keycloak');
-              if (btn) {
-                console.log('Auto-clicking Keycloak button');
-                btn.click();
-              } else {
-                console.warn('btn-signin-keycloak not found');
-              }
-          });
+        const btn = document.getElementById('btn-signin-keycloak');
+        const lastAttempt = sessionStorage.getItem('kc-last-attempt');
+        const now = Date.now();
+  
+        const shouldRetry =
+          !lastAttempt || (now - parseInt(lastAttempt, 10)) > 10000 ||
+          performance.getEntriesByType("navigation")[0]?.type === "reload";
+    
+        if (btn && shouldRetry) {
+          sessionStorage.setItem('kc-last-attempt', now.toString());
+          console.log('Auto-clicking Keycloak button');
+          btn.click();
+        } else {
+          console.warn('btn-signin-keycloak not found or retry not allowed yet');
+        }
+      });
     </script>
+    
 {% endblock %}
