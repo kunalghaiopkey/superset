@@ -218,3 +218,45 @@ TALISMAN_CONFIG = {
     "force_https": True,
     "strict_transport_security": True,
 }
+
+
+
+# Experimental / Advanced
+
+GLOBAL_ASYNC_QUERIES = True
+ASYNC_QUERY_EXECUTION_ROW_LIMIT = 1000000
+ENABLE_ROW_LEVEL_SECURITY = True
+
+
+
+
+# Documentation & Debugging pip install flask-compress
+
+DEBUG = False
+SHOW_STACKTRACE = True
+ENABLE_FLASK_COMPRESS = True
+
+
+
+
+# Email setup
+
+EMAIL_NOTIFICATIONS = True  # Enable email notifications
+SMTP_HOST = 'smtp.your-email-provider.com'
+SMTP_STARTTLS = True
+SMTP_SSL = False
+SMTP_USER = 'your-email@example.com'
+SMTP_PORT = 587
+SMTP_PASSWORD = 'your-email-password'
+SMTP_MAIL_FROM = 'your-email@example.com'
+
+
+
+# SUPERSET_WEBSERVER_TIMEOUT = 60
+# SQL_MAX_ROW = 10000
+# SAMPLES_ROW_LIMIT = 1000  # Limit for table previews
+# CSV_EXPORT = {"max_rows": 1000000}
+# ENABLE_JINJA_TEMPLATE_PROCESSING = True
+
+
+ENABLE_THUMBNAILS = True
