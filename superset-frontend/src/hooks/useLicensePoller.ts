@@ -9,13 +9,18 @@ const useLicensePoller = () => {
       SupersetClient.get({ endpoint: '/BI/ValidateLicense' })
         .then(response => {
           console.log('response', response);
+          const isValid = response &&  response.json && response.json.result === true;
+
+          if (isValid == true) {
+            timeoutId = setTimeout(poll, 30000);
+          } else {
+            window.location.href = `${window.location.origin}/license/error/`;
+          }
         })
         .catch(error => {
           console.error('error', error);
         })
-        .finally(() => {
-          timeoutId = setTimeout(poll, 30000);
-        });
+      
     };
 
     poll(); 
