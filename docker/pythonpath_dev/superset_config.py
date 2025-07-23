@@ -99,7 +99,7 @@ class CeleryConfig:
 CELERY_CONFIG = CeleryConfig
 
 
-# ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
@@ -162,7 +162,7 @@ FEATURE_FLAGS = {
     "SQLLAB_BACKEND_PERSISTENCE" :True,
     "DASHBOARD_VIRTUALIZATION" : True,
     "EMAIL_NOTIFICATIONS" : True,
-    "ALERT_REPORTS_NOTIFICATION_DRY_RUN" : False,
+    "ALERT_REPORTS_NOTIFICATION_DRY_RUN" : True,
      "ALERTS_ATTACH_REPORTS": True,
 
 }
