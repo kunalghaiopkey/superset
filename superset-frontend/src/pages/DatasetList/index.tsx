@@ -750,7 +750,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                         ) => (
                           <li key={result.id}>
                             <a
-                              href={`/superset/dashboard/${result.id}`}
+                              href={`/main/dashboard/${result.id}`}
                               target="_atRiskItem"
                             >
                               {result.title}
