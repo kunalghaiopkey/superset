@@ -9,7 +9,7 @@ const useLicensePoller = () => {
       SupersetClient.get({ endpoint: '/BI/ValidateLicense' })
         .then(response => {
           console.log('response', response);
-          const isValid = response &&  response.json && response.json.result === true;
+          const isValid = response && typeof response.json == 'boolean' && response.json == true;
 
           if (isValid == true) {
             timeoutId = setTimeout(poll, 30000);
