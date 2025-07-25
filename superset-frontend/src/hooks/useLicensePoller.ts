@@ -14,7 +14,7 @@ const useLicensePoller = () => {
           if (isValid == true) {
             timeoutId = setTimeout(poll, 30000);
           } else {
-            window.location.href = `${window.location.origin}/license/error/`;
+            window.location.href = `${window.location.origin}/bistudio/license/error/`;
           }
         })
         .catch(error => {
