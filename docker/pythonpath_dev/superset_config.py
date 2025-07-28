@@ -27,6 +27,7 @@ import sys
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
 
+
 logger = logging.getLogger()
 
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT")
@@ -174,16 +175,16 @@ RECAPTCHA_PUBLIC_KEY = ""
 RECAPTCHA_PRIVATE_KEY = ""
 
 DEFAULT_LANGUAGE = "en"
-APP_NAME = "Opkey BI Studio"
+APP_NAME = "Opkey BI-Studio"
 APP_ICON = "/static/assets/images/opkey/opkey.png"
 FAVICONS = [{"href": "/static/assets/images/opkey/favicon/favicon.ico"}]
-WELCOME_MESSAGE = "Welcome to Opkey BI Studio"
+WELCOME_MESSAGE = "Welcome to Opkey BI-Studio"
 
 # Setting it to '/' would take the user to '/superset/welcome/'
 LOGO_TARGET_PATH = ''
 
 # Specify tooltip that should appear when hovering over the App Icon/Logo
-LOGO_TOOLTIP = "Opkey BI Studio"
+LOGO_TOOLTIP = "Opkey BI-Studio"
 
 # Specify any text that should appear to the right of the logo
 # LOGO_RIGHT_TEXT = "BI Studio"
