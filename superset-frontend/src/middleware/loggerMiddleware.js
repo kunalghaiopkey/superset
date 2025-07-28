@@ -29,7 +29,7 @@ import {
 } from '../logger/LogUtils';
 import DebouncedMessageQueue from '../utils/DebouncedMessageQueue';
 
-const LOG_ENDPOINT = '/superset/log/?explode=events';
+const LOG_ENDPOINT = '/main/log/?explode=events';
 const sendBeacon = events => {
   if (events.length <= 0) {
     return;
