@@ -42,7 +42,7 @@ import { logEvent } from 'src/logger/actions';
 import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
-import useLicensePoller from 'src/hooks/useLicensePoller';
+// import useLicensePoller from 'src/hooks/useLicensePoller';
 
 
 setupApp();
