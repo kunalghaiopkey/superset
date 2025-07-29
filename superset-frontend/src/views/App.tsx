@@ -73,7 +73,7 @@ const LocationPathnameLogger = () => {
 };
 
 const App = () => {
-  useLicensePoller();
+  // useLicensePoller();
   return (
     <Router>
       <ScrollToTop />
