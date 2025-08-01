@@ -261,3 +261,33 @@ USER root
 RUN uv pip install .[postgres]
 USER superset
 CMD ["/app/docker/entrypoints/docker-ci.sh"]
+
+
+######################################################################
+# Custom image extending Superset with Chrome and Chromedriver
+######################################################################
+FROM lean AS custom-chrome
+
+USER root
+
+# Install Chrome dependencies and Chrome
+RUN apt-get update && \
+    apt-get install -y wget zip libaio1
+
+# Install Google Chrome
+RUN export CHROMEDRIVER_VERSION=$(curl --silent https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_116) && \
+    wget -O google-chrome-stable_current_amd64.deb -q http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROMEDRIVER_VERSION}-1_amd64.deb && \
+    apt-get install -y --no-install-recommends ./google-chrome-stable_current_amd64.deb && \
+    rm -f google-chrome-stable_current_amd64.deb
+
+# Install ChromeDriver
+RUN export CHROMEDRIVER_VERSION=$(curl --silent https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_116) && \
+    wget -q https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip && \
+    unzip -j chromedriver-linux64.zip -d /usr/bin && \
+    chmod 755 /usr/bin/chromedriver && \
+    rm -f chromedriver-linux64.zip
+
+# Install additional Python packages
+RUN pip install --no-cache-dir gevent psycopg2 redis
+
+USER superset

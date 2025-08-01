@@ -100,12 +100,23 @@ class CeleryConfig:
 CELERY_CONFIG = CeleryConfig
 
 
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
 # The base URL for the email report hyperlinks.
+WEBDRIVER_OPTION_ARGS = [
+    "--force-device-scale-factor=2.0",
+    "--high-dpi-support=2.0",
+    "--headless",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-extensions",
+]
+WEBDRIVER_TYPE = "chrome"
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 SQLLAB_CTAS_NO_LIMIT = True
-
+SCREENSHOT_LOCATE_WAIT = 30
 log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
 LOG_LEVEL = getattr(logging, log_level_text.upper(), logging.INFO)
 
@@ -163,9 +174,9 @@ FEATURE_FLAGS = {
     "SQLLAB_BACKEND_PERSISTENCE" :True,
     "DASHBOARD_VIRTUALIZATION" : True,
     "EMAIL_NOTIFICATIONS" : True,
-    "ALERT_REPORTS_NOTIFICATION_DRY_RUN" : True,
-     "ALERTS_ATTACH_REPORTS": True,
-
+    "ALERT_REPORTS_NOTIFICATION_DRY_RUN" : False,
+    "ALERTS_ATTACH_REPORTS": True,
+    "PRESTO_EXPAND_DATA": False,
 }
 
 FAB_ADD_SECURITY_API = True
@@ -229,45 +240,14 @@ TALISMAN_CONFIG = {
 }
 
 
-
-# Experimental / Advanced
-
-GLOBAL_ASYNC_QUERIES = True
-ASYNC_QUERY_EXECUTION_ROW_LIMIT = 1000000
-ENABLE_ROW_LEVEL_SECURITY = True
-
-
-
-
-# Documentation & Debugging pip install flask-compress
-
-DEBUG = False
-SHOW_STACKTRACE = True
-ENABLE_FLASK_COMPRESS = True
-
-
-
-
-# Email setup
-
-EMAIL_NOTIFICATIONS = True  # Enable email notifications
-SMTP_HOST = 'smtp.your-email-provider.com'
+# superset_config.py file me ye daal:
+EMAIL_NOTIFICATIONS = True
+SMTP_HOST = 'smtp.gmail.com'
 SMTP_STARTTLS = True
 SMTP_SSL = False
-SMTP_USER = 'your-email@example.com'
+SMTP_USER = 'tyagiworkmail@gmail.com'
 SMTP_PORT = 587
-SMTP_PASSWORD = 'your-email-password'
-SMTP_MAIL_FROM = 'your-email@example.com'
-
-
-
-# SUPERSET_WEBSERVER_TIMEOUT = 60
-# SQL_MAX_ROW = 10000
-# SAMPLES_ROW_LIMIT = 1000  # Limit for table previews
-# CSV_EXPORT = {"max_rows": 1000000}
-# ENABLE_JINJA_TEMPLATE_PROCESSING = True
-
-
-ENABLE_THUMBNAILS = True
+SMTP_PASSWORD = 'cqqm crwa xtqu zoho'  # jo App Password mila
+SMTP_MAIL_FROM = 'tyagiworkmail@gmail.com'
 
 
