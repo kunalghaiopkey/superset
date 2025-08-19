@@ -156,7 +156,7 @@ export default function Button(props: ButtonProps) {
     renderedChildren = Children.toArray(children);
   }
   const firstChildMargin =
-    showMarginRight && renderedChildren.length > 1 ? theme.gridUnit * 2 : 0;
+    showMarginRight && renderedChildren.length > 1 ? theme.gridUnit * 1 : 0;
 
   const effectiveButtonStyle: ButtonStyle = buttonStyle ?? 'default';
 
