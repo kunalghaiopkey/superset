@@ -54,6 +54,7 @@ const ListViewStyles = styled.div`
       & .controls {
         display: flex;
         flex-wrap: wrap;
+        align-items: end;
         column-gap: ${({ theme }) => theme.gridUnit * 6}px;
         row-gap: ${({ theme }) => theme.gridUnit * 4}px;
 
