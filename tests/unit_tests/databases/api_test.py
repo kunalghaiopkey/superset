@@ -1962,7 +1962,7 @@ def test_table_metadata_invalid_database(
                     "issue_codes": [
                         {
                             "code": 1011,
-                            "message": "Issue 1011 - Superset encountered an unexpected error.",  # noqa: E501
+                            "message": "Issue 1011 - BI Studio encountered an unexpected error.",  # noqa: E501
                         },
                         {
                             "code": 1036,
@@ -2126,7 +2126,7 @@ def test_table_extra_metadata_invalid_database(
                     "issue_codes": [
                         {
                             "code": 1011,
-                            "message": "Issue 1011 - Superset encountered an unexpected error.",  # noqa: E501
+                            "message": "Issue 1011 - BI Studio encountered an unexpected error.",  # noqa: E501
                         },
                         {
                             "code": 1036,

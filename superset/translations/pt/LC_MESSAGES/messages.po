@@ -10496,7 +10496,7 @@ msgstr "Gravar Dashboard"
 msgid "Superset encountered an error while running a command."
 msgstr ""
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr ""
 
 #, fuzzy

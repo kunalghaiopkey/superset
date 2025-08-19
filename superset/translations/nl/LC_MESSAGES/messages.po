@@ -10432,7 +10432,7 @@ msgstr "Superset dashboard"
 msgid "Superset encountered an error while running a command."
 msgstr "Een fout is opgetreden in Superset tijdens het uitvoeren van een commando."
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Er is een onverwachte fout opgetreden in Superset."
 
 msgid "Supported databases"

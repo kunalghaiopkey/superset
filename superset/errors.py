@@ -117,7 +117,7 @@ ISSUE_CODES = {
     1008: _("The port is closed."),
     1009: _("The host might be down, and can't be reached on the provided port."),
     1010: _("Superset encountered an error while running a command."),
-    1011: _("Superset encountered an unexpected error."),
+    1011: _("BI Studio encountered an unexpected error."),
     1012: _("The username provided when connecting to a database is not valid."),
     1013: _("The password provided when connecting to a database is not valid."),
     1014: _("Either the username or the password is wrong."),

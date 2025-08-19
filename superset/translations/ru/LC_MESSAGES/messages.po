@@ -10364,7 +10364,7 @@ msgstr "Дашборд Superset"
 msgid "Superset encountered an error while running a command."
 msgstr "Superset столкнулся с ошибкой во время выполнения команды"
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Superset столкнулся с неожиданной ошибкой"
 
 msgid "Supported databases"

@@ -10443,7 +10443,7 @@ msgstr "Інформаційна панель суперсетів"
 msgid "Superset encountered an error while running a command."
 msgstr "Суперсет зіткнувся з помилкою під час запуску команди."
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Суперсет зіткнувся з несподіваною помилкою."
 
 msgid "Supported databases"

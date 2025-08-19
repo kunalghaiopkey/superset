@@ -10354,7 +10354,7 @@ msgstr "看板"
 msgid "Superset encountered an error while running a command."
 msgstr "Superset 在执行命令时遇到了一个错误。"
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Superset 遇到了未知错误。"
 
 msgid "Supported databases"

@@ -10340,7 +10340,7 @@ msgstr "Superset nadzorna plošča"
 msgid "Superset encountered an error while running a command."
 msgstr "Superset je naletel na napako pri izvajanju ukaza."
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Superset je naletel na nepričakovano napako."
 
 msgid "Supported databases"

@@ -11304,7 +11304,7 @@ msgstr "Tableau de bord de Superset"
 msgid "Superset encountered an error while running a command."
 msgstr "Superset a rencontré une erreur lors de l'exécution d'une commande."
 
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Superset a rencontré une erreur inattendue."
 
 #, fuzzy

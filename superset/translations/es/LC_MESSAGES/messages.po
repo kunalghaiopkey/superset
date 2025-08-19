@@ -10776,7 +10776,7 @@ msgid "Superset encountered an error while running a command."
 msgstr "La alerta encontró un error al ejecutar una consulta."
 
 #, fuzzy
-msgid "Superset encountered an unexpected error."
+msgid "BI Studio encountered an unexpected error."
 msgstr "Error inesperado del informe programado"
 
 #, fuzzy
