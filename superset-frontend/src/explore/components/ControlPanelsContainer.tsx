@@ -136,8 +136,9 @@ const Styles = styled.div`
   // To override it, we need to use !important
   overflow: visible !important;
   #controlSections {
-    height: 100%;
+    // height: 100%;
     overflow: visible;
+    height: calc(100vh - 14rem);
   }
   .nav-tabs {
     flex: 0 0 1;
