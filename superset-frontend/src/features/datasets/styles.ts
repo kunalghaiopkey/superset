@@ -19,10 +19,11 @@
 import { styled, css, SupersetTheme } from '@superset-ui/core';
 
 export const StyledLayoutWrapper = styled.div`
-  flex-grow: 1;
+  // flex-grow: 1;
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.grayscale.light5};
+  height: 100%;
 `;
 
 export const LeftColumn = styled.div<{ width?: number }>`
@@ -46,7 +47,7 @@ const Row = styled.div`
 `;
 
 export const OuterRow = styled(Row)`
-  flex: 1 0 auto;
+  // flex: 1 0 auto;
   position: relative;
 `;
 
