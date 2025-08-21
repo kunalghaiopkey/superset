@@ -24,7 +24,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
-import { styled, SupersetClient, SupersetError, t } from '@superset-ui/core';
+import { css, styled, SupersetClient, SupersetError, t } from '@superset-ui/core';
 import type { LabeledValue as AntdLabeledValue } from 'antd/lib/select';
 import rison from 'rison';
 import { AsyncSelect, Select } from 'src/components';
@@ -39,6 +39,8 @@ import {
   useSchemas,
   SchemaOption,
 } from 'src/hooks/apiResources';
+import Icons from 'src/components/Icons';
+import Modal from 'src/components/Modal';
 
 const DatabaseSelectorWrapper = styled.div`
   ${({ theme }) => `
@@ -95,6 +97,53 @@ const LabelStyle = styled.div`
     text-overflow: ellipsis;
   }
 `;
+
+const ModalStyle = styled.div`
+  .modalDiv{
+    margin:1rem 2rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+   }
+  .modalHeading{
+    color:#116173;
+    font-weight:700;
+    font-size:1.2rem;
+    padding:0.5rem 1rem;
+  }
+    
+  .modalContent{
+    display: grid;
+    grid-template-columns: 160px 1fr; 
+    align-items: flex-start;
+    gap: 1rem;
+    margin-left:1.5rem
+  }
+  .modalContentUl{
+    list-style: disc;
+    padding-left: 1.2rem;
+    margin: 0;
+  }
+      
+  .modalContentli{
+    font-weight: 500;
+    font-size: 1rem;
+    color: #333;
+    position: relative;
+    }
+
+  .modalContentUl li::marker {
+    color: #116173;
+    font-size: 1.1rem;
+  }
+
+  .modalContentP {
+    color: #6A7388;
+    font-size: 0.95rem;
+    width: 350px;
+  }
+`;
+
 
 type DatabaseValue = {
   label: ReactNode;
@@ -248,6 +297,9 @@ export default function DatabaseSelector({
     [formMode, getDbList, sqlLabMode, onEmptyResults],
   );
 
+  const [IsJsonModalVisible,setIsJsonModalVisible]=useState(false); 
+  const [jsonData, setJsonData] = useState<any>(null);
+  
   useEffect(() => {
     setCurrentDb(current =>
       current?.id !== db?.id
@@ -272,6 +324,19 @@ export default function DatabaseSelector({
     if (onSchemaChange && schema?.value !== schemaRef.current) {
       onSchemaChange(schema?.value);
     }
+  }
+  async function fetchJsonData() {
+    setIsJsonModalVisible(true);
+      try {
+        const { json } = await SupersetClient.get({
+          endpoint: 'Assets/Resources/JSON/BIStudio/queries_columns.json',
+        });
+        setJsonData(json);
+        console.log(json);
+      } catch (error) {
+        console.error('Error fetching JSON:', error);
+      }
+    console.log(jsonData);
   }
 
   const {
@@ -379,6 +444,14 @@ export default function DatabaseSelector({
   }
 
   function renderDatabaseSelect() {
+     const jsonIcon = (
+      <Icons.InfoCircleOutlined
+        style={{ cursor: 'pointer', fontSize: 10}}
+        onClick={() =>fetchJsonData()
+        }
+      />
+    );
+
     return renderSelectRow(
       <AsyncSelect
         ariaLabel={t('Select database or type to search databases')}
@@ -394,7 +467,7 @@ export default function DatabaseSelector({
         options={loadDatabases}
         sortComparator={sortComparator}
       />,
-      null,
+      jsonIcon,
     );
   }
 
@@ -464,6 +537,57 @@ export default function DatabaseSelector({
       {renderError()}
       {showCatalogSelector && renderCatalogSelect()}
       {renderSchemaSelect()}
+      <Modal
+        show={IsJsonModalVisible}
+        onHide={() => setIsJsonModalVisible(false)}
+        title="Database Info"
+        width="700px"
+        css={css`
+              .antd5-modal-header {
+                background-color: #116173 !important;
+                }
+              .antd5-modal-title{
+                color : white;
+              }
+              .antd5-modal-close-x > .close{
+                color : white !important;
+              }
+        `}
+        bodyStyle={{
+          height: 500,
+        }}
+        hideFooter
+      >
+        {jsonData ? (
+          <ModalStyle>
+            <div>
+              {Object.keys(jsonData).map((key) => (
+                <div className='modalDiv'>
+                  <p className='modalHeading'>{key}</p>
+                  {Array.isArray(jsonData[key]) ? (
+                    <>
+                      {jsonData[key].map((value: { name: string; description: string; }) => (
+                        <div className='modalContent'>
+                          <ul className='modalContentUl'>
+                            <li className='modalContentli'>{value.name}</li>
+                          </ul>
+                          <p className='modalContentP'>{value.description}</p>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <p>{jsonData[key]}</p>
+                  )}
+                </div>
+              ))
+              }
+            </div>
+          </ModalStyle>
+        ) : (
+          <p>Loading...</p>
+        )}
+
+      </Modal>
     </DatabaseSelectorWrapper>
   );
 }
