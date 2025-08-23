@@ -32,12 +32,12 @@ const supersetTextDocs = getDatabaseDocumentationLinks();
 
 export const DOCUMENTATION_LINK = supersetTextDocs
   ? supersetTextDocs.support
-  : 'https://superset.apache.org/docs/configuration/databases#installing-database-drivers';
+  : 'https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio';
 
 const irregularDocumentationLinks = {
-  postgresql: 'https://superset.apache.org',
-  mssql: 'https://superset.apache.org/docs/databases/sql-server',
-  gsheets: 'https://superset.apache.org/docs/databases/google-sheets',
+  postgresql: 'https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio',
+  mssql: 'https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio',
+  gsheets: 'https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio',
 };
 
 const documentationLink = (engine: string | undefined) => {
@@ -53,7 +53,7 @@ const documentationLink = (engine: string | undefined) => {
       engine as keyof typeof irregularDocumentationLinks
     ]
   ) {
-    return `https://superset.apache.org/docs/databases/${engine}`;
+    return `https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio`;
   }
   return irregularDocumentationLinks[
     engine as keyof typeof irregularDocumentationLinks

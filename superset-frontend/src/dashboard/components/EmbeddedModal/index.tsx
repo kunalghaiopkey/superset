@@ -157,7 +157,7 @@ export const DashboardEmbedControls = ({ dashboardId, onHide }: Props) => {
   );
   const docsUrl =
     extensionsRegistry.get('embedded.documentation.url') ??
-    'https://www.npmjs.com/package/@superset-ui/embedded-sdk';
+    'https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio';
 
   return (
     <>
@@ -185,7 +185,7 @@ export const DashboardEmbedControls = ({ dashboardId, onHide }: Props) => {
         <a href={docsUrl} target="_blank" rel="noreferrer">
           {docsDescription
             ? docsDescription()
-            : t('Superset Embedded SDK documentation.')}
+            : t('Bi-Studio Embedded SDK documentation.')}
         </a>
       </p>
       <h3>{t('Settings')}</h3>
