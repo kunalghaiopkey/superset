@@ -673,7 +673,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       },
       createErrorHandler(errMsg =>
         addDangerToast(
-          t('There was an issue deleting %s: %s', tableName, errMsg),
+          t("You can’t delete this item because you’re not the owner")
         ),
       ),
     );

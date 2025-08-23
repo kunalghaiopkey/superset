@@ -255,7 +255,7 @@ function ChartList(props: ChartListProps) {
       },
       createErrorHandler(errMsg =>
         addDangerToast(
-          t('There was an issue deleting the selected charts: %s', errMsg),
+          t('You can’t delete this item because you’re not the owner'),
         ),
       ),
     );

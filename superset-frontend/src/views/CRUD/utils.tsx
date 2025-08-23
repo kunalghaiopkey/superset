@@ -297,7 +297,7 @@ export function handleChartDelete(
       addSuccessToast(t('Deleted: %s', sliceName));
     },
     () => {
-      addDangerToast(t('There was an issue deleting: %s', sliceName));
+      addDangerToast(t('You can’t delete this item because you’re not the owner'));
     },
   );
 }
@@ -337,7 +337,7 @@ export function handleDashboardDelete(
     },
     createErrorHandler(errMsg =>
       addDangerToast(
-        t('There was an issue deleting %s: %s', dashboardTitle, errMsg),
+        t('You can’t delete this item because you’re not the owner'),
       ),
     ),
   );

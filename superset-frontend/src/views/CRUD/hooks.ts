@@ -629,7 +629,7 @@ export function useFavoriteStatus(
         },
         createErrorHandler(errMsg =>
           handleErrorMsg(
-            t('There was an error saving the favorite status: %s', errMsg),
+            t('You can’t mark this item because you’re not the owner'),
           ),
         ),
       );
