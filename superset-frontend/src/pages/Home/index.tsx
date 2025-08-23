@@ -111,6 +111,7 @@ const WelcomeContainer = styled.div`
     .nav-right {
       position: relative;
       padding: 0px;
+      bottom: 0.25rem;
     }
 
 
