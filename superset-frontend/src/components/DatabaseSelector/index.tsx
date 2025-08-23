@@ -444,7 +444,7 @@ export default function DatabaseSelector({
   }
 
   function renderDatabaseSelect() {
-     const jsonIcon = (
+     const jsonIcon = !readOnly &&(
       <Icons.InfoCircleOutlined
         style={{ cursor: 'pointer', fontSize: 10}}
         onClick={() =>fetchJsonData()
@@ -541,7 +541,7 @@ export default function DatabaseSelector({
         show={IsJsonModalVisible}
         onHide={() => setIsJsonModalVisible(false)}
         title="Database Info"
-        width="700px"
+        width="48vw"
         css={css`
               .antd5-modal-header {
                 background-color: #116173 !important;
@@ -554,7 +554,7 @@ export default function DatabaseSelector({
               }
         `}
         bodyStyle={{
-          height: 500,
+          height: '65vh',
         }}
         hideFooter
       >
