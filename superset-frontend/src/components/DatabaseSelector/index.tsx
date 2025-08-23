@@ -102,7 +102,7 @@ const ModalStyle = styled.div`
   .modalDiv{
     margin:1rem 2rem;
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 0.1rem solid #ddd;
     border-radius: 6px;
    }
   .modalHeading{
@@ -114,33 +114,28 @@ const ModalStyle = styled.div`
     
   .modalContent{
     display: grid;
-    grid-template-columns: 160px 1fr; 
-    align-items: flex-start;
+    grid-template-columns: 9vw 1fr; 
+    align-items: center;
     gap: 1rem;
-    margin-left:1.5rem
+    margin-left:1.5rem;
   }
   .modalContentUl{
-    list-style: disc;
     padding-left: 1.2rem;
-    margin: 0;
   }
       
   .modalContentli{
     font-weight: 500;
-    font-size: 1rem;
     color: #333;
-    position: relative;
     }
 
   .modalContentUl li::marker {
     color: #116173;
-    font-size: 1.1rem;
   }
 
   .modalContentP {
     color: #6A7388;
     font-size: 0.95rem;
-    width: 350px;
+    align-item:center;
   }
 `;
 
