@@ -2027,7 +2027,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
                 />
                 {renderPreferredSelector()}
                 {renderAvailableSelector()}
-                <StyledUploadWrapper>
+                <StyledUploadWrapper className="import-database-padding">
                   <Upload
                     name="databaseFile"
                     id="databaseFile"

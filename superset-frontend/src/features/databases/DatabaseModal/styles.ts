@@ -492,6 +492,10 @@ export const SelectDatabaseStyles = styled.div`
     }
   }
 
+  .import-database-padding {
+    margin: ${({ theme }) => theme.gridUnit * 4}px;
+  }
+
   .label-available-select {
     font-size: ${({ theme }) => theme.typography.sizes.s}px;
   }
