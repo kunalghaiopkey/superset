@@ -114,7 +114,7 @@ const ModalStyle = styled.div`
     
   .modalContent{
     display: grid;
-    grid-template-columns: 9vw 1fr; 
+    grid-template-columns: 10vw 1fr; 
     align-items: center;
     gap: 1rem;
     margin-left:1.5rem;
@@ -327,11 +327,9 @@ export default function DatabaseSelector({
           endpoint: 'Assets/Resources/JSON/BIStudio/queries_columns.json',
         });
         setJsonData(json);
-        console.log(json);
       } catch (error) {
         console.error('Error fetching JSON:', error);
       }
-    console.log(jsonData);
   }
 
   const {
