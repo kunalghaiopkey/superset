@@ -139,7 +139,7 @@ export default class ChartClient {
   ): Promise<Datasource> {
     return this.client
       .get({
-        endpoint: `/superset/fetch_datasource_metadata?datasourceKey=${datasourceKey}`,
+        endpoint: `/main/fetch_datasource_metadata?datasourceKey=${datasourceKey}`,
         ...options,
       } as RequestConfig)
       .then(response => response.json as Datasource);
