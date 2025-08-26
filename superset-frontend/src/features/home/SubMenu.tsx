@@ -31,10 +31,6 @@ import { MenuObjectProps } from 'src/types/bootstrapTypes';
 
 const StyledHeader = styled.div`
   margin-bottom: ${({ theme }) => theme.gridUnit * 4}px;
-  position: sticky;
-  top: 0rem;
-  background: #fff;
-  z-index: 1;
   .header {
     font-weight: ${({ theme }) => theme.typography.weights.bold};
     margin-right: ${({ theme }) => theme.gridUnit * 3}px;
@@ -200,7 +196,7 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
   }, [props.buttons]);
 
   return (
-    <StyledHeader>
+    <StyledHeader className="stikcy-header-main">
       <Row className="menu" role="navigation">
         {props.name && <div className="header">{props.name}</div>}
         <Menu mode={showMenu} disabledOverflow>
