@@ -249,8 +249,8 @@ export class HeaderActionsDropdown extends PureComponent<
             data-test="share-dashboard-menu-item"
             title={t('Share')}
             url={url}
-            copyMenuItemTitle={t('Copy permalink to clipboard')}
-            emailMenuItemTitle={t('Share permalink by email')}
+            copyMenuItemTitle={t('Copy link to clipboard')}
+            emailMenuItemTitle={t('Share link by email')}
             emailSubject={emailSubject}
             emailBody={emailBody}
             addSuccessToast={addSuccessToast}
