@@ -274,16 +274,22 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const columns = useMemo(
     () => [
-      {
-        Cell: ({
-          row: {
-            original: { kind },
-          },
-        }: any) => null,
-        accessor: 'kind_icon',
+      // {
+      //   Cell: ({
+      //     row: {
+      //       original: { kind },
+      //     },
+      //   }: any) => null,
+      //   accessor: 'kind_icon',
+      //   disableSortBy: true,
+      //   size: 'xs',
+      //   id: 'id',
+      // },
+       {
+        Header: t('Id'),
+        accessor: 'id',
         disableSortBy: true,
-        size: 'xs',
-        id: 'id',
+        size: 'xl',
       },
       {
         Cell: ({
