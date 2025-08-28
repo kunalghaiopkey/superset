@@ -129,6 +129,16 @@ function DashboardTable({
     setPreparingExport(true);
   };
 
+  const handleSaveFavorite = (id: number, isStarred: boolean) => {
+    saveFavoriteStatus(id, isStarred);
+    
+    if (activeTab === TableTab.Favorite && isStarred) {
+      setTimeout(() => {
+        refreshData();
+      }, 300);
+    }
+  };
+
   const handleDashboardEdit = (edits: Dashboard) =>
     SupersetClient.get({
       endpoint: `/api/v1/dashboard/${edits.id}`,
@@ -260,7 +270,7 @@ function DashboardTable({
               openDashboardEditModal={(dashboard: Dashboard) =>
                 setEditModal(dashboard)
               }
-              saveFavoriteStatus={saveFavoriteStatus}
+              saveFavoriteStatus={handleSaveFavorite}
               favoriteStatus={favoriteStatus[e.id]}
               handleBulkDashboardExport={handleBulkDashboardExport}
               onDelete={dashboard => setDashboardToDelete(dashboard)}

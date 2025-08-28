@@ -100,6 +100,16 @@ function ChartTable({
     chartIds,
     addDangerToast,
   );
+  const handleSaveFavorite = (id: number, isStarred: boolean) => {
+    saveFavoriteStatus(id, isStarred);
+
+    if (activeTab === TableTab.Favorite && isStarred) {
+      setTimeout(() => {
+        refreshData();
+      }, 300);
+    }
+  };
+
   const {
     sliceCurrentlyEditing,
     openChartEditModal,
@@ -227,7 +237,7 @@ function ChartTable({
               addDangerToast={addDangerToast}
               addSuccessToast={addSuccessToast}
               favoriteStatus={favoriteStatus[e.id]}
-              saveFavoriteStatus={saveFavoriteStatus}
+              saveFavoriteStatus={handleSaveFavorite}
               handleBulkChartExport={handleBulkChartExport}
             />
           ))}
