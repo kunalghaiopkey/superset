@@ -262,7 +262,7 @@ export const displayField = ({
       label={t('Display Name')}
       onChange={changeMethods.onChange}
       helpText={t(
-        'Pick a nickname for how the database will display in Superset.',
+        'Pick a nickname for how the database will display in Bi Studio.',
       )}
     />
   </>
