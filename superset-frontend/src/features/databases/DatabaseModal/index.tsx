@@ -2079,7 +2079,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
                             },
                           })
                         }
-                        css={buttonLinkStyles}
+                        css={[buttonLinkStyles, { margin: '16px' }]}
                       >
                         {t(
                           'Connect this database with a SQLAlchemy URI string instead',
