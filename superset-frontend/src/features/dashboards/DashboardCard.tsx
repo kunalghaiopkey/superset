@@ -177,6 +177,7 @@ function DashboardCard({
                 itemId={dashboard.id}
                 saveFaveStar={saveFavoriteStatus}
                 isStarred={favoriteStatus}
+                showTooltip={true}
               />
             )}
             <AntdDropdown overlay={menu}>

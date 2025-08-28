@@ -170,6 +170,7 @@ export default function ChartCard({
                 itemId={chart.id}
                 saveFaveStar={saveFavoriteStatus}
                 isStarred={favoriteStatus}
+                showTooltip={true}
               />
             )}
             <AntdDropdown overlay={menu}>
