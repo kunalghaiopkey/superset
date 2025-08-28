@@ -26,7 +26,7 @@ export default function IssueCode({ code, message }: IssueCodeProps) {
     <>
       {message}{' '}
       <a
-        href={`https://superset.apache.org/docs/using-superset/issue-codes#issue-${code}`}
+        href={`https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio`}
         rel="noopener noreferrer"
         target="_blank"
         aria-label="Superset docs link"
