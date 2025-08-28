@@ -153,6 +153,7 @@ function TagList(props: TagListProps) {
               itemId={id}
               saveFaveStar={saveFavoriteStatus}
               isStarred={favoriteStatus[id]}
+              showTooltip={true}
             />
           ),
         Header: '',

@@ -322,6 +322,7 @@ function ChartList(props: ChartListProps) {
               itemId={id}
               saveFaveStar={saveFavoriteStatus}
               isStarred={favoriteStatus[id]}
+              showTooltip={true}
             />
           ),
         Header: '',

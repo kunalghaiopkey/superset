@@ -308,6 +308,7 @@ function DashboardList(props: DashboardListProps) {
               itemId={id}
               saveFaveStar={saveFavoriteStatus}
               isStarred={favoriteStatus[id]}
+              showTooltip={true}
             />
           ),
         Header: '',
