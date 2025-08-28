@@ -80,7 +80,7 @@ const MARKDOWN_PLACE_HOLDER = `# ✨Header 1
 
 <br />
 
-Click here to learn more about [markdown formatting](https://bit.ly/1dQOfRK)`;
+`;
 
 const MARKDOWN_ERROR_MESSAGE = t('This markdown component has an error.');
 
