@@ -38,7 +38,7 @@ const CardContainer = styled.div<{ showThumbnails?: boolean }>`
     margin-top: ${theme.gridUnit * -6}px;
     padding: ${
       showThumbnails
-        ? `${theme.gridUnit * 8 + 3}px ${theme.gridUnit * 9}px`
+        ? `${theme.gridUnit * 8 + 3}px ${theme.gridUnit * 9}px ${theme.gridUnit * 8 + 3}px ${theme.gridUnit * 19 + 2}px`
         : `${theme.gridUnit * 8 + 1}px ${theme.gridUnit * 9}px`
     };
   `}
