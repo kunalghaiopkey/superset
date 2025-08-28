@@ -109,7 +109,7 @@ class CssEditor extends PureComponent<CssEditorProps, CssEditorState> {
     if (this.state.templates) {
       const menu = (
         <Menu onClick={this.changeCssTemplate}>
-          {this.state.templates.map(template => (
+          {this.state.templates.length == 0 ? <Menu.Item disabled> {'No CSS template'} </Menu.Item> : this.state.templates.map(template => (
             <Menu.Item key={template.css}>{template.label}</Menu.Item>
           ))}
         </Menu>
