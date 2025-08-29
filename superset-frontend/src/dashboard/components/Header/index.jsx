@@ -633,7 +633,6 @@ const Header = () => {
                 <Button
                   css={saveBtnStyle}
                   buttonSize="small"
-                  disabled={!hasUnsavedChanges}
                   buttonStyle="primary"
                   onClick={overwriteDashboard}
                   data-test="header-save-button"
