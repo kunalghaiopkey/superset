@@ -273,6 +273,7 @@ const SavedQueries = ({
         <CardContainer showThumbnails={showThumbnails}>
           {queries.map(q => (
             <CardStyles key={q.id}>
+              <Link to={`/sqllab?savedQueryId=${q.id}`}>
               <ListViewCard
                 imgURL=""
                 url={`/sqllab?savedQueryId=${q.id}`}
@@ -324,6 +325,7 @@ const SavedQueries = ({
                   </QueryData>
                 }
               />
+              </Link>
             </CardStyles>
           ))}
         </CardContainer>
