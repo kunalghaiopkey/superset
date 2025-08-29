@@ -115,7 +115,7 @@ const ChartSelect = ({
             margin-bottom: 0;
           `}
         >{`${t('Chart')} *`}</InfoText>
-        <Tooltip title={t('Tooltip')} placement="top">
+        <Tooltip title={t('Type of chart we can select')} placement="top">
           <Icons.InfoCircleOutlined
             iconSize="xs"
             iconColor={theme.colors.grayscale.base}
