@@ -29,6 +29,7 @@ import BulkTagModal from 'src/features/tags/BulkTagModal';
 import CardCollection from './CardCollection';
 import FilterControls from './Filters';
 import { CardSortSelect } from './CardSortSelect';
+import { Tooltip } from 'src/components/Tooltip';
 import {
   FetchDataConfig,
   Filters,
@@ -193,28 +194,32 @@ const ViewModeToggle = ({
   setMode: (mode: 'table' | 'card') => void;
 }) => (
   <ViewModeContainer>
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={e => {
-        e.currentTarget.blur();
-        setMode('card');
-      }}
-      className={cx('toggle-button', { active: mode === 'card' })}
-    >
-      <Icons.CardView />
-    </div>
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={e => {
-        e.currentTarget.blur();
-        setMode('table');
-      }}
-      className={cx('toggle-button', { active: mode === 'table' })}
-    >
-      <Icons.ListView />
-    </div>
+     <Tooltip title="Card View">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={e => {
+          e.currentTarget.blur();
+          setMode('card');
+        }}
+        className={cx('toggle-button', { active: mode === 'card' })}
+      >
+        <Icons.CardView />
+      </div>
+     </Tooltip>
+      <Tooltip title="Table View">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={e => {
+          e.currentTarget.blur();
+          setMode('table');
+        }}
+        className={cx('toggle-button', { active: mode === 'table' })}
+      >
+        <Icons.ListView />
+      </div>
+     </Tooltip>
   </ViewModeContainer>
 );
 
