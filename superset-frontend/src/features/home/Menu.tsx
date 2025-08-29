@@ -380,6 +380,16 @@ export function Menu({
 
               return renderSubMenu(props);
             })}
+            <MainNav.Item key="help">
+                <a
+                  href="https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Help
+                </a>
+            </MainNav.Item>
           </MainNav>
         </Col>
         <Col md={8} xs={24}>
