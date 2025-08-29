@@ -340,7 +340,7 @@ const Header = () => {
 
   const handleChangeText = useCallback(
     nextText => {
-      if (nextText && dashboardTitle !== nextText) {
+      if (dashboardTitle !== nextText) {
         boundActionCreators.updateDashboardTitle(nextText);
         boundActionCreators.onChange();
       }
@@ -633,6 +633,7 @@ const Header = () => {
                 <Button
                   css={saveBtnStyle}
                   buttonSize="small"
+                  disabled={!hasUnsavedChanges || !dashboardTitle?.trim()}
                   buttonStyle="primary"
                   onClick={overwriteDashboard}
                   data-test="header-save-button"
