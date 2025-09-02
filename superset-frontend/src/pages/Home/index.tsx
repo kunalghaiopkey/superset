@@ -156,7 +156,7 @@ const WelcomeContainer = styled.div`
   }
 `;
 const StyleIcon=styled.div`
-  chatIcon {
+  .chatIcon {
         position: fixed;
         bottom: 2rem;
         z-index:3000;
@@ -170,6 +170,12 @@ const StyleIcon=styled.div`
         font-size: 1.5rem;
         cursor: pointer;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        .wilfred-image {
+          width: 100%;
+          height: 3rem;
+          border-radius: 50%;
+        }
   }
 
 `;
@@ -411,7 +417,10 @@ function Welcome({ user, addDangerToast }: WelcomeProps) {
       )}
       <StyleIcon>
         <button className="chatIcon" onClick={() => setIsPopupOpen(true)}>
-          💬
+            <img className='wilfred-image'
+              src="/static/assets/images/wilfred.png"
+              alt="Chat"
+            />
         </button>
         </StyleIcon>
         {isPopupOpen &&

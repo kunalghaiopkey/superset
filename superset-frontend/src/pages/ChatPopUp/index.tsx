@@ -22,32 +22,24 @@ const PopupContainer = styled.div`
     to { transform: translateX(0); opacity: 1; }
   }
   .popupHeader {
-    padding: 0.75rem 1rem;
+    padding: 1.25rem 1rem;
     color: black;
-    height: 5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom:1px solid #ddd;
+
+    .main-header {
+        margin: 0px;
+    }
+
+    .close-modal-btn {
+        border: 1px solid transparent;
+        background-color: #fff;
+        font-size: 1.25rem;
+    }
   }
-  .popupBody {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    background: #fafafa;
-  }
-  .greeting {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  height: 100%;   /* take full height of popup body */
-}
-.greeting h2 {
-  margin: 2rem 0 1rem 0;
-}
-.greeting p {
-  margin: 0.5rem 0;
-}
+  
 
   .msg {
   display: inline-block;
@@ -73,24 +65,86 @@ const PopupContainer = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  background: #fafafa;
   display: flex;
   flex-direction: column;
+
+   .greeting {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 100%;
+
+        .greetings-body {
+            height:100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            .greetings-body-center {
+
+                .header {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    color: #004352;
+                    margin-bottom: .75rem;
+                }
+
+                .date-text {
+                    color: #004352;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    letter-spacing: .2rem;
+                    margin-bottom: .25rem;
+                }
+            }
+        }
+
+        .main-request {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+    }
+
+
+    .greeting p {
+        margin: 0.5rem 0;
+    }
 }
 
   .popupFooter {
-    display: flex;
-    padding: 0.5rem;
-    border-top: 1px solid #ddd;
-    gap: 0.5rem;
+    padding:1rem;
+
+    .footer-main {
+        font-size: .875rem !important;
+        border-radius: 1rem;
+        box-shadow: rgba(60, 64, 67, .3) 0 1px 2px 0, rgba(60, 64, 67, .15) 0 1px 3px 1px;
+    }
+
+    .footer-main:focus, .footer-main:focus-visible , .footer-main:focus-within {
+        outline:#116173 auto 1px!important;
+    }
   }
   .input-wilfred {
     flex: 1;
     resize: none;
     border-radius: 8px;
     padding: 1rem;
-    border: none;
-    font-size: 0.875rem;
+    max-height: 10rem !important;
+    min-height: 5rem !important;
+    background: 0 0;
+    border: 0 solid transparent !important;
+    box-shadow: none !important;
+    padding-top: .75rem;
+    overflow-y: auto !important;
+    font-size: .875rem !important;
+    padding-bottom: 0;
+    width:100%;
+  }
+
+  .input-wilfred:focus-visible {
+    outline: 0px !important;
   }
   .btn_speek_msg_wilfred {
     color: #fff !important;
@@ -108,6 +162,7 @@ const PopupContainer = styled.div`
    .askBtn{
       display:flex;
       justify-content:end;
+      padding:0.5rem;
     }
 `;
 
@@ -267,8 +322,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         <PopupContainer>
             <div className="popUp">
                 <div className="popupHeader">
-                    <h3>Ask Wilfred </h3>
-                    <button onClick={(e) => {
+                    <h4 className="main-header">Ask Wilfred </h4>
+                    <button className="close-modal-btn" onClick={(e) => {
                         e.preventDefault();
                         onClose
                     }
@@ -278,20 +333,22 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 <div className="popupBody" ref={messagesEndRef}>
                     {showGreeting && (
                         <div className="greeting">
-                            <h4>
-                                {(() => {
-                                    const hour = new Date().getHours();
-                                    if (hour < 12) return "Good Morning";
-                                    if (hour < 18) return "Good Afternoon";
-                                    return "Good Evening";
-                                })()}, {"there"} 
-                            </h4>
+                            <div className="greetings-body">
+                               <div className="greetings-body-center">
+                                    <h4 className="header">
+                                        {(() => {
+                                            const hour = new Date().getHours();
+                                            if (hour < 12) return "Good Morning";
+                                            if (hour < 18) return "Good Afternoon";
+                                            return "Good Evening";
+                                        })()}, {"there"} 
+                                    </h4>
 
-                            <p>{today}</p>
+                                    <p className="date-text">{today}</p>
+                               </div>
+                            </div>
 
-                            <div style={{ flexGrow: 1 }}></div>
-
-                            <p style={{ fontWeight: "500", marginTop: "2rem" }}>
+                            <p className="main-request">
                                 How can I help you?
                             </p>
                         </div>
@@ -306,7 +363,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 <div className="popupFooter">
-                    <textarea
+                   <div className="footer-main">
+                         <textarea
                         placeholder="Ask me anything..."
                         value={chatText}
                         className="input-wilfred"
@@ -318,6 +376,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             }
                         }}
                     />
+
                     <div className="askBtn">
                         <button
                             onClick={handleSend}
@@ -326,6 +385,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             Ask Wilfred
                         </button>
                     </div>
+                   </div>
+                    
                 </div>
             </div>
         </PopupContainer>
