@@ -161,7 +161,7 @@ const StyleIcon=styled.div`
         bottom: 2rem;
         z-index:3000;
         right: 2rem;
-        background: #4192aa;
+        border: 3px solid #116173;
         color: white;
         border: none;
         border-radius: 50%;
@@ -173,7 +173,7 @@ const StyleIcon=styled.div`
 
         .wilfred-image {
           width: 100%;
-          height: 3rem;
+          height: 2.5rem;
           border-radius: 50%;
         }
   }
