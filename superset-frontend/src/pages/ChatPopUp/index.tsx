@@ -136,10 +136,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         let project = null;
 
         if (userEncoded) {
-            user = JSON.parse(atob(userEncoded)); 
+            user = JSON.parse(btoa(userEncoded)); 
         }
         if (projectEncoded) {
-            project = JSON.parse(atob(projectEncoded));
+            project = JSON.parse(btoa(projectEncoded));
         }
 
         console.log("Decoded user:", user);
