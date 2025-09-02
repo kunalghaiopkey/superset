@@ -39,7 +39,8 @@ const BuilderComponentPane = ({ topOffset = 0 }) => (
       position: sticky;
       right: 0;
       top: ${topOffset}px;
-      height: calc(100vh - ${topOffset}px);
+      // height: calc(100vh - ${topOffset}px);
+      height: calc(100vh - 9rem);
       width: ${BUILDER_PANE_WIDTH}px;
     `}
   >
