@@ -163,7 +163,6 @@ const StyleIcon=styled.div`
         right: 2rem;
         border: 3px solid #116173;
         color: white;
-        border: none;
         border-radius: 50%;
         width: 3.5rem;
         height: 3.5rem;
