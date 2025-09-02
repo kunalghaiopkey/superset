@@ -167,7 +167,8 @@ const PropertiesModal = ({
           )
           .map((item: { value: number; text: string }) => ({
             value: item.value,
-            label: item.text,
+            // label: item.text,
+            label: item.text === 'Superset Admin' ? 'BI Studio Admin' : item.text,
           })),
         totalCount: response.json.count,
       }));

@@ -24,7 +24,7 @@ import { ColorSchemeGroup } from '../../types';
 const schemes = [
   {
     id: 'supersetColors',
-    label: 'Superset Colors',
+    label: 'BI Studio Colors',
     group: ColorSchemeGroup.Featured,
     colors: [
       // Full color

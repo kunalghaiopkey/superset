@@ -24,7 +24,7 @@ import { ColorSchemeGroup } from '../../types';
 const schemes = [
   {
     id: 'supersetAndPresetColors',
-    label: 'Preset + Superset',
+    label: 'Preset + BI Studio',
     group: ColorSchemeGroup.Featured,
     colors: [
       '#004960',

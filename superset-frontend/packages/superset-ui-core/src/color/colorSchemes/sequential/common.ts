@@ -82,7 +82,7 @@ const schemes = [
   },
   {
     id: 'superset_seq_1',
-    label: 'Superset Sequential #1',
+    label: 'BI Studio Sequential #1',
     isDiverging: false,
     colors: [
       '#F4FAD4',
@@ -99,7 +99,7 @@ const schemes = [
   },
   {
     id: 'superset_seq_2',
-    label: 'Superset Sequential #2',
+    label: 'BI Studio Sequential #2',
     isDiverging: false,
     colors: [
       '#FBF1B4',
@@ -116,7 +116,7 @@ const schemes = [
   },
   {
     id: 'superset_div_1',
-    label: 'Superset Diverging #1',
+    label: 'BI Studio Diverging #1',
     isDiverging: false,
     colors: [
       '#E04355',
@@ -132,7 +132,7 @@ const schemes = [
   },
   {
     id: 'superset_div_2',
-    label: 'Superset Diverging #2',
+    label: 'BI Studio Diverging #2',
     isDiverging: false,
     colors: [
       '#FF7F44',
