@@ -56,6 +56,7 @@ import ActivityTable from 'src/features/home/ActivityTable';
 import ChartTable from 'src/features/home/ChartTable';
 import SavedQueries from 'src/features/home/SavedQueries';
 import DashboardTable from 'src/features/home/DashboardTable';
+import ChatPopup from '../ChatPopUp';
 
 const extensionsRegistry = getExtensionsRegistry();
 
@@ -154,6 +155,24 @@ const WelcomeContainer = styled.div`
     }
   }
 `;
+const StyleIcon=styled.div`
+  chatIcon {
+        position: fixed;
+        bottom: 2rem;
+        z-index:3000;
+        right: 2rem;
+        background: #4192aa;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 3.5rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+`;
 
 const WelcomeNav = styled.div`
   ${({ theme }) => `
@@ -246,6 +265,8 @@ function Welcome({ user, addDangerToast }: WelcomeProps) {
       ],
     ];
   }, []);
+
+   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
     if (!otherTabFilters || WelcomeMainExtension) {
@@ -388,6 +409,14 @@ function Welcome({ user, addDangerToast }: WelcomeProps) {
       ) : (
         <SubMenu {...menuData} />
       )}
+      <StyleIcon>
+        <button className="chatIcon" onClick={() => setIsPopupOpen(true)}>
+          💬
+        </button>
+        </StyleIcon>
+        {isPopupOpen &&
+          <ChatPopup onClose={() => setIsPopupOpen(false)} />
+        }
       <WelcomeContainer>
         {WelcomeMessageExtension && <WelcomeMessageExtension />}
         {WelcomeTopExtension && <WelcomeTopExtension />}
