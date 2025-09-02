@@ -178,80 +178,87 @@ function ChartTable({
     });
   }
 
-  if (loading) return <LoadingCards cover={showThumbnails} />;
-  return (
-    <ErrorBoundary>
-      {sliceCurrentlyEditing && (
-        <PropertiesModal
-          onHide={closeChartEditModal}
-          onSave={handleChartUpdated}
-          show
-          slice={sliceCurrentlyEditing}
-        />
-      )}
+return (
+  <ErrorBoundary>
 
-      <SubMenu
-        activeChild={activeTab}
-        tabs={menuTabs}
-        buttons={[
-          {
-            name: (
-              <>
-                <i className="fa fa-plus" />
-                {t('Chart')}
-              </>
-            ),
-            buttonStyle: 'tertiary',
-            onClick: () => {
-              window.location.assign('/chart/add');
-            },
+    <SubMenu
+      activeChild={activeTab}
+      tabs={menuTabs}
+      buttons={[
+        {
+          name: (
+            <>
+              <i className="fa fa-plus" />
+              {t('Chart')}
+            </>
+          ),
+          buttonStyle: 'tertiary',
+          onClick: () => {
+            window.location.assign('/chart/add');
           },
-          {
-            name: t('View All »'),
-            buttonStyle: 'link',
-            onClick: () => {
-              const target =
-                activeTab === TableTab.Favorite
-                  ? `/chart/list/?filters=(favorite:(label:${t(
-                      'Yes',
-                    )},value:!t))`
-                  : '/chart/list/';
-              history.push(target);
-            },
+        },
+        {
+          name: t('View All »'),
+          buttonStyle: 'link',
+          onClick: () => {
+            const target =
+              activeTab === TableTab.Favorite
+                ? `/chart/list/?filters=(favorite:(label:${t('Yes')},value:!t))`
+                : '/chart/list/';
+            history.push(target);
           },
-        ]}
-      />
-      {charts?.length ? (
-        <CardContainer showThumbnails={showThumbnails}>
-          {charts.map(e => (
-            <ChartCard
-              key={`${e.id}`}
-              openChartEditModal={openChartEditModal}
-              chartFilter={activeTab}
-              chart={e}
-              userId={user?.userId}
-              hasPerm={hasPerm}
-              showThumbnails={showThumbnails}
-              bulkSelectEnabled={bulkSelectEnabled}
-              refreshData={refreshData}
-              addDangerToast={addDangerToast}
-              addSuccessToast={addSuccessToast}
-              favoriteStatus={favoriteStatus[e.id]}
-              saveFavoriteStatus={handleSaveFavorite}
-              handleBulkChartExport={handleBulkChartExport}
-            />
-          ))}
-        </CardContainer>
-      ) : (
-        <EmptyState
-          tableName={WelcomeTable.Charts}
-          tab={activeTab}
-          otherTabTitle={otherTabTitle}
-        />
-      )}
-      {preparingExport && <Loading />}
-    </ErrorBoundary>
-  );
+        },
+      ]}
+    />
+
+   
+    {loading ? (
+      <LoadingCards cover={showThumbnails} />
+    ) : (
+      <>
+        {sliceCurrentlyEditing && (
+          <PropertiesModal
+            onHide={closeChartEditModal}
+            onSave={handleChartUpdated}
+            show
+            slice={sliceCurrentlyEditing}
+          />
+        )}
+
+        {charts?.length > 0 ? (
+          <CardContainer showThumbnails={showThumbnails}>
+            {charts.map(e => (
+              <ChartCard
+                key={`${e.id}`}
+                openChartEditModal={openChartEditModal}
+                chartFilter={activeTab}
+                chart={e}
+                userId={user?.userId}
+                hasPerm={hasPerm}
+                showThumbnails={showThumbnails}
+                bulkSelectEnabled={bulkSelectEnabled}
+                refreshData={refreshData}
+                addDangerToast={addDangerToast}
+                addSuccessToast={addSuccessToast}
+                favoriteStatus={favoriteStatus[e.id]}
+                saveFavoriteStatus={handleSaveFavorite}
+                handleBulkChartExport={handleBulkChartExport}
+              />
+            ))}
+          </CardContainer>
+        ) : (
+          <EmptyState
+            tableName={WelcomeTable.Charts}
+            tab={activeTab}
+            otherTabTitle={otherTabTitle}
+          />
+        )}
+        {preparingExport && <Loading />}
+      </>
+    )}
+  </ErrorBoundary>
+);
+
 }
 
 export default withToasts(ChartTable);
