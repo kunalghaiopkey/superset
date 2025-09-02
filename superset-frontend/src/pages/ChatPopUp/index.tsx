@@ -31,6 +31,11 @@ const PopupContainer = styled.div`
 
     .main-header {
         margin: 0px;
+
+        .sparkler-image-header {
+            margin-right: 0.5rem;
+            width: 2rem;
+        }
     }
 
     .close-modal-btn {
@@ -163,6 +168,11 @@ const PopupContainer = styled.div`
       display:flex;
       justify-content:end;
       padding:0.5rem;
+
+      .sparkler-image {
+      width:1.5rem;
+      margin-right:0.5rem;
+      }
     }
 `;
 
@@ -322,7 +332,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         <PopupContainer>
             <div className="popUp">
                 <div className="popupHeader">
-                    <h4 className="main-header">Ask Wilfred </h4>
+                    <h4 className="main-header">
+                         <img className='sparkler-image-header'
+                            src="/static/assets/images/sparkler.svg"
+                            alt="Chat"
+                            />
+                        Ask Wilfred </h4>
                     <button className="close-modal-btn" onClick={(e) => {
                         e.preventDefault();
                         onClose
@@ -382,6 +397,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             onClick={handleSend}
                             className="btn_speek_msg_wilfred"
                         >
+
+                             <img className='sparkler-image'
+                            src="/static/assets/images/sparkler-white.svg"
+                            alt="Chat"
+                            />
                             Ask Wilfred
                         </button>
                     </div>
