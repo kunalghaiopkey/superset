@@ -181,9 +181,19 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [messages, setMessages] = useState<Msg[]>([]);
     const [showGreeting, setShowGreeting] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const [userName, setUserName] = useState<string | null>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        const userEncoded = localStorage.getItem("UserDTO");
+        if (userEncoded) {
+            try {
+                const decoded = JSON.parse(btoa(userEncoded)); 
+                setUserName(decoded.name || decoded.userName || decoded.email || "there");
+            } catch (err) {
+                console.error("Failed to decode user:", err);
+            }
+        }
     }, [messages]);
 
     const [bearerToken,setBearerToken]=useState(null);
@@ -310,11 +320,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             console.log("Bearer token:", bearerToken);
             return ;
 
-            // store in localStorage (encrypted if you want)
-            // localStorage.setItem("BearerToken", .bearerToken);
-
-            // return result.bearerToken;
-
         } catch (error) {
             console.error("Failed to fetch bearer token:", error);
             return null;
@@ -338,11 +343,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             alt="Chat"
                             />
                         Ask Wilfred </h4>
-                    <button className="close-modal-btn" onClick={(e) => {
-                        e.preventDefault();
-                        onClose
-                    }
-                    }>✕</button>
+                    <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
                 </div>
 
                 <div className="popupBody" ref={messagesEndRef}>
@@ -356,7 +357,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                             if (hour < 12) return "Good Morning";
                                             if (hour < 18) return "Good Afternoon";
                                             return "Good Evening";
-                                        })()}, {"there"} 
+                                        })()}, {(userName && (userName as any).name) || "there"} 
                                     </h4>
 
                                     <p className="date-text">{today}</p>
