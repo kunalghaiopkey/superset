@@ -179,10 +179,17 @@ const ViewModeContainer = styled.div`
 `;
 
 const EmptyWrapper = styled.div`
-  padding: ${({ theme }) => theme.gridUnit * 40}px 0;
+  // padding: ${({ theme }) => theme.gridUnit * 40}px 0;
 
   &.table {
     background: ${({ theme }) => theme.colors.grayscale.light5};
+    height: calc(100vh - 27rem);
+
+    .antd5-empty {
+      .antd5-empty-image {
+        height: 5rem !important;
+      }
+    }
   }
 `;
 
