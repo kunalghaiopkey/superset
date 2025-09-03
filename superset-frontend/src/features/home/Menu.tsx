@@ -23,7 +23,7 @@ import { getUrlParam } from 'src/utils/urlUtils';
 import { Row, Col, Grid } from 'src/components';
 import { MainNav, MenuMode } from 'src/components/Menu';
 import { Tooltip } from 'src/components/Tooltip';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import { GenericLink } from 'src/components/GenericLink/GenericLink';
 import Icons from 'src/components/Icons';
 import { useUiConfig } from 'src/components/UiConfigContext';
@@ -242,6 +242,14 @@ export function Menu({
     return () => window.removeEventListener('resize', windowResize);
   }, []);
 
+  const handleClick = (url: any) => {
+    const currentPath = location.pathname;
+    if (currentPath.includes(url)) {
+      return;
+    }
+    history.push(url);
+  };
+
   enum Paths {
     Explore = '/explore',
     Dashboard = '/dashboard',
@@ -252,6 +260,7 @@ export function Menu({
   const defaultTabSelection: string[] = [];
   const [activeTabs, setActiveTabs] = useState(defaultTabSelection);
   const location = useLocation();
+  const history = useHistory();
   useEffect(() => {
     const path = location.pathname;
     switch (true) {
@@ -282,9 +291,10 @@ export function Menu({
     if (url && isFrontendRoute) {
       return (
         <MainNav.Item key={label} role="presentation">
-          <NavLink role="button" to={url} activeClassName="is-active">
+          {/* <NavLink role="button" to={url} activeClassName="is-active">
             {label}
-          </NavLink>
+          </NavLink> */}
+          <span className="antd5-menu-title-content"><a role="button" onClick={()=> handleClick(url)}>{label}</a></span>
         </MainNav.Item>
       );
     }
