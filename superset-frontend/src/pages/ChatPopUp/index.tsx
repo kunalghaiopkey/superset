@@ -188,8 +188,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const userEncoded = localStorage.getItem("UserDTO");
         if (userEncoded) {
             try {
-                const decoded = JSON.parse(btoa(userEncoded)); 
-                setUserName(decoded.name || decoded.userName || decoded.email || "there");
+                const decoded = JSON.parse(atob(userEncoded)); 
+                setUserName(decoded.Name || decoded.UserName || decoded.email_ID || "there");
             } catch (err) {
                 console.error("Failed to decode user:", err);
             }
@@ -211,17 +211,17 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         let project = null;
 
         if (userEncoded) {
-            user = JSON.parse(btoa(userEncoded)); 
+            user = JSON.parse(atob(userEncoded)); 
         }
         if (projectEncoded) {
-            project = JSON.parse(btoa(projectEncoded));
+            project = JSON.parse(atob(projectEncoded));
         }
 
         console.log("Decoded user:", user);
         console.log("Decoded project:", project);
 
-        if(bearerToken ==null){
-            getBearerToken(user.userEmail,user.apiKey);
+        if(bearerToken == null){
+            getBearerToken(user.email_ID,user.ApiKey);
         }
 
         // const user = JSON.parse(localStorage.getItem("UserDTO") || "{}");
@@ -232,9 +232,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         try {
             let payload = {
                 contextId: crypto.randomUUID(),
-                userEmail: user.email,
-                projectName: project.name,
-                projectId: project.id,
+                userEmail: user.email_ID,
+                projectName: project.Name,
+                projectId: project.P_ID,
                 domainName: window.location.origin,
                 text: chatText,
                 agentType: "BI_AGENT",
@@ -293,7 +293,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             console.error("Stream failed:", err);
             setMessages((prev) => [
                 ...prev,
-                { role: "assistant", text: "⚠️ Something went wrong." },
+                { role: "assistant", text: "Something went wrong." },
             ]);
         }
     };
@@ -357,7 +357,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                             if (hour < 12) return "Good Morning";
                                             if (hour < 18) return "Good Afternoon";
                                             return "Good Evening";
-                                        })()}, {(userName && (userName as any).name) || "there"} 
+                                        })()}, {userName  || "there"} 
                                     </h4>
 
                                     <p className="date-text">{today}</p>
