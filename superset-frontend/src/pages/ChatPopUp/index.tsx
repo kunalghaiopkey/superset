@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
+import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -272,16 +273,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             project = JSON.parse(atob(projectEncoded));
         }
 
-        console.log("Decoded user:", user);
-        console.log("Decoded project:", project);
-
         if(bearerToken == null){
             getBearerToken(user.email_ID,user.ApiKey);
         }
-
-        // const user = JSON.parse(localStorage.getItem("UserDTO") || "{}");
-        // const project = JSON.parse(localStorage.getItem("ProjectDTO") || "{}");
-        // console.log(user + '---- ' + project);
 
 
         try {
@@ -295,9 +289,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 agentType: "BI_AGENT",
                 temporaryFilePath: "",
                 extra_metadata: {
-                    // artifact_id: "ca65a139-4878-4818-8721-f4eef1d7d5b5",
-                    // current_url:
-                    //     "https://myqlm.preprod.opkeyone.com/opkeyone/myspace/wilfred/",
                 },
             };
 
@@ -331,7 +322,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                         const data = line.replace("data:", "").trim();
                         if (data && data !== "[DONE]") {
                             assistantReply += data;
-
+                            console.log(assistantReply);
                             setMessages((prev) => {
                                 const updated = [...prev];
                                 updated[updated.length - 1] = {
@@ -372,7 +363,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             let bearerToken = await response.json();
             setBearerToken(bearerToken);
-            console.log("Bearer token:", bearerToken);
             return ;
 
         } catch (error) {
@@ -435,7 +425,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                     /> : ''}
                                 </div>
                                 <div key={i} className="msg-bubble">
-                                    {m.text}
+                                    <ReactMarkdown>{m.text}</ReactMarkdown>
                                 </div>
                             </div>
                         ))}

@@ -8,7 +8,6 @@ const usePingPoller = () => {
     const poll = () => {
       SupersetClient.get({ endpoint: '/login/ping' })
         .then(response => {
-          console.log('response', response);
           const opkeyCookies = response.json ;
 
           if (opkeyCookies && opkeyCookies.UserDTO ) {
