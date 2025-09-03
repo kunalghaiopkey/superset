@@ -73,6 +73,8 @@ const StyledHeader = styled.header`
           ${theme.gridUnit}px
           ${theme.gridUnit * 4}px;
         max-width: ${theme.gridUnit * theme.brandIconMaxWidth}px;
+        z-index: 9999;
+        position: relative;
         img {
           height: 100%;
           object-fit: contain;
@@ -381,14 +383,11 @@ export function Menu({
               return renderSubMenu(props);
             })}
             <MainNav.Item key="help">
-                <a
-                  href="https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
-                  Help
-                </a>
+              <a
+                href="https://customerhub.opkey.com/en/support/solutions/articles/88000062506-understanding-opkey-s-bi-studio"
+                target="_blank">
+                Help
+              </a>
             </MainNav.Item>
           </MainNav>
         </Col>
