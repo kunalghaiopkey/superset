@@ -46,24 +46,79 @@ const PopupContainer = styled.div`
   }
   
 
-  .msg {
-  display: inline-block;
-  max-width: 50%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  word-break: break-word;
-  white-space: pre-wrap;
-}
+//   .msg {
+//     display: inline-block;
+//     max-width: 50%;
+//     padding: 0.75rem;
+//     border-radius: 1rem;
+//     margin-bottom: 0.5rem;
+//     word-break: break-word;
+//     white-space: pre-wrap;
+// }
 
-.msg.user {
-  background: #e8f4f6;
-  align-self: flex-end;   
-}
+// .msg.user {
+//     background: #299BB5;
+//     color: #fff;
+//     border-bottom-right-radius: 0;
+//     align-self: flex-end;   
+// }
 
-.msg.assistant {
-  background: #f1f1f1;
-  align-self: flex-start; 
+// .msg.assistant {
+//     border-top-left-radius: 0;
+//     background-color: #eaf2f3;
+//     color: #344054;
+//     align-self: flex-start; 
+// }
+
+.msg {
+    display: flex;
+    margin-bottom: 2.75rem;
+    width: 100%;
+    position: relative;
+
+    &.user {
+        flex-direction: row-reverse;
+
+        .msg-bubble {
+            background: #299bb5;
+            color: #fff;
+            border-bottom-right-radius: 0;
+        }
+    }
+
+    &.assistant {
+        .msg-bubble {
+            border-top-left-radius: 0;
+            background-color: #eaf2f3;
+            color: #344054;
+        }
+
+        .msg-img {
+            width: 2rem;
+            height: 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #fff;
+            margin-right: .5rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                padding: .125rem;
+            }
+        }
+    }
+
+    .msg-bubble {
+        max-width: calc(100% - 3rem);
+        padding: .875rem;
+        border-radius: 1rem;
+        background: #ececec;
+        font-size: 1rem;
+    }
 }
 
 .popupBody {
@@ -372,8 +427,16 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                     {!showGreeting &&
                         messages.map((m, i) => (
-                            <div key={i} className={`msg ${m.role}`}>
-                                {m.text}
+                            <div className={`msg ${m.role}`}>
+                                <div className="msg-img">
+                                    {m.role == 'assistant' ? <img className='wilfred-image'
+                                        src="/static/assets/images/wilfred.png"
+                                        alt="Chat"
+                                    /> : ''}
+                                </div>
+                                <div key={i} className="msg-bubble">
+                                    {m.text}
+                                </div>
                             </div>
                         ))}
                 </div>
