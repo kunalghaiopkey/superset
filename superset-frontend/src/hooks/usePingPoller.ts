@@ -14,8 +14,8 @@ const usePingPoller = () => {
           if (opkeyCookies && opkeyCookies.UserDTO ) {
             let user= JSON.stringify(opkeyCookies.UserDTO);
             let projectDto=JSON.stringify(opkeyCookies.ProjectDTO);
-            localStorage.setItem("UserDTO",atob(user));
-            localStorage.setItem("ProjectDTO", atob(projectDto));
+            localStorage.setItem("UserDTO",btoa(user));
+            localStorage.setItem("ProjectDTO", btoa(projectDto));
 
             timeoutId = setTimeout(poll, 30000);
           } else {
