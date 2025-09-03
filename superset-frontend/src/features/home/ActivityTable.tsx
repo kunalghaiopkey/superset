@@ -170,7 +170,7 @@ export default function ActivityTable({
       (activeChild === TableTab.Edited
         ? editedCards
         : activityData[activeChild as keyof ActivityData]) ?? [];
-    return activities.map((entity: ActivityObject) => {
+    return activities.slice(0,5).map((entity: ActivityObject) => {
       const url = getEntityUrl(entity);
       const lastActionOn = getEntityLastActionOn(entity);
       return (
