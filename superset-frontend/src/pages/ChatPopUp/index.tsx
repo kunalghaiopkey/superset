@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
 import ReactMarkdown from "react-markdown";
-import { ClearOutlined } from "@ant-design/icons";
+import { ClearOutlined, CloseOutlined } from "@ant-design/icons";
+import { Tooltip } from 'src/components/Tooltip';
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -440,24 +441,34 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             <div className="popUp">
                 <div className="popupHeader">
                    
-                        <div className="main-header">
-                            <div className="title_img">
-                                <img className='sparkler-image-header'
-                                src="/static/assets/images/sparkler.svg"
-                                alt="Chat"
-                                />
-                            </div>
-
-                            <div>
-                                <h4 className="modal_title">Ask Wilfred AI</h4>
-                                <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
-                            </div>
+                    <div className="main-header">
+                        <div className="title_img">
+                            <img className='sparkler-image-header'
+                            src="/static/assets/images/sparkler.svg"
+                            alt="Chat"
+                            />
                         </div>
+
+                        <div>
+                            <h4 className="modal_title">Ask Wilfred AI</h4>
+                            <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
+                        </div>
+                    </div>
+                    
                     <div>
-                        {!showGreeting && <button className="close-modal-btn" onClick={()=>clearChat() }>
+                        {!showGreeting && (
+                            <Tooltip title="Clear Chat">
+                                <button className="close-modal-btn" onClick={() => clearChat()}>
                                     <ClearOutlined />
-                                    </button>}
-                        <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
+                                </button>
+                            </Tooltip>
+                        )}
+
+                        <Tooltip title="Close">
+                            <button className="close-modal-btn" onClick={() => onClose()}>
+                            <CloseOutlined />
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
 
