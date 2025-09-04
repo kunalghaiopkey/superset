@@ -247,6 +247,16 @@ const DashboardContentWrapper = styled.div`
           border: 1px dashed ${theme.colors.primary.base};
           z-index: 2;
         }
+
+        .ace_editor {
+          .ace_scroller {
+            .ace_content {
+              .ace_print-margin {
+                display:none;
+              }
+            }
+          }
+        }
       }
 
       .contract-trigger:before {
