@@ -9,7 +9,7 @@ const PopupContainer = styled.div`
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 35vw;
+    width: 43rem;
     height: 100vh;
     background: #fff;
     box-shadow: -2px 0 8px rgba(0,0,0,0.2);
@@ -23,7 +23,7 @@ const PopupContainer = styled.div`
     to { transform: translateX(0); opacity: 1; }
   }
   .popupHeader {
-    padding: 1.25rem 1rem;
+    padding: 1rem;
     color: black;
     display: flex;
     justify-content: space-between;
@@ -31,11 +31,42 @@ const PopupContainer = styled.div`
     border-bottom:1px solid #ddd;
 
     .main-header {
-        margin: 0px;
+        display: flex;
+        align-items: center;
 
-        .sparkler-image-header {
-            margin-right: 0.5rem;
-            width: 2rem;
+        .title_img {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #fff;
+            margin-right: 0.75rem;
+            position: relative;
+
+            .sparkler-image-header {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                padding: 0.125rem;
+            }
+        }
+
+        .modal_title {
+            font-size: 1rem;
+            color: #101828;
+            font-weight: 500;
+            margin:0px;
+            line-height: 1.5;
+        }
+
+        .modal_sub_title {
+            font-size: .875rem;
+            font-weight: 400;
+            margin: 0px;
+            line-height: normal;
+            color: #344054;
         }
     }
 
@@ -218,10 +249,14 @@ const PopupContainer = styled.div`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #4192AA !important;
+    background-color: #4192AA;
     border-radius: 1rem;
-    border: 1px solid #116173;
+    border: 1px solid transparent;
     cursor: pointer;
+
+    &:hover {
+        background-color: #166d87 !important;
+    }
   }
 
    .askBtn{
@@ -386,12 +421,20 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         <PopupContainer>
             <div className="popUp">
                 <div className="popupHeader">
-                    <h4 className="main-header">
-                         <img className='sparkler-image-header'
-                            src="/static/assets/images/sparkler.svg"
-                            alt="Chat"
-                            />
-                        Ask Wilfred </h4>
+                   
+                        <div className="main-header">
+                            <div className="title_img">
+                                <img className='sparkler-image-header'
+                                src="/static/assets/images/sparkler.svg"
+                                alt="Chat"
+                                />
+                            </div>
+
+                            <div>
+                                <h4 className="modal_title">Ask Wilfred AI</h4>
+                                <h3 className="modal_sub_title">Your AI assistant for ERP testing</h3>
+                            </div>
+                        </div>
                     <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
                 </div>
 
