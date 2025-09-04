@@ -202,7 +202,7 @@ export const DashboardEmbedControls = ({ dashboardId, onHide }: Props) => {
           name="allowed-domains"
           id="allowed-domains"
           value={allowedDomains}
-          placeholder="superset.example.com"
+          placeholder="bistudio.example.com"
           onChange={event => setAllowedDomains(event.target.value)}
         />
       </FormItem>
