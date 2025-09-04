@@ -206,7 +206,7 @@ LOGO_TOOLTIP = "Opkey BI-Studio"
 # Security Flags
 
 
-WTF_CSRF_ENABLED = True  # Enabled by default
+WTF_CSRF_ENABLED = False  # Enabled by default
 
 ENABLE_CORS = True
 
