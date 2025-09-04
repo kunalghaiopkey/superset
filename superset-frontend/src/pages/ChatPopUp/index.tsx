@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
 import ReactMarkdown from "react-markdown";
+import { ClearOutlined } from "@ant-design/icons";
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -452,8 +453,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                 <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
                             </div>
                         </div>
-                    {!showGreeting && <button onClick={()=>clearChat() }>Clear Thread</button>}
-                    <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
+                    <div>
+                        {!showGreeting && <button className="close-modal-btn" onClick={()=>clearChat() }>
+                                    <ClearOutlined />
+                                    </button>}
+                        <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
+                    </div>
                 </div>
 
                 <div className="popupBody" >
