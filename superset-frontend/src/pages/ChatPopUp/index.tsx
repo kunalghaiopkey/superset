@@ -277,9 +277,21 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [showGreeting, setShowGreeting] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
+    const [messageLoader,setMessageLoader]=useState(false);
 
+    const clearChat=()=>{
+        setChatText('');
+        setMessageLoader(false);
+        setShowGreeting(true);
+        setMessages([]); 
+    }
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesEndRef.current) {
+            console.log('----------'+messagesEndRef );
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+        console.log(messagesEndRef);
+
         const userEncoded = localStorage.getItem("UserDTO");
         if (userEncoded) {
             try {
@@ -298,6 +310,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setMessages(prev => [...prev, { role: "user", text: chatText }]);
         setChatText("");
         setShowGreeting(false);
+        setMessageLoader(true);
 
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -359,10 +372,13 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 for (let line of lines) {
                     if (line.startsWith("data:")) {
                         const data = line.replace("data:", "").trim();
-                        if (data && data !== "[DONE]") {
+
+                        if (data === "[DONE]") {
+                            setMessageLoader(false);
+                        } else if (data) {
                             assistantReply += data;
-                            console.log(assistantReply);
-                            setMessages((prev) => {
+
+                            setMessages(prev => {
                                 const updated = [...prev];
                                 updated[updated.length - 1] = {
                                     role: "assistant",
@@ -376,10 +392,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             }
         } catch (err) {
             console.error("Stream failed:", err);
-            setMessages((prev) => [
+            setMessages(prev => [
                 ...prev,
-                { role: "assistant", text: "Something went wrong." },
+                { role: "assistant", text: " Something went wrong." },
             ]);
+            setMessageLoader(false);
         }
     };
 
@@ -435,10 +452,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                 <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
                             </div>
                         </div>
+                    {!showGreeting && <button onClick={()=>clearChat() }>Clear Thread</button>}
                     <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
                 </div>
 
-                <div className="popupBody" ref={messagesEndRef}>
+                <div className="popupBody" >
                     {showGreeting && (
                         <div className="greeting">
                             <div className="greetings-body">
@@ -473,7 +491,13 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                 </div>
                                 <div key={i} className="msg-bubble">
                                     <ReactMarkdown>{m.text}</ReactMarkdown>
+                                    {messageLoader && m.role === "assistant" && i === messages.length - 1 && (
+                                        <img alt="" src="/static/assets/images/loader2.gif" />
+                                    )}
                                 </div>
+
+                                <div ref={messagesEndRef}></div>
+
                             </div>
                         ))}
                 </div>
