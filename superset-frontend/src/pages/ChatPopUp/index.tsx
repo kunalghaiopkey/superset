@@ -432,7 +432,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                             <div>
                                 <h4 className="modal_title">Ask Wilfred AI</h4>
-                                <h3 className="modal_sub_title">Your AI assistant for ERP testing</h3>
+                                <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
                             </div>
                         </div>
                     <button className="close-modal-btn" onClick={() => {onClose()}}>✕</button>
