@@ -280,11 +280,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [showGreeting, setShowGreeting] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
-    const [messageLoader,setMessageLoader]=useState(false);
-    const [bearerToken,setBearerToken]=useState(null);
+    const [messageLoader, setMessageLoader] = useState(false);
+    const [bearerToken, setBearerToken] = useState(null);
     const [contextId, setContextId] = useState<string | null>(null);
     const [isContinueConversation, setIsContinueConversation] = useState(false);
-    const [disableChat,setDisableChat]=useState(false);
+    const [disableChat, setDisableChat] = useState(false);
 
     const newThread = () => {
         setChatText('');
@@ -293,33 +293,29 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setShowGreeting(true);
 
         setIsContinueConversation(false);
-        setContextId(crypto.randomUUID()); 
+        setContextId(crypto.randomUUID());
 
         localStorage.setItem("continue_chat_key", "false");
     };
 
 
-    const clearChat=()=>{
+    const clearChat = () => {
         setChatText('');
         setMessageLoader(false);
         setShowGreeting(true);
-        setMessages([]); 
+        setMessages([]);
     }
-    function parseEventData(data: string): { text: string; done: boolean } {
+  
+    function parseEventData(data: string): string {
         let parsedData = "";
         let nextlinefound = 0;
-        let done = false;
 
         data.split("\n").forEach((line) => {
             const [key, value] = line.split(": ");
-            console.log(key,'--------',value)
-            if (value !== undefined) {
-                if (value === "[DONE]") {
-                    done = true;
-                } else {
-                    nextlinefound = 0;
-                    parsedData += value;
-                }
+            console.log(key,'-----',value)
+            if (value !== undefined && value !== "[DONE]") {
+                nextlinefound = 0;
+                parsedData += value;
             } else {
                 if (nextlinefound > 0) {
                     parsedData += "\n";
@@ -328,13 +324,13 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             }
         });
 
-        return { text: parsedData, done };
+        return parsedData;
     }
 
 
     useEffect(() => {
         if (messagesEndRef.current) {
-            console.log('----------'+messagesEndRef );
+            console.log('----------' + messagesEndRef);
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
         console.log(messagesEndRef);
@@ -342,7 +338,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const userEncoded = localStorage.getItem("UserDTO");
         if (userEncoded) {
             try {
-                const decoded = JSON.parse(atob(userEncoded)); 
+                const decoded = JSON.parse(atob(userEncoded));
                 setUserName(decoded.Name || decoded.UserName || decoded.email_ID || "there");
             } catch (err) {
                 console.error("Failed to decode user:", err);
@@ -352,7 +348,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
     useEffect(() => {
         getLastChatData();
-     
+
     }, []);
 
 
@@ -392,7 +388,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (!resp.ok) throw new Error(`Error ${resp.status}`);
             const result = await resp.json();
-      
+
             if (result.conversation_id === EMPTY_GUID) {
                 setMessages([]);
                 setShowGreeting(true);
@@ -460,7 +456,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     //             setRecentChats([]);
     //             // setMsgOffset(0);
     //             await getRecentChatData();
-                
+
     //         }
     //     } catch (err) {
     //         console.error("curdRecentChat failed:", err);
@@ -491,10 +487,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             try { project = JSON.parse(atob(projectEncoded)); } catch (e) { console.warn("Invalid ProjectDTO encoding", e); }
         }
 
-        if (!bearerToken ) {
-           await getBearerToken(user.email_ID, user.ApiKey); 
+        if (!bearerToken) {
+            await getBearerToken(user.email_ID, user.ApiKey);
         }
         const newContextId = crypto.randomUUID();
+        setContextId(newContextId);
 
         try {
             let payload = {
@@ -506,17 +503,16 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 text: chatText,
                 agentType: "BI_AGENT",
                 temporaryFilePath: "",
-                extra_metadata: {
-                },
+                extra_metadata: {},
             };
 
-            setMessages((prev) => [...prev, { role: "assistant", text: "" }]);
+            setMessages(prev => [...prev, { role: "assistant", text: "" }]);
 
             const response = await fetch("/wilfred_v4/chat", {
                 method: "POST",
                 headers: {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json',
+                    accept: "application/json",
+                    "Content-Type": "application/json",
                     Authorization: `Bearer ${bearerToken}`,
                 },
                 body: JSON.stringify(payload),
@@ -533,12 +529,30 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
-                const { text, done: isDone } = parseEventData(chunk);
 
-                if (text) {
-                    assistantReply += text;
+                if (chunk.includes("[DONE]")) {
+                    setMessageLoader(false);
+                    setDisableChat(false);
 
-                    setMessages((prev) => {
+                    const wilfred_response_timestamp = new Date();
+                    const chatId = crypto.randomUUID();
+
+                    await saveResponseChat(
+                        chatText,
+                        user_msg_timestamp,
+                        chatId,
+                        assistantReply,
+                        wilfred_response_timestamp
+                    );
+
+                    break; 
+                }
+
+                const parsedText = parseEventData(chunk);
+                if (parsedText) {
+                    assistantReply += parsedText;
+
+                    setMessages(prev => {
                         const updated = [...prev];
                         updated[updated.length - 1] = {
                             role: "assistant",
@@ -546,21 +560,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                         };
                         return updated;
                     });
-                }
-
-                if (isDone) {
-                    setMessageLoader(false);
-                    setDisableChat(false);
-                    const wilfred_response_timestamp = new Date();
-                    const chatId = crypto.randomUUID();
-
-                    await saveResponseChat(
-                        chatText,                 
-                        user_msg_timestamp,       
-                        chatId,                   
-                        assistantReply,           
-                        wilfred_response_timestamp
-                    );
                 }
             }
         } catch (err) {
@@ -576,7 +575,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
     const getBearerToken = async (userEmail: string, apiKey: string) => {
         try {
-            const url =`/api/WilfredSearchAPI/GetAuthToken?username=${encodeURIComponent(userEmail)}&apikey=${encodeURIComponent(apiKey)}`;
+            const url = `/api/WilfredSearchAPI/GetAuthToken?username=${encodeURIComponent(userEmail)}&apikey=${encodeURIComponent(apiKey)}`;
 
             const response = await fetch(url, {
                 method: "POST",
@@ -584,7 +583,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({}) 
+                body: JSON.stringify({})
             });
 
             if (!response.ok) {
@@ -708,7 +707,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    
+
     const getSessionChatData = async (conversationId: string) => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -773,14 +772,14 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             const payload = {
                 userId: user.U_ID,
                 projectId: project.P_ID,
-                dbId: "00000000-0000-0000-0000-000000000000", 
+                dbId: "00000000-0000-0000-0000-000000000000",
                 feature: "",
                 offset: 0,
                 limit: 5,
             };
 
             const resp = await fetch(url, {
-                method: "GET", 
+                method: "GET",
                 headers: {
                     accept: "application/json",
                     "Content-Type": "application/json",
@@ -814,12 +813,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         <PopupContainer>
             <div className="popUp">
                 <div className="popupHeader">
-                   
+
                     <div className="main-header">
                         <div className="title_img">
                             <img className='sparkler-image-header'
-                            src="/static/assets/images/sparkler.svg"
-                            alt="Chat"
+                                src="/static/assets/images/sparkler.svg"
+                                alt="Chat"
                             />
                         </div>
 
@@ -828,8 +827,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             <h3 className="modal_sub_title">Your AI assistant for BI Studio</h3>
                         </div>
                     </div>
-                    
-                    
+
+
                     <div>
                         {!showGreeting && (
                             <>
@@ -861,18 +860,18 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     {showGreeting && (
                         <div className="greeting">
                             <div className="greetings-body">
-                               <div className="greetings-body-center">
+                                <div className="greetings-body-center">
                                     <h4 className="header">
                                         {(() => {
                                             const hour = new Date().getHours();
                                             if (hour < 12) return "Good Morning";
                                             if (hour < 18) return "Good Afternoon";
                                             return "Good Evening";
-                                        })()}, {userName  || "there"} 
+                                        })()}, {userName || "there"}
                                     </h4>
 
                                     <p className="date-text">{today}</p>
-                               </div>
+                                </div>
                             </div>
                             <div className="recent-threads">
                                 <h4>Recent Threads</h4>
@@ -898,7 +897,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                     {!showGreeting &&
                         messages.map((m, i) => (
-                            <div  key={i} className={`msg ${m.role}`}>
+                            <div key={i} className={`msg ${m.role}`}>
                                 <div className="msg-img">
                                     {m.role == 'assistant' ? <img className='wilfred-image'
                                         src="/static/assets/images/wilfred.png"
@@ -919,37 +918,37 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 <div className="popupFooter">
-                   <div className="footer-main">
-                         <textarea
-                        placeholder="Ask me anything..."
-                        value={chatText}
-                        disabled={disableChat}
-                        className="input-wilfred"
-                        onChange={e => setChatText(e.target.value)}
-                        onKeyDown={e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSend();
-                            }
-                        }}
-                    />
-
-                    <div className="askBtn">
-                        <button
-                            onClick={handleSend}
-                            className="btn_speek_msg_wilfred"
+                    <div className="footer-main">
+                        <textarea
+                            placeholder="Ask me anything..."
+                            value={chatText}
                             disabled={disableChat}
-                        >
+                            className="input-wilfred"
+                            onChange={e => setChatText(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSend();
+                                }
+                            }}
+                        />
 
-                             <img className='sparkler-image'
-                            src="/static/assets/images/sparkler-white.svg"
-                            alt="Chat"
-                            />
-                            Ask Wilfred
-                        </button>
+                        <div className="askBtn">
+                            <button
+                                onClick={handleSend}
+                                className="btn_speek_msg_wilfred"
+                                disabled={disableChat}
+                            >
+
+                                <img className='sparkler-image'
+                                    src="/static/assets/images/sparkler-white.svg"
+                                    alt="Chat"
+                                />
+                                Ask Wilfred
+                            </button>
+                        </div>
                     </div>
-                   </div>
-                    
+
                 </div>
             </div>
         </PopupContainer>
