@@ -309,14 +309,18 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     function parseEventData(data: string): string {
         let parsedData = "";
         let nextlinefound = 0;
-
+        console.log(data)
         data.split("\n").forEach((line) => {
             const [key, value] = line.split(": ");
-            console.log(key,'-----',value)
+            key!=''?console.log(key,'-----',value):console.log('key may be empty or value is undefined '+key,'-----',value)
             if (value !== undefined && value !== "[DONE]") {
                 nextlinefound = 0;
                 parsedData += value;
-            } else {
+            } 
+            else if(value == undefined || key == ""){
+
+            }
+            else {
                 if (nextlinefound > 0) {
                     parsedData += "\n";
                 }
@@ -765,8 +769,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const project = JSON.parse(atob(projectEncoded));
 
         try {
-            const url = "/api/WilfredConversation/GetConversationByUserId";
-            const payload = {
+            const baseUrl = "/api/WilfredConversation/GetConversationByUserId";
+            const payload: any = {
                 userId: user.U_ID,
                 projectId: project.P_ID,
                 dbId: "00000000-0000-0000-0000-000000000000",
@@ -774,6 +778,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 offset: 0,
                 limit: 5,
             };
+            const queryString = new URLSearchParams(payload).toString();
+            const url = `${baseUrl}?${queryString}`;
 
             const resp = await fetch(url, {
                 method: "GET",
@@ -781,11 +787,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     accept: "application/json",
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(payload),
             });
 
             if (!resp.ok) throw new Error(`Error: ${resp.status} ${resp.statusText}`);
             const result = await resp.json();
+            console.log("recent chat data " + result.data);
 
             if (result.data) {
                 setRecentChats(prev => [...prev, ...result.data]);
