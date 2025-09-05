@@ -288,6 +288,33 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setShowGreeting(true);
         setMessages([]); 
     }
+    function parseEventData(data: string): { text: string; done: boolean } {
+        let parsedData = "";
+        let nextlinefound = 0;
+        let done = false;
+
+        data.split("\n").forEach((line) => {
+            const [key, value] = line.split(": ");
+            console.log(key,'--------',value)
+            if (value !== undefined) {
+                if (value === "[DONE]") {
+                    done = true;
+                } else {
+                    nextlinefound = 0;
+                    parsedData += value;
+                }
+            } else {
+                if (nextlinefound > 0) {
+                    parsedData += "\n";
+                }
+                nextlinefound++;
+            }
+        });
+
+        return { text: parsedData, done };
+    }
+
+
     useEffect(() => {
         if (messagesEndRef.current) {
             console.log('----------'+messagesEndRef );
@@ -328,14 +355,14 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             project = JSON.parse(atob(projectEncoded));
         }
 
-        if(bearerToken == null){
-            getBearerToken(user.email_ID,user.ApiKey);
+        if (!bearerToken ) {
+           await getBearerToken(user.email_ID, user.ApiKey); 
         }
-
+        const newContextId = crypto.randomUUID();
 
         try {
             let payload = {
-                contextId: crypto.randomUUID(),
+                contextId: newContextId,
                 userEmail: user.email_ID,
                 projectName: project.Name,
                 projectId: project.P_ID,
@@ -370,27 +397,23 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split("\n");
+                const { text, done: isDone } = parseEventData(chunk);
 
-                for (let line of lines) {
-                    if (line.startsWith("data:")) {
-                        const data = line.replace("data:", "").trim();
+                if (text) {
+                    assistantReply += text;
 
-                        if (data === "[DONE]") {
-                            setMessageLoader(false);
-                        } else if (data) {
-                            assistantReply += data;
+                    setMessages((prev) => {
+                        const updated = [...prev];
+                        updated[updated.length - 1] = {
+                            role: "assistant",
+                            text: assistantReply,
+                        };
+                        return updated;
+                    });
+                }
 
-                            setMessages(prev => {
-                                const updated = [...prev];
-                                updated[updated.length - 1] = {
-                                    role: "assistant",
-                                    text: assistantReply,
-                                };
-                                return updated;
-                            });
-                        }
-                    }
+                if (isDone) {
+                    setMessageLoader(false);
                 }
             }
         } catch (err) {
@@ -422,7 +445,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             let bearerToken = await response.json();
             setBearerToken(bearerToken);
-            return ;
+            return bearerToken;
 
         } catch (error) {
             console.error("Failed to fetch bearer token:", error);
@@ -499,14 +522,14 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                     {!showGreeting &&
                         messages.map((m, i) => (
-                            <div className={`msg ${m.role}`}>
+                            <div  key={i} className={`msg ${m.role}`}>
                                 <div className="msg-img">
                                     {m.role == 'assistant' ? <img className='wilfred-image'
                                         src="/static/assets/images/wilfred.png"
                                         alt="Chat"
                                     /> : ''}
                                 </div>
-                                <div key={i} className="msg-bubble">
+                                <div className="msg-bubble">
                                     <ReactMarkdown>{m.text}</ReactMarkdown>
                                     {messageLoader && m.role === "assistant" && i === messages.length - 1 && (
                                         <img alt="" src="/static/assets/images/loader2.gif" />
