@@ -700,10 +700,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (!response.ok) throw new Error("Failed to save chat");
 
             const result = await response.json();
-            if (result.status === "success") {
-                setIsContinueConversation(true);
-                localStorage.setItem("continue_chat_key", "true");
-            }
+            console.log(result)
+            setIsContinueConversation(true);
+            localStorage.setItem("continue_chat_key", "true");
         } catch (err) {
             console.error("Save response failed:", err);
         }
@@ -830,28 +829,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                         </div>
                     </div>
                     
-                    <div>
-                        {!showGreeting && (
-                            <>
-                            <Tooltip title="New Thread">
-                                <button className="close-modal-btn" onClick={() => newThread()}>
-                                
-                                </button>
-                            </Tooltip>
-                            <Tooltip title="Clear Chat">
-                                {/* <button className="close-modal-btn" onClick={() => curdRecentChat(chat, "delete")}>
-                                    <ClearOutlined />
-                                </button> */}
-                            </Tooltip>
-                            </>
-                        )}
-
-                        <Tooltip title="Close">
-                            <button className="close-modal-btn" onClick={() => onClose()}>
-                            <CloseOutlined />
-                            </button>
-                        </Tooltip>
-                    </div>
+                    
                     <div>
                         {!showGreeting && (
                             <>
