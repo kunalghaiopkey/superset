@@ -20,6 +20,7 @@
 {% import 'appbuilder/baselib.html' as baselib %}
 {% import "superset/macros.html" as macros %}
 
+
 {% block body %}
     {% include 'appbuilder/general/confirm.html' %}
     {% include 'appbuilder/general/alert.html' %}
@@ -30,6 +31,10 @@
 
     {% block uncontained %}{% endblock %}
 
+     
+    <div id="loader" class="loader-container">
+      <div class="login_spinner"></div>
+    </div>
     <div class="container list-table-body">
       <div class="row">
           {% block messages %}
@@ -54,24 +59,30 @@
           </div>
         </footer>
     {% endblock %}
-    <script nonce="{{ macros.get_nonce() }}">
-      window.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('btn-signin-keycloak');
-        const lastAttempt = sessionStorage.getItem('kc-last-attempt');
-        const now = Date.now();
-  
-        const shouldRetry =
-          !lastAttempt || (now - parseInt(lastAttempt, 10)) > 10000 ||
-          performance.getEntriesByType("navigation")[0]?.type === "reload";
-    
-        if (btn && shouldRetry) {
-          sessionStorage.setItem('kc-last-attempt', now.toString());
-          console.log('Auto-clicking Keycloak button');
-          btn.click();
-        } else {
-          console.warn('btn-signin-keycloak not found or retry not allowed yet');
-        }
-      });
-    </script>
+   <script nonce="{{ macros.get_nonce() }}">
+ 
+  window.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('btn-signin-keycloak');
+    const lastAttempt = sessionStorage.getItem('kc-last-attempt');
+    const now = Date.now();
+    const loginbox = document.getElementById('loginbox');
+
+
+    const shouldRetry =
+      !lastAttempt || (now - parseInt(lastAttempt, 10)) > 10000 ||
+      performance.getEntriesByType("navigation")[0]?.type === "reload";
+
+    if (btn && shouldRetry) {
+      if (loginbox) {
+        loginbox.style.display = 'none';
+      }
+      sessionStorage.setItem('kc-last-attempt', now.toString());
+      console.log('Auto-clicking Keycloak button');
+      btn.click();
+    } else {
+      console.warn('btn-signin-keycloak not found or retry not allowed yet');
+    }
+  });
+</script>
     
 {% endblock %}

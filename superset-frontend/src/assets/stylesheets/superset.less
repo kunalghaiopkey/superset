@@ -850,3 +850,33 @@ hr {
 .antd5-tooltip {
   z-index: 4002 !important;
 }
+// #loginbox{
+//   display: none;
+// }
+
+ .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 9999;
+    }
+ 
+    .login_spinner {
+      width: 50px;
+      height: 50px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      animation: login_spin 1s linear infinite;
+    }
+ 
+    @keyframes login_spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
