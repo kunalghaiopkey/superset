@@ -371,11 +371,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const project = JSON.parse(atob(projectEncoded));
 
         try {
-            const url = "/api/WilfredConversation/LastConversationByUserId";
-            const payload = {
-                userId: user.U_ID,
-                projectId: project.P_ID,
-            };
+            const url = `/api/WilfredConversation/LastConversationByUserId?userId=${encodeURIComponent(
+                user.U_ID
+            )}&projectId=${encodeURIComponent(project.P_ID)}`;
 
             const resp = await fetch(url, {
                 method: "GET",
@@ -383,7 +381,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     accept: "application/json",
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(payload),
             });
 
             if (!resp.ok) throw new Error(`Error ${resp.status}`);
@@ -397,24 +394,24 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 localStorage.setItem(CONTINUE_CHAT_KEY, "false");
             } else {
                 const isContinueChat = localStorage.getItem(CONTINUE_CHAT_KEY);
-                if (isContinueChat == "true") {
-                    console.log(" Resuming chat", result.conversation_id);
+                if (isContinueChat === "true") {
+                    console.log("Resuming chat", result.conversation_id);
                     getSessionChatData(result.conversation_id);
                     localStorage.setItem(CONTINUE_CHAT_KEY, "true");
                 } else {
-                    console.log(" Forcing new chat");
+                    console.log("Forcing new chat");
                     setMessages([]);
                     setShowGreeting(true);
                     setContextId(crypto.randomUUID());
                     localStorage.setItem(CONTINUE_CHAT_KEY, "false");
                     getRecentChatData();
                 }
-
             }
         } catch (err) {
             console.error("getLastChatData failed:", err);
         }
     };
+
 
     // const curdRecentChat = async (item: any, actionType: "delete") => {
     //     const userEncoded = localStorage.getItem("UserDTO");
