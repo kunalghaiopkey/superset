@@ -77,6 +77,15 @@ const PopupContainer = styled.div`
         background-color: #fff;
         font-size: 1.25rem;
     }
+
+    .new-thread-btn {
+        background: #116173;
+        color: #fff;
+        border: 1px solid #116173;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        margin-right: 0.5rem;
+    }
   }
   
 
@@ -263,8 +272,9 @@ const PopupContainer = styled.div`
                 cursor: pointer;
                 padding: 0rem !important;
                 border-left: 5px solid #b27ae7;
-                max-height: 18.5rem;
+                max-height: 22rem;
                 min-height: 2rem;
+                overflow: auto;
 
                 .no-recent-chat {
                     position: relative;
@@ -950,8 +960,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                         {!showGreeting && (
                             <>
                                 <Tooltip title="New Thread">
-                                    <button className="close-modal-btn" onClick={() => newThread()}>
-                                        new thread
+                                    <button className="new-thread-btn" onClick={() => newThread()}>
+                                        New Thread
                                     </button>
                                 </Tooltip>
                                 <Tooltip title="Clear Thread">
