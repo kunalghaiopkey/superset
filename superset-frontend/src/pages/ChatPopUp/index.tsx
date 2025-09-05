@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
 import ReactMarkdown from "react-markdown";
-import { ClearOutlined, CloseOutlined } from "@ant-design/icons";
+import { ClearOutlined, CloseOutlined, MessageOutlined, MoreOutlined } from "@ant-design/icons";
 import { Tooltip } from 'src/components/Tooltip';
 
 type Msg = { role: "user" | "assistant"; text: string };
@@ -167,6 +167,10 @@ const PopupContainer = styled.div`
   display: flex;
   flex-direction: column;
 
+   .greeting-body {
+        height:100%;
+    }
+
    .greeting {
         display: flex;
         flex-direction: column;
@@ -203,6 +207,122 @@ const PopupContainer = styled.div`
             text-align: center;
             font-size: 1.5rem;
             font-weight: 600;
+        }
+    }
+
+    .recent-details-body {
+        height:100%;
+        display:none;
+
+        .recent-user-details {
+            display: flex;
+            align-items:center;
+            width:100%;
+            margin-bottom:1rem;
+
+            .recent-user-img {
+                width: 5rem;
+                height: 5rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-right: 1rem;
+
+                img {
+                    width: 100%;
+                    height:100%;
+                    border-radius: 50%;
+                    background-color: #e8f4f6;
+                }
+            }
+
+            .recent-user-name {
+                h4 {
+                    background: linear-gradient(to right, #2D6571, #59B2C5);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
+                    -webkit-text-fill-color: transparent;
+                    font-size: 2rem;
+                }
+
+                p {
+                    color: #c4c7c5;
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .recent-chat {
+            .recent-chat-body {
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+                cursor: pointer;
+                padding: 0rem !important;
+                border-left: 5px solid #b27ae7;
+                max-height: 18.5rem;
+                min-height: 2rem;
+
+                .no-recent-chat {
+                    position: relative;
+                    text-align: center;
+                    width: 100%;
+                    height: 5rem;
+
+                    .recent-text {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 1rem;
+                        color: #67748e;
+                        font-weight: 500;
+                    }
+                }
+
+                .recent-chat-history {
+
+                    ul {
+                        padding-left: 0rem;
+                        margin-bottom:0rem;
+                    }
+
+                    .recent-main-text {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding:0.5rem 0.75rem 0rem;
+
+                        &:last-child {
+                            padding-bottom: 0.75rem !important;
+                        }
+
+                        .recent-text-details {
+                            display: flex;
+                            align-items: center;
+                            width: calc(100% - 3rem);
+                           
+
+                            .msg-icon {
+                                padding-right: 0.5rem;}
+
+                            .text-ellipsis {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                display: inline-block;
+                            }
+                        }
+
+                        .ant-dropdown-trigger:hover .ant-dropdown {
+                            display: block;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -860,46 +980,47 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 </div>
 
                 <div className="popupBody" >
-                    {showGreeting && (
-                        <div className="greeting">
-                            <div className="greetings-body">
-                                <div className="greetings-body-center">
-                                    <h4 className="header">
-                                        {(() => {
-                                            const hour = new Date().getHours();
-                                            if (hour < 12) return "Good Morning";
-                                            if (hour < 18) return "Good Afternoon";
-                                            return "Good Evening";
-                                        })()}, {userName || "there"}
-                                    </h4>
+                    <div className="greeting-body">
+                        {showGreeting && (
+                            <div className="greeting">
+                                <div className="greetings-body">
+                                    <div className="greetings-body-center">
+                                        <h4 className="header">
+                                            {(() => {
+                                                const hour = new Date().getHours();
+                                                if (hour < 12) return "Good Morning";
+                                                if (hour < 18) return "Good Afternoon";
+                                                return "Good Evening";
+                                            })()}, {userName || "there"}
+                                        </h4>
 
-                                    <p className="date-text">{today}</p>
+                                        <p className="date-text">{today}</p>
+                                    </div>
                                 </div>
+                                <div className="recent-threads">
+                                    <h4>Recent Threads</h4>
+                                    {recentChats.length === 0 ? (
+                                        <p>No recent threads available</p>
+                                    ) : (
+                                        <ul>
+                                            {recentChats.map((chat) => (
+                                                <li key={chat.conversation_id} className="recent-item">
+                                                    <span>{chat.summarized_name || "Untitled Chat"}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+
+
+                                <p className="main-request">
+                                    How can I help you?
+                                </p>
                             </div>
-                            <div className="recent-threads">
-                                <h4>Recent Threads</h4>
-                                {recentChats.length === 0 ? (
-                                    <p>No recent threads available</p>
-                                ) : (
-                                    <ul>
-                                        {recentChats.map((chat) => (
-                                            <li key={chat.conversation_id} className="recent-item">
-                                                <span>{chat.summarized_name || "Untitled Chat"}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
+                        )}
 
-
-                            <p className="main-request">
-                                How can I help you?
-                            </p>
-                        </div>
-                    )}
-
-                    {!showGreeting &&
-                        messages.map((m, i) => (
+                        {!showGreeting &&
+                            messages.map((m, i) => (
                             <div key={i} className={`msg ${m.role}`}>
                                 <div className="msg-img">
                                     {m.role == 'assistant' ? <img className='wilfred-image'
@@ -918,6 +1039,70 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                             </div>
                         ))}
+                    </div>
+
+                    <div className="recent-details-body">
+                        <div className="recent-user-details">
+                            <div className="recent-user-img">
+                                <img className='wilfred-image'
+                                    src="/static/assets/images/wilfred.png"
+                                    alt="Chat"
+                                    />
+                            </div>
+                            <div className="recent-user-name">
+                                <h4 className="header">
+                                        {(() => {
+                                            const hour = new Date().getHours();
+                                            if (hour < 12) return "Good Morning";
+                                            if (hour < 18) return "Good Afternoon";
+                                            return "Good Evening";
+                                        })()}, {userName  || "there"} 
+                                </h4>
+                                <p>How can I help you?</p>
+                            </div>
+                        </div>
+
+                        <div className="recent-chat">
+                            <h5>Recent chats</h5>
+
+                            <div className="recent-chat-body">
+
+                                <div className="recent-chat-history">
+                                    <ul>
+                                        <li className="recent-main-text">
+                                            <a className="recent-text-details">
+                                                <span className="msg-icon">
+                                                    <MessageOutlined />
+                                                </span>
+                                                <span className="text-ellipsis">
+                                                    hello text
+                                                </span>
+                                            </a>
+
+                                            <div className="ant-dropdown-trigger" style={{ display: "inline-block", position: "relative" }}>
+                                                
+                                                <span className="anticon" style={{ fontSize: "20px", cursor: "pointer" }}><MoreOutlined /></span>
+
+                                                
+                                                <div
+                                                    className="ant-dropdown ant-dropdown-placement-bottomLeft"
+                                                    style={{ position: "absolute", top: "100%", left: 0, display: "none" }}
+                                                >
+                                                    <ul className="ant-dropdown-menu ant-dropdown-menu-root ant-dropdown-menu-vertical" role="menu">
+                                                    <li className="ant-dropdown-menu-item" role="menuitem">Edit</li>
+                                                    <li className="ant-dropdown-menu-item" role="menuitem">Delete</li>
+                                                    <li className="ant-dropdown-menu-item" role="menuitem">Share</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="popupFooter">
