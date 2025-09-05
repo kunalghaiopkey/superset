@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
 import ReactMarkdown from "react-markdown";
-import { ClearOutlined, CloseOutlined, MessageOutlined, MoreOutlined } from "@ant-design/icons";
+import { ClearOutlined, CloseOutlined, MessageOutlined } from "@ant-design/icons";
 import { Tooltip } from 'src/components/Tooltip';
 
 type Msg = { role: "user" | "assistant"; text: string };
@@ -428,23 +428,17 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
   
     function parseEventData(data: string): string {
         let parsedData = "";
-        let nextlinefound = 0;
-        console.log(data)
-        data.split("\n").forEach((line) => {
-            const [key, value] = line.split(": ");
-            key!=''?console.log(key,'-----',value):console.log('key may be empty or value is undefined '+key,'-----',value)
-            if (value !== undefined && value !== "[DONE]") {
-                nextlinefound = 0;
-                parsedData += value;
-            } 
-            else if(value == undefined || key == ""){
+        data.split('\n').forEach((line) => {
+            if (line.startsWith("data: ")) {
+                const value = line.slice(6);
 
-            }
-            else {
-                if (nextlinefound > 0) {
+                if (value === "[DONE]") return;
+
+                if (value.trim() === "") {
                     parsedData += "\n";
+                } else {
+                    parsedData += value;
                 }
-                nextlinefound++;
             }
         });
 
@@ -979,130 +973,98 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                 </div>
 
-                <div className="popupBody" >
-                    <div className="greeting-body">
-                        {showGreeting && (
-                            <div className="greeting">
-                                <div className="greetings-body">
-                                    <div className="greetings-body-center">
-                                        <h4 className="header">
-                                            {(() => {
-                                                const hour = new Date().getHours();
-                                                if (hour < 12) return "Good Morning";
-                                                if (hour < 18) return "Good Afternoon";
-                                                return "Good Evening";
-                                            })()}, {userName || "there"}
-                                        </h4>
-
-                                        <p className="date-text">{today}</p>
-                                    </div>
-                                </div>
-                                <div className="recent-threads">
-                                    <h4>Recent Threads</h4>
-                                    {recentChats.length === 0 ? (
-                                        <p>No recent threads available</p>
-                                    ) : (
-                                        <ul>
-                                            {recentChats.map((chat) => (
-                                                <li key={chat.conversation_id} className="recent-item">
-                                                    <span>{chat.summarized_name || "Untitled Chat"}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-
-
-                                <p className="main-request">
-                                    How can I help you?
-                                </p>
-                            </div>
-                        )}
-
-                        {!showGreeting &&
-                            messages.map((m, i) => (
-                            <div key={i} className={`msg ${m.role}`}>
-                                <div className="msg-img">
-                                    {m.role == 'assistant' ? <img className='wilfred-image'
-                                        src="/static/assets/images/wilfred.png"
-                                        alt="Chat"
-                                    /> : ''}
-                                </div>
-                                <div className="msg-bubble">
-                                    <ReactMarkdown>{m.text}</ReactMarkdown>
-                                    {messageLoader && m.role === "assistant" && i === messages.length - 1 && (
-                                        <img alt="" src="/static/assets/images/loader2.gif" />
-                                    )}
-                                </div>
-
-                                <div ref={messagesEndRef}></div>
-
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="recent-details-body">
-                        <div className="recent-user-details">
-                            <div className="recent-user-img">
-                                <img className='wilfred-image'
-                                    src="/static/assets/images/wilfred.png"
-                                    alt="Chat"
-                                    />
-                            </div>
-                            <div className="recent-user-name">
-                                <h4 className="header">
+                <div className="popupBody">
+                    {/* 1. Greeting screen */}
+                    {showGreeting && (
+                        <div className="greeting">
+                            <div className="greetings-body">
+                                <div className="greetings-body-center">
+                                    <h4 className="header">
                                         {(() => {
                                             const hour = new Date().getHours();
                                             if (hour < 12) return "Good Morning";
                                             if (hour < 18) return "Good Afternoon";
                                             return "Good Evening";
-                                        })()}, {userName  || "there"} 
-                                </h4>
-                                <p>How can I help you?</p>
+                                        })()}, {userName || "there"}
+                                    </h4>
+                                    <p className="date-text">{today}</p>
+                                </div>
                             </div>
+                            <p className="main-request">How can I help you?</p>
                         </div>
+                    )}
 
-                        <div className="recent-chat">
-                            <h5>Recent chats</h5>
+                    {/* 2. Chat messages */}
+                    {!showGreeting && messages.length > 0 && (
+                        <div className="chat-messages">
+                            {messages.map((m, i) => (
+                                <div key={i} className={`msg ${m.role}`}>
+                                    <div className="msg-img">
+                                        {m.role === "assistant" && (
+                                            <img
+                                                className="wilfred-image"
+                                                src="/static/assets/images/wilfred.png"
+                                                alt="Chat"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="msg-bubble">
+                                        <ReactMarkdown>{m.text}</ReactMarkdown>
+                                        {messageLoader && m.role === "assistant" && i === messages.length - 1 && (
+                                            <img alt="" src="/static/assets/images/loader2.gif" />
+                                        )}
+                                    </div>
+                                    <div ref={messagesEndRef}></div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
-                            <div className="recent-chat-body">
+                    {/* 3. Recent chats */}
+                    {!showGreeting && messages.length === 0 && recentChats.length > 0 && (
+                        <div className="recent-details-body">
+                            <div className="recent-user-details">
+                                <div className="recent-user-img">
+                                    <img
+                                        className="wilfred-image"
+                                        src="/static/assets/images/wilfred.png"
+                                        alt="Chat"
+                                    />
+                                </div>
+                                <div className="recent-user-name">
+                                    <h4 className="header">
+                                        {(() => {
+                                            const hour = new Date().getHours();
+                                            if (hour < 12) return "Good Morning";
+                                            if (hour < 18) return "Good Afternoon";
+                                            return "Good Evening";
+                                        })()}, {userName || "there"}
+                                    </h4>
+                                    <p>How can I help you?</p>
+                                </div>
+                            </div>
 
-                                <div className="recent-chat-history">
+                            <div className="recent-chat">
+                                <h5>Recent chats</h5>
+                                <div className="recent-chat-body">
                                     <ul>
-                                        <li className="recent-main-text">
-                                            <a className="recent-text-details">
-                                                <span className="msg-icon">
-                                                    <MessageOutlined />
-                                                </span>
-                                                <span className="text-ellipsis">
-                                                    hello text
-                                                </span>
-                                            </a>
-
-                                            <div className="ant-dropdown-trigger" style={{ display: "inline-block", position: "relative" }}>
-                                                
-                                                <span className="anticon" style={{ fontSize: "20px", cursor: "pointer" }}><MoreOutlined /></span>
-
-                                                
-                                                <div
-                                                    className="ant-dropdown ant-dropdown-placement-bottomLeft"
-                                                    style={{ position: "absolute", top: "100%", left: 0, display: "none" }}
-                                                >
-                                                    <ul className="ant-dropdown-menu ant-dropdown-menu-root ant-dropdown-menu-vertical" role="menu">
-                                                    <li className="ant-dropdown-menu-item" role="menuitem">Edit</li>
-                                                    <li className="ant-dropdown-menu-item" role="menuitem">Delete</li>
-                                                    <li className="ant-dropdown-menu-item" role="menuitem">Share</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-
-                                        </li>
+                                        {recentChats.map(chat => (
+                                            <li key={chat.conversation_id} className="recent-main-text">
+                                                <a className="recent-text-details">
+                                                    <span className="msg-icon">
+                                                        <MessageOutlined />
+                                                    </span>
+                                                    <span className="text-ellipsis">
+                                                        {chat.summarized_name || "Untitled Chat"}
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 <div className="popupFooter">
