@@ -281,6 +281,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [messageLoader,setMessageLoader]=useState(false);
+    const [disableChat,setDisableChat]=useState(false);
 
     const clearChat=()=>{
         setChatText('');
@@ -341,6 +342,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setChatText("");
         setShowGreeting(false);
         setMessageLoader(true);
+        setDisableChat(true);
 
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -414,6 +416,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
                 if (isDone) {
                     setMessageLoader(false);
+                    setDisableChat(false);
                 }
             }
         } catch (err) {
@@ -423,6 +426,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 { role: "assistant", text: " Something went wrong." },
             ]);
             setMessageLoader(false);
+            setDisableChat(false);
         }
     };
 
@@ -561,6 +565,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                         <button
                             onClick={handleSend}
                             className="btn_speek_msg_wilfred"
+                            disabled={disableChat}
                         >
 
                              <img className='sparkler-image'
