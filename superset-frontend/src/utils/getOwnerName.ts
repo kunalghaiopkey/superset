@@ -22,5 +22,7 @@ export default function getOwnerName(owner?: Owner): string {
   if (!owner) {
     return '';
   }
+  if (owner.first_name == owner.last_name) return `${owner.first_name}`;
+  
   return owner.full_name || `${owner.first_name} ${owner.last_name}`;
 }
