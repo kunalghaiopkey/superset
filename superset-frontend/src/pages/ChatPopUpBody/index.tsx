@@ -28,7 +28,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
         <div className="popupBody">
             {console.log(showGreeting, '--------', totalRecentCount, '--------', messages.length)}
             {/* 1. Greeting screen */}
-            {!showGreeting &&  messages.length == 0 &&(
+            {showGreeting && messages.length == 0 && (
                 <div className="greeting">
                     <div className="greetings-body">
                         <div className="greetings-body-center">
@@ -76,7 +76,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
             )}
 
             {/* 3. Recent chats */}
-            {showGreeting && messages.length == 0 && totalRecentCount == 0 && (
+            {!showGreeting && messages.length == 0 && totalRecentCount > 0 && (
                 <div className="recent-details-body">
                     <div className="recent-user-details">
                         <div className="recent-user-img">
