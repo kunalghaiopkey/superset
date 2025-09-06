@@ -1,11 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@superset-ui/core";
-import ReactMarkdown from "react-markdown";
-import { ClearOutlined, CloseOutlined, MessageOutlined } from "@ant-design/icons";
+import { ClearOutlined, CloseOutlined } from "@ant-design/icons";
 import { Tooltip } from 'src/components/Tooltip';
+import ChatPopupBody from "../ChatPopUpBody";
 
 type Msg = { role: "user" | "assistant"; text: string };
+interface UserDTO {
+    U_ID: string;
+    email_ID: string;
+    ApiKey: string;
+}
 
+interface ProjectDTO {
+    P_ID: string;
+    Name: string;
+}
 const PopupContainer = styled.div`
   .popUp {
     position: fixed;
@@ -221,7 +230,6 @@ const PopupContainer = styled.div`
 
     .recent-details-body {
         height:100%;
-        display:none;
 
         .recent-user-details {
             display: flex;
@@ -405,6 +413,7 @@ const PopupContainer = styled.div`
 `;
 
 const ChatPopup = ({ onClose }: { onClose: () => void }) => {
+    const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
     const [chatText, setChatText] = useState("");
     const [messages, setMessages] = useState<Msg[]>([]);
     const [showGreeting, setShowGreeting] = useState(true);
@@ -412,9 +421,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [userName, setUserName] = useState<string | null>(null);
     const [messageLoader, setMessageLoader] = useState(false);
     const [bearerToken, setBearerToken] = useState(null);
-    const [contextId, setContextId] = useState<string | null>(null);
+    const [contextId, setContextId] = useState<string>(EMPTY_GUID);
     const [isContinueConversation, setIsContinueConversation] = useState(false);
     const [disableChat, setDisableChat] = useState(false);
+    const [totalRecentCount,setTotalRecentCount]=useState(0);
 
     const newThread = () => {
         setChatText('');
@@ -424,17 +434,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
         setIsContinueConversation(false);
         setContextId(crypto.randomUUID());
-
+        getRecentChatData(); 
         localStorage.setItem("continue_chat_key", "false");
     };
 
-
-    const clearChat = () => {
-        setChatText('');
-        setMessageLoader(false);
-        setShowGreeting(true);
-        setMessages([]);
-    }
   
     function parseEventData(data: string): string {
         let parsedData = "";
@@ -455,13 +458,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         return parsedData;
     }
 
-
     useEffect(() => {
         if (messagesEndRef.current) {
-            console.log('----------' + messagesEndRef);
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
-        console.log(messagesEndRef);
 
         const userEncoded = localStorage.getItem("UserDTO");
         if (userEncoded) {
@@ -475,8 +475,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     }, [messages]);
 
     useEffect(() => {
+        getRecentChatData(); 
         getLastChatData();
-
     }, []);
 
 
@@ -487,7 +487,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     //     getRecentChatData(); 
     // };
 
-    const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
+    
     const CONTINUE_CHAT_KEY = "continue_chat";
 
     const getLastChatData = async () => {
@@ -516,23 +516,23 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (result.conversation_id === EMPTY_GUID) {
                 setMessages([]);
-                setShowGreeting(true);
+                totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(crypto.randomUUID());
-                getRecentChatData();
+                // getRecentChatData();
                 localStorage.setItem(CONTINUE_CHAT_KEY, "false");
             } else {
                 const isContinueChat = localStorage.getItem(CONTINUE_CHAT_KEY);
-                if (isContinueChat === "true") {
+                if (isContinueChat == "true") {
                     console.log("Resuming chat", result.conversation_id);
                     getSessionChatData(result.conversation_id);
                     localStorage.setItem(CONTINUE_CHAT_KEY, "true");
                 } else {
                     console.log("Forcing new chat");
                     setMessages([]);
-                    setShowGreeting(true);
+                    totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                     setContextId(crypto.randomUUID());
                     localStorage.setItem(CONTINUE_CHAT_KEY, "false");
-                    getRecentChatData();
+                    // getRecentChatData();
                 }
             }
         } catch (err) {
@@ -541,59 +541,57 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     };
 
 
-    // const curdRecentChat = async (item: any, actionType: "delete") => {
-    //     const userEncoded = localStorage.getItem("UserDTO");
-    //     const projectEncoded = localStorage.getItem("ProjectDTO");
-    //     if (!userEncoded || !projectEncoded) return;
+    const curdRecentChat = async (item: { conversation_id: string }, actionType: "delete") => {
+        if (!item?.conversation_id) return;
 
-    //     const user = JSON.parse(atob(userEncoded));
-    //     const project = JSON.parse(atob(projectEncoded));
+        try {
+            const url = "/api/WilfredConversation/RenameDeleteOrPinConversationInWilfred";
+            const userEncoded = localStorage.getItem("UserDTO");
+            const projectEncoded = localStorage.getItem("ProjectDTO");
+            if (!userEncoded || !projectEncoded) return;
 
-    //     try {
-    //         const url = "/api/WilfredConversation/RenameDeleteOrPinConversationInWilfred";
-    //         const payload = {
-    //             conversation_id: item.conversation_id,
-    //             action: actionType,
-    //             value: "", 
-    //             username: user.email_ID,
-    //             projectId: project.P_ID,
-    //         };
+            const user = JSON.parse(atob(userEncoded));
+            const project = JSON.parse(atob(projectEncoded));
 
-    //         const resp = await fetch(url, {
-    //             method: "POST",
-    //             headers: {
-    //                 accept: "application/json",
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify(payload),
-    //         });
+            const payload = {
+                conversation_id: item.conversation_id,
+                action: actionType,
+                value: "",
+                username: user.email_ID,
+                projectId: project.P_ID,
+            };
 
-    //         if (!resp.ok) {
-    //             throw new Error(`Error: ${resp.status} ${resp.statusText}`);
-    //         }
+            const resp = await fetch(url, {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
-    //         const result = await resp.json();
+            const result = await resp.json();
+            if (result.status !== "fail") {
+                getRecentChatData();
+                setMessages([]);
+                totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
+                setContextId(EMPTY_GUID);
+                setChatText('');
+                setMessageLoader(false);
+                // setRecentChats([]);
+            } else {
+                console.error("curdRecentChat failed:", result.message);
+            }
+        } catch (err) {
+            console.error("curdRecentChat error:", err);
+        }
+    };
 
-    //         if (result.status === "fail") {
-    //             console.error("Delete failed:", result.message);
-    //         } else {
-    //             console.log("Delete success:", result.message);
-    //             setRecentChats([]);
-    //             // setMsgOffset(0);
-    //             await getRecentChatData();
-
-    //         }
-    //     } catch (err) {
-    //         console.error("curdRecentChat failed:", err);
-    //     }
-    // };
-
-
-
-    const handleSend = async () => {
+    const handleSend = () => {
         if (!chatText.trim()) return;
-        setMessages(prev => [...prev, { role: "user", text: chatText }]);
+
         const user_msg_timestamp = new Date();
+        setMessages((prev: any) => [...prev, { role: "user", text: chatText }]);
         setChatText("");
         setShowGreeting(false);
         setMessageLoader(true);
@@ -601,29 +599,49 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
+        // const keycloak_token = localStorage.getItem("keycloak_token");
 
-        let user = null;
-        let project = null;
+        let user: UserDTO | null = null;
+        let project:ProjectDTO  |null = null;
+
 
         if (userEncoded) {
-            try { user = JSON.parse(atob(userEncoded)); } catch (e) { console.warn("Invalid UserDTO encoding", e); }
+            try {
+                user = JSON.parse(atob(userEncoded));
+            } catch (e) {
+                console.warn("Invalid UserDTO encoding", e);
+            }
         }
+
         if (projectEncoded) {
-            try { project = JSON.parse(atob(projectEncoded)); } catch (e) { console.warn("Invalid ProjectDTO encoding", e); }
+            try {
+                project = JSON.parse(atob(projectEncoded));
+            } catch (e) {
+                console.warn("Invalid ProjectDTO encoding", e);
+            }
+        }
+        if (!user || !project) {
+            console.error("Missing user or project info");
+            return;
         }
 
-        if (!bearerToken) {
-            await getBearerToken(user.email_ID, user.ApiKey);
-        }
-        const newContextId = crypto.randomUUID();
-        setContextId(newContextId);
+        const fetchToken = bearerToken
+            ? Promise.resolve()
+            : getBearerToken(user?.email_ID, user?.ApiKey);
 
-        try {
-            let payload = {
-                contextId: newContextId,
-                userEmail: user.email_ID,
-                projectName: project.Name,
-                projectId: project.P_ID,
+        fetchToken.then(() => {
+            let currentContextId = contextId;
+
+            if (currentContextId == EMPTY_GUID) {
+                currentContextId = crypto.randomUUID();
+                setContextId(currentContextId);
+            }
+
+            const payload = {
+                contextId: currentContextId,
+                userEmail: user?.email_ID,
+                projectName: project?.Name,
+                projectId: project?.P_ID,
                 domainName: window.location.origin,
                 text: chatText,
                 agentType: "BI_AGENT",
@@ -631,71 +649,77 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 extra_metadata: {},
             };
 
-            setMessages(prev => [...prev, { role: "assistant", text: "" }]);
+            setMessages((prev: any) => [...prev, { role: "assistant", text: "" }]);
 
-            const response = await fetch("/wilfred_v4/chat", {
+            fetch("/wilfred_v4/chat", {
                 method: "POST",
                 headers: {
                     accept: "application/json",
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${bearerToken}`,
+                    // "keycloak-token": keycloak_token ? keycloak_token.toString() : "",
                 },
                 body: JSON.stringify(payload),
-            });
+            })
+                .then((response) => {
+                    if (!response.body) throw new Error("No response body");
 
-            if (!response.body) throw new Error("No response body");
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let assistantReply = "";
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let assistantReply = "";
+                    const readChunk = () => {
+                        return reader.read().then(({ done, value }): any => {
+                            if (done) {
+                                setMessageLoader(false);
+                                setDisableChat(false);
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+                                const wilfred_response_timestamp = new Date();
+                                const chatId = crypto.randomUUID();
 
-                const chunk = decoder.decode(value, { stream: true });
+                                return saveResponseChat(
+                                    chatText,
+                                    user_msg_timestamp,
+                                    chatId,
+                                    assistantReply,
+                                    wilfred_response_timestamp,
+                                    currentContextId
+                                ).then(() => Promise.resolve());
 
-                if (chunk.includes("[DONE]")) {
+                            }
+
+                            const chunk = decoder.decode(value, { stream: true });
+
+                            const parsedText = parseEventData(chunk);
+                            if (parsedText) {
+                                assistantReply += parsedText;
+
+                                setMessages((prev: any) => {
+                                    const updated = [...prev];
+                                    updated[updated.length - 1] = {
+                                        role: "assistant",
+                                        text: assistantReply,
+                                    };
+                                    return updated;
+                                });
+                            }
+
+                            return readChunk();
+                        });
+                    };
+
+                    return readChunk();
+                })
+                .catch((err) => {
+                    console.error("Stream failed:", err);
+                    setMessages((prev: any) => [
+                        ...prev,
+                        { role: "assistant", text: " Something went wrong." },
+                    ]);
                     setMessageLoader(false);
                     setDisableChat(false);
-
-                    const wilfred_response_timestamp = new Date();
-                    const chatId = crypto.randomUUID();
-
-                    await saveResponseChat(
-                        chatText,
-                        user_msg_timestamp,
-                        chatId,
-                        assistantReply,
-                        wilfred_response_timestamp
-                    );
-
-                    break; 
-                }
-
-                const parsedText = parseEventData(chunk);
-                if (parsedText) {
-                    assistantReply += parsedText;
-
-                    setMessages(prev => {
-                        const updated = [...prev];
-                        updated[updated.length - 1] = {
-                            role: "assistant",
-                            text: assistantReply,
-                        };
-                        return updated;
-                    });
-                }
-            }
-        } catch (err) {
-            console.error("Stream failed:", err);
-            setMessages(prev => [
-                ...prev,
-                { role: "assistant", text: " Something went wrong." },
-            ]);
-            setMessageLoader(false);
-            setDisableChat(false);
-        }
+                });
+        });
     };
 
     const getBearerToken = async (userEmail: string, apiKey: string) => {
@@ -725,65 +749,13 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    // const saveResponseChat = async (
-    //     user_msg: string,
-    //     user_msg_timestamp: Date,
-    //     chatId: string,
-    //     wilfred_resp: string,
-    //     wilfred_response_timestamp: Date,
-    // ) => {
-    //     const userEncoded = localStorage.getItem("UserDTO");
-    //     const projectEncoded = localStorage.getItem("ProjectDTO");
-    //     if (!userEncoded || !projectEncoded) return;
-
-    //     const user = JSON.parse(atob(userEncoded));
-    //     const project = JSON.parse(atob(projectEncoded));
-
-    //     const url = isContinueConversation
-    //         ? "/api/WilfredConversation/ResumeConversation"
-    //         : "/api/WilfredConversation/CreateNewConversation";
-
-    //     const payload = {
-    //         projectId: project.P_ID,
-    //         userId: user.U_ID,
-    //         conversationId: contextId,
-    //         chatId,
-    //         user_msg,
-    //         wilfred_resp,
-    //         user_msg_timestamp,
-    //         wilfred_response_timestamp,
-    //         persona_type: "BI_AGENT",
-    //         WorkerID: "00000000-0000-0000-0000-000000000000",
-    //         dbid: "00000000-0000-0000-0000-000000000000",
-    //         feature: "",
-    //         user_msg_summerised: user_msg,
-    //     };
-
-    //     try {
-    //         const resp = await fetch(url, {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json", accept: "application/json" },
-    //             body: JSON.stringify(payload),
-    //         });
-
-    //         if (!resp.ok) throw new Error(`Error ${resp.status}`);
-    //         const result = await resp.json();
-
-    //         if (result.status === "success") {
-    //             setIsContinueConversation(true);
-    //         } else {
-    //             setIsContinueConversation(false);
-    //         }
-    //     } catch (err) {
-    //         console.error("saveResponseChat failed:", err);
-    //     }
-    // };
     const saveResponseChat = async (
         userMsg: string,
         userMsgTimestamp: Date,
         chatId: string,
         wilfredResp: string,
         wilfredRespTimestamp: Date,
+        currentContextId : string 
     ) => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -798,15 +770,15 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const payload = {
             projectId: project.P_ID,
             userId: user.U_ID,
-            conversationId: contextId,
+            conversationId: currentContextId,
             chatId: chatId,
             user_msg: userMsg,
             wilfred_resp: wilfredResp,
             user_msg_timestamp: userMsgTimestamp,
             wilfred_resp_timestamp: wilfredRespTimestamp,
             persona_type: "BI_AGENT",
-            WorkerID: "00000000-0000-0000-0000-000000000000",
-            dbid: "00000000-0000-0000-0000-000000000000",
+            WorkerID: EMPTY_GUID,
+            dbid: EMPTY_GUID,
             feature: "",
             user_msg_summerised: userMsg,
         };
@@ -824,7 +796,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (!response.ok) throw new Error("Failed to save chat");
 
             const result = await response.json();
-            console.log(result)
+            console.log('Save / resume chat result ',result)
             setIsContinueConversation(true);
             localStorage.setItem("continue_chat_key", "true");
         } catch (err) {
@@ -897,11 +869,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             const payload: any = {
                 userId: user.U_ID,
                 projectId: project.P_ID,
-                dbId: "00000000-0000-0000-0000-000000000000",
+                dbId: EMPTY_GUID,
                 feature: "",
                 offset: 0,
-                limit: 5,
+                limit: 15,
             };
+
             const queryString = new URLSearchParams(payload).toString();
             const url = `${baseUrl}?${queryString}`;
 
@@ -915,12 +888,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (!resp.ok) throw new Error(`Error: ${resp.status} ${resp.statusText}`);
             const result = await resp.json();
-            console.log("recent chat data " + result.data);
 
             if (result.data) {
-                setRecentChats(prev => [...prev, ...result.data]);
+                setRecentChats(result.data);
             }
-            // setTotalRecentCount(result.total_count || 0);
+
+            setTotalRecentCount(result.total_count ?? 0);
 
         } catch (err) {
             console.error("getRecentChatData failed:", err);
@@ -965,10 +938,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                                     </button>
                                 </Tooltip>
                                 <Tooltip title="Clear Thread">
-                                    {/* <button className="close-modal-btn" onClick={() => curdRecentChat(chat, "delete")}>
-                                        <ClearOutlined />
-                                    </button> */}
-                                    <button className="close-modal-btn" onClick={() => clearChat()}>
+                                    <button
+                                        className="close-modal-btn"
+                                        onClick={() => curdRecentChat({ conversation_id: contextId }, "delete")}
+                                    >
                                         <ClearOutlined />
                                     </button>
                                 </Tooltip>
@@ -982,100 +955,17 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     </div>
 
                 </div>
-
-                <div className="popupBody">
-                    {/* 1. Greeting screen */}
-                    {showGreeting && (
-                        <div className="greeting">
-                            <div className="greetings-body">
-                                <div className="greetings-body-center">
-                                    <h4 className="header">
-                                        {(() => {
-                                            const hour = new Date().getHours();
-                                            if (hour < 12) return "Good Morning";
-                                            if (hour < 18) return "Good Afternoon";
-                                            return "Good Evening";
-                                        })()}, {userName || "there"}
-                                    </h4>
-                                    <p className="date-text">{today}</p>
-                                </div>
-                            </div>
-                            <p className="main-request">How can I help you?</p>
-                        </div>
-                    )}
-
-                    {/* 2. Chat messages */}
-                    {!showGreeting && messages.length > 0 && (
-                        <div className="chat-messages">
-                            {messages.map((m, i) => (
-                                <div key={i} className={`msg ${m.role}`}>
-                                    <div className="msg-img">
-                                        {m.role === "assistant" && (
-                                            <img
-                                                className="wilfred-image"
-                                                src="/static/assets/images/wilfred.png"
-                                                alt="Chat"
-                                            />
-                                        )}
-                                    </div>
-                                    <div className="msg-bubble">
-                                        <ReactMarkdown>{m.text}</ReactMarkdown>
-                                        {messageLoader && m.role === "assistant" && i === messages.length - 1 && (
-                                            <img alt="" src="/static/assets/images/loader2.gif" />
-                                        )}
-                                    </div>
-                                    <div ref={messagesEndRef}></div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* 3. Recent chats */}
-                    {!showGreeting && messages.length === 0 && recentChats.length > 0 && (
-                        <div className="recent-details-body">
-                            <div className="recent-user-details">
-                                <div className="recent-user-img">
-                                    <img
-                                        className="wilfred-image"
-                                        src="/static/assets/images/wilfred.png"
-                                        alt="Chat"
-                                    />
-                                </div>
-                                <div className="recent-user-name">
-                                    <h4 className="header">
-                                        {(() => {
-                                            const hour = new Date().getHours();
-                                            if (hour < 12) return "Good Morning";
-                                            if (hour < 18) return "Good Afternoon";
-                                            return "Good Evening";
-                                        })()}, {userName || "there"}
-                                    </h4>
-                                    <p>How can I help you?</p>
-                                </div>
-                            </div>
-
-                            <div className="recent-chat">
-                                <h5>Recent chats</h5>
-                                <div className="recent-chat-body">
-                                    <ul>
-                                        {recentChats.map(chat => (
-                                            <li key={chat.conversation_id} className="recent-main-text">
-                                                <a className="recent-text-details">
-                                                    <span className="msg-icon">
-                                                        <MessageOutlined />
-                                                    </span>
-                                                    <span className="text-ellipsis">
-                                                        {chat.summarized_name || "Untitled Chat"}
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                {console.log('chatpopup-----',showGreeting,'--------',totalRecentCount,'--------',messages.length)}
+                <ChatPopupBody
+                    showGreeting={showGreeting}
+                    messages={messages}
+                    messageLoader={messageLoader}
+                    recentChats={recentChats}
+                    totalRecentCount={totalRecentCount}
+                    userName={userName}
+                    today={today}
+                    messagesEndRef={messagesEndRef}
+                />
 
                 <div className="popupFooter">
                     <div className="footer-main">
