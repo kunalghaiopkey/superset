@@ -475,8 +475,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     }, [messages]);
 
     useEffect(() => {
-        getRecentChatData(); 
         getLastChatData();
+        getRecentChatData(); 
     }, []);
 
 
@@ -488,7 +488,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     // };
 
     
-    const CONTINUE_CHAT_KEY = "continue_chat";
+    const CONTINUE_CHAT_KEY = "continue_chat_key";
 
     const getLastChatData = async () => {
         const userEncoded = localStorage.getItem("UserDTO");
@@ -842,7 +842,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     { role: "user", text: c.user_msg },
                     { role: "assistant", text: c.wilfred_resp },
                 ]).flat();
-
+                setIsContinueConversation(true);
                 setMessages(restoredMessages);
                 setShowGreeting(false);
             }
@@ -930,7 +930,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
 
                     <div>
-                        {!showGreeting && (
+                        {!showGreeting && messages.length > 0  && (
                             <>
                                 <Tooltip title="New Thread">
                                     <button className="new-thread-btn" onClick={() => newThread()}>
