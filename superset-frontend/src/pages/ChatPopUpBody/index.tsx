@@ -106,22 +106,34 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                         <div className="recent-chat-body">
                             <div className="recent-chat-history">
                                 <ul>
-                                    {recentChats.map((chat) => (
-                                        <li
-                                            key={chat.conversation_id}
-                                            onClick={() => onOpenRecentChat(chat.conversation_id)} 
-                                            className="recent-main-text"
-                                        >
-                                            <a className="recent-text-details">
-                                                <span className="msg-icon">
-                                                    <MessageOutlined />
-                                                </span>
-                                                {totalRecentCount == 0 ? <span>No Recent Thread Availae</span> : <span className="text-ellipsis">
-                                                    {chat.summarized_name || "Untitled Chat"}
-                                                </span>}
-                                            </a>
-                                        </li>
-                                    ))}
+                                    {totalRecentCount == 0 ?
+                                        <div className="no-recent-chat">
+                                            <span className="recent-text">
+                                                No recent thread available
+                                            </span>
+                                        </div>
+
+                                        :
+
+                                        recentChats.map((chat) => (
+                                            <li
+                                                key={chat.conversation_id}
+                                                onClick={() => onOpenRecentChat(chat.conversation_id)}
+                                                className="recent-main-text">
+                                                    
+                                                <a className="recent-text-details">
+                                                    <span className="msg-icon">
+                                                        <MessageOutlined />
+                                                    </span>
+                                                    {/* {totalRecentCount == 0 ? <span>No Recent Thread Availae</span> : <span className="text-ellipsis">
+                                                        {chat.summarized_name || "Untitled Chat"}
+                                                    </span>} */}
+                                                    <span className="text-ellipsis">
+                                                        {chat.summarized_name || "Untitled Chat"}
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        ))}
                                 </ul>
                             </div>
                         </div>
