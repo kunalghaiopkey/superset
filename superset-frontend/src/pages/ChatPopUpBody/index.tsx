@@ -104,24 +104,26 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                     <div className="recent-chat">
                         <h5>Recent chats</h5>
                         <div className="recent-chat-body">
-                            <ul>
-                                {recentChats.map((chat) => (
-                                    <li
-                                        key={chat.conversation_id}
-                                        onClick={() => onOpenRecentChat(chat.conversation_id)} 
-                                        className="recent-main-text"
-                                    >
-                                        <a className="recent-text-details">
-                                            <span className="msg-icon">
-                                                <MessageOutlined />
-                                            </span>
-                                            <span className="text-ellipsis">
-                                                {chat.summarized_name || "Untitled Chat"}
-                                            </span>
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="recent-chat-history">
+                                <ul>
+                                    {recentChats.map((chat) => (
+                                        <li
+                                            key={chat.conversation_id}
+                                            onClick={() => onOpenRecentChat(chat.conversation_id)} 
+                                            className="recent-main-text"
+                                        >
+                                            <a className="recent-text-details">
+                                                <span className="msg-icon">
+                                                    <MessageOutlined />
+                                                </span>
+                                                <span className="text-ellipsis">
+                                                    {chat.summarized_name || "Untitled Chat"}
+                                                </span>
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
