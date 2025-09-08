@@ -13,6 +13,7 @@ interface PopupBodyProps {
     userName: string | null;
     today: string;
     messagesEndRef: React.RefObject<HTMLDivElement>;
+     onOpenRecentChat: (conversationId: string) => void; 
 }
 const ChatPopupBody: React.FC<PopupBodyProps> = ({
     showGreeting,
@@ -23,6 +24,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
     userName,
     today,
     messagesEndRef,
+    onOpenRecentChat
 }) => {
     return (
         <div className="popupBody">
@@ -106,6 +108,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                                 {recentChats.map((chat) => (
                                     <li
                                         key={chat.conversation_id}
+                                        onClick={() => onOpenRecentChat(chat.conversation_id)} 
                                         className="recent-main-text"
                                     >
                                         <a className="recent-text-details">

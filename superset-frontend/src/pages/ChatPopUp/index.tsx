@@ -425,16 +425,18 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [isContinueConversation, setIsContinueConversation] = useState(false);
     const [disableChat, setDisableChat] = useState(false);
     const [totalRecentCount,setTotalRecentCount]=useState(0);
+    const [recentChats, setRecentChats] = useState<any[]>([]);
+ // const [msgOffset, setMsgOffset] = useState(0);
+ // const msgLimit = 6; 
 
     const newThread = () => {
+        getRecentChatData(); 
         setChatText('');
         setMessages([]);
         setMessageLoader(false);
-        setShowGreeting(true);
-
+        totalRecentCount== 0 ?setShowGreeting(true):setShowGreeting(false);
         setIsContinueConversation(false);
-        setContextId(crypto.randomUUID());
-        getRecentChatData(); 
+        setContextId(EMPTY_GUID);
         localStorage.setItem("continue_chat_key", "false");
     };
 
@@ -530,7 +532,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     console.log("Forcing new chat");
                     setMessages([]);
                     totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
-                    setContextId(crypto.randomUUID());
+                    // setContextId(crypto.randomUUID());
                     localStorage.setItem(CONTINUE_CHAT_KEY, "false");
                     // getRecentChatData();
                 }
@@ -804,6 +806,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
+    const handleOpenRecentChat = (conversationId: string) => {
+        getSessionChatData(conversationId);
+    };
 
     const getSessionChatData = async (conversationId: string) => {
         const userEncoded = localStorage.getItem("UserDTO");
@@ -851,11 +856,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    const [recentChats, setRecentChats] = useState<any[]>([]);
-    // const [totalRecentCount, setTotalRecentCount] = useState(0);
-    // const [msgOffset, setMsgOffset] = useState(0);
-    // const msgLimit = 6; 
-
     const getRecentChatData = async () => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -891,9 +891,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (result.data) {
                 setRecentChats(result.data);
+                setTotalRecentCount(result.total_count ?? 0);
+                result.total_count == 0 ? setShowGreeting(true) : setShowGreeting(false);
             }
-
-            setTotalRecentCount(result.total_count ?? 0);
 
         } catch (err) {
             console.error("getRecentChatData failed:", err);
@@ -965,6 +965,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     userName={userName}
                     today={today}
                     messagesEndRef={messagesEndRef}
+                    onOpenRecentChat={handleOpenRecentChat} 
                 />
 
                 <div className="popupFooter">
