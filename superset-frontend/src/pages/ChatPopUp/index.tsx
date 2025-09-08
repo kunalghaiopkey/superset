@@ -428,7 +428,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [totalRecentCount, setTotalRecentCount] = useState(0);
     const [recentChats, setRecentChats] = useState<any[]>([]);
     const [msgOffset, setMsgOffset] = useState(0);
-    let msgLimit = 15; 
+    let msgLimit = 10; 
 
     const newThread = () => {
         getRecentChatData();
@@ -439,26 +439,26 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setContextId(EMPTY_GUID);
         localStorage.setItem("continue_chat_key", "false");
         setMsgOffset(0);
-        msgLimit=15;
     };
 
-    const loadMore=()=>{
-        setMsgOffset(msgLimit);
-        msgLimit+=5;
+    const loadMore = () => {
+        const newOffset = msgOffset + msgLimit;
+        setMsgOffset(newOffset);
+        getRecentChatData();
     }
 
 
     function parseEventData(data: string): string {
-        let i=0;
+        let i = 0;
 
-        return data.replaceAll('data: ','').split('\n\n').map(line=>{
-      if(i>0 && line == ''){
-          line+='\n';
-      }
-      if(line == ''){i++}
-      
-      return line
-  }).join('').replace('[DONE]','');                  
+        return data.replaceAll('data: ', '').split('\n\n').map(line => {
+            if (i > 0 && line == '') {
+                line += '\n';
+            }
+            if (line == '') { i++ }
+
+            return line
+        }).join('').replace('[DONE]', '');
     }
 
     useEffect(() => {
@@ -481,15 +481,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         getLastChatData();
         // getRecentChatData(); 
     }, []);
-
-
-    // const startNewChat = () => {
-    //     setMessages([]);
-    //     setShowGreeting(true);
-    //     setContextId(crypto.randomUUID());
-    //     getRecentChatData(); 
-    // };
-
 
     const CONTINUE_CHAT_KEY = "continue_chat_key";
 
@@ -583,7 +574,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 setChatText('');
                 setMessageLoader(false);
                 setMsgOffset(0);
-                msgLimit=15;
             } else {
                 console.error("curdRecentChat failed:", result.message);
             }

@@ -114,37 +114,35 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                                                 No recent thread available
                                             </span>
                                         </div>
+                                        :
+                                        (
+                                            recentChats.map((chat) => (
+                                                <li
+                                                    key={chat.conversation_id}
+                                                    onClick={() => onOpenRecentChat(chat.conversation_id)}
+                                                    className="recent-main-text">
 
-                                        : (
-                                            <>
-                                                {recentChats.map((chat) => (
-                                                    <li
-                                                        key={chat.conversation_id}
-                                                        onClick={() => onOpenRecentChat(chat.conversation_id)}
-                                                        className="recent-main-text">
-
-                                                        <a className="recent-text-details">
-                                                            <span className="msg-icon">
-                                                                <MessageOutlined />
-                                                            </span>
-                                                            <span className="text-ellipsis">
-                                                                {chat.summarized_name || "Untitled Chat"}
-                                                            </span>
-                                                        </a>
-                                                    </li>
-                                                ))}
-                                                {totalRecentCount > 15 && (
-                                                    <li>
-                                                        <button className="text-ellipsis" onClick={() => showMoreData()}>
-                                                            Show More
-                                                        </button>
-                                                    </li>
-                                                )}
-                                            </>
+                                                    <a className="recent-text-details">
+                                                        <span className="msg-icon">
+                                                            <MessageOutlined />
+                                                        </span>
+                                                        <span className="text-ellipsis">
+                                                            {chat.summarized_name || "Untitled Chat"}
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            ))
                                         )
                                     }
                                 </ul>
                             </div>
+                            {recentChats.length < totalRecentCount && (
+                                <div className="recent-showmore">
+                                    <button onClick={showMoreData} className="text-ellipsis">
+                                        Show More
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
