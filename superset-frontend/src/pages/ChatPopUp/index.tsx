@@ -312,7 +312,8 @@ const PopupContainer = styled.div`
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
-                        padding:0.5rem 0.75rem 0rem;
+                        padding:0.5rem 0.75rem;
+                        border: 1px solid rgba(0,0,0,.125);
 
                         &:last-child {
                             padding-bottom: 0.75rem !important;
