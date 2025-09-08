@@ -5,32 +5,32 @@ import { MessageOutlined } from "@ant-design/icons";
 type Msg = { role: "user" | "assistant"; text: string };
 
 interface PopupBodyProps {
-    showGreeting: boolean;
+    // showGreeting: boolean;
     messages: Msg[];
     messageLoader: boolean;
     recentChats: any[];
     totalRecentCount: number;
     userName: string | null;
-    today: string;
+    // today: string;
     messagesEndRef: React.RefObject<HTMLDivElement>;
      onOpenRecentChat: (conversationId: string) => void; 
 }
 const ChatPopupBody: React.FC<PopupBodyProps> = ({
-    showGreeting,
+    // showGreeting,
     messages,
     messageLoader,
     recentChats,
     totalRecentCount,
     userName,
-    today,
+    // today,
     messagesEndRef,
     onOpenRecentChat
 }) => {
     return (
         <div className="popupBody">
-            {console.log(showGreeting, '--------', totalRecentCount, '--------', messages.length)}
+            {console.log('--------', totalRecentCount, '--------', messages.length)}
             {/* 1. Greeting screen */}
-            {showGreeting && messages.length == 0 && (
+            {/* {showGreeting && messages.length == 0 && (
                 <div className="greeting">
                     <div className="greetings-body">
                         <div className="greetings-body-center">
@@ -47,10 +47,10 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                     </div>
                     <p className="main-request">How can I help you?</p>
                 </div>
-            )}
+            )} */}
 
             {/* 2. Chat messages */}
-            {!showGreeting && messages.length > 0 && (
+            {messages.length > 0 && (
                 <div className="chat-messages">
                     {messages.map((m, i) => (
                         <div key={i} className={`msg ${m.role}`}>
@@ -78,7 +78,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
             )}
 
             {/* 3. Recent chats */}
-            {!showGreeting && messages.length == 0 && totalRecentCount > 0 && (
+            {messages.length == 0 &&(
                 <div className="recent-details-body">
                     <div className="recent-user-details">
                         <div className="recent-user-img">
@@ -116,9 +116,9 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                                                 <span className="msg-icon">
                                                     <MessageOutlined />
                                                 </span>
-                                                <span className="text-ellipsis">
+                                                {totalRecentCount == 0 ? <span>No Recent Thread Availae</span> : <span className="text-ellipsis">
                                                     {chat.summarized_name || "Untitled Chat"}
-                                                </span>
+                                                </span>}
                                             </a>
                                         </li>
                                     ))}

@@ -416,7 +416,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
     const [chatText, setChatText] = useState("");
     const [messages, setMessages] = useState<Msg[]>([]);
-    const [showGreeting, setShowGreeting] = useState(true);
+    // const [showGreeting, setShowGreeting] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [messageLoader, setMessageLoader] = useState(false);
@@ -434,7 +434,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         setChatText('');
         setMessages([]);
         setMessageLoader(false);
-        totalRecentCount== 0 ?setShowGreeting(true):setShowGreeting(false);
         setIsContinueConversation(false);
         setContextId(EMPTY_GUID);
         localStorage.setItem("continue_chat_key", "false");
@@ -478,7 +477,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
     useEffect(() => {
         getLastChatData();
-        getRecentChatData(); 
+        // getRecentChatData(); 
     }, []);
 
 
@@ -518,9 +517,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (result.conversation_id === EMPTY_GUID) {
                 setMessages([]);
-                totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
+                // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(crypto.randomUUID());
-                // getRecentChatData();
+                getRecentChatData();
                 localStorage.setItem(CONTINUE_CHAT_KEY, "false");
             } else {
                 const isContinueChat = localStorage.getItem(CONTINUE_CHAT_KEY);
@@ -531,10 +530,10 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 } else {
                     console.log("Forcing new chat");
                     setMessages([]);
-                    totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
+                    // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                     // setContextId(crypto.randomUUID());
                     localStorage.setItem(CONTINUE_CHAT_KEY, "false");
-                    // getRecentChatData();
+                    getRecentChatData();
                 }
             }
         } catch (err) {
@@ -576,7 +575,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (result.status !== "fail") {
                 getRecentChatData();
                 setMessages([]);
-                totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
+                // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(EMPTY_GUID);
                 setChatText('');
                 setMessageLoader(false);
@@ -595,7 +594,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         const user_msg_timestamp = new Date();
         setMessages((prev: any) => [...prev, { role: "user", text: chatText }]);
         setChatText("");
-        setShowGreeting(false);
+        // setShowGreeting(false);
         setMessageLoader(true);
         setDisableChat(true);
 
@@ -849,7 +848,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 ]).flat();
                 setIsContinueConversation(true);
                 setMessages(restoredMessages);
-                setShowGreeting(false);
+                // setShowGreeting(false);
+                localStorage.setItem(CONTINUE_CHAT_KEY, "true");
+
             }
         } catch (err) {
             console.error("getSessionChatData failed:", err);
@@ -892,7 +893,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (result.data) {
                 setRecentChats(result.data);
                 setTotalRecentCount(result.total_count ?? 0);
-                result.total_count == 0 ? setShowGreeting(true) : setShowGreeting(false);
+                // result.total_count == 0 ? setShowGreeting(true) : setShowGreeting(false);
             }
 
         } catch (err) {
@@ -902,12 +903,12 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
 
 
-    const today = new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+    // const today = new Date().toLocaleDateString("en-US", {
+    //     weekday: "long",
+    //     day: "numeric",
+    //     month: "long",
+    //     year: "numeric",
+    // });
 
     return (
         <PopupContainer>
@@ -930,15 +931,16 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
 
                     <div>
-                        {!showGreeting && messages.length > 0  && (
+                        {messages.length > 0  && (
                             <>
                                 <Tooltip title="New Thread">
-                                    <button className="new-thread-btn" onClick={() => newThread()}>
+                                    <button className="new-thread-btn" onClick={() => newThread()} disabled={disableChat}>
                                         New Thread
                                     </button>
                                 </Tooltip>
                                 <Tooltip title="Clear Thread">
                                     <button
+                                        disabled={disableChat}
                                         className="close-modal-btn"
                                         onClick={() => curdRecentChat({ conversation_id: contextId }, "delete")}
                                     >
@@ -955,15 +957,15 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     </div>
 
                 </div>
-                {console.log('chatpopup-----',showGreeting,'--------',totalRecentCount,'--------',messages.length)}
+                {console.log('chatpopup--------',totalRecentCount,'--------',messages.length)}
                 <ChatPopupBody
-                    showGreeting={showGreeting}
+                    // showGreeting={showGreeting}
                     messages={messages}
                     messageLoader={messageLoader}
                     recentChats={recentChats}
                     totalRecentCount={totalRecentCount}
                     userName={userName}
-                    today={today}
+                    // today={today}
                     messagesEndRef={messagesEndRef}
                     onOpenRecentChat={handleOpenRecentChat} 
                 />
