@@ -13,7 +13,8 @@ interface PopupBodyProps {
     userName: string | null;
     // today: string;
     messagesEndRef: React.RefObject<HTMLDivElement>;
-     onOpenRecentChat: (conversationId: string) => void; 
+    onOpenRecentChat: (conversationId: string) => void;
+    showMoreData: () => void;
 }
 const ChatPopupBody: React.FC<PopupBodyProps> = ({
     // showGreeting,
@@ -24,7 +25,8 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
     userName,
     // today,
     messagesEndRef,
-    onOpenRecentChat
+    onOpenRecentChat,
+    showMoreData
 }) => {
     return (
         <div className="popupBody">
@@ -78,7 +80,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
             )}
 
             {/* 3. Recent chats */}
-            {messages.length == 0 &&(
+            {messages.length == 0 && (
                 <div className="recent-details-body">
                     <div className="recent-user-details">
                         <div className="recent-user-img">
@@ -113,27 +115,34 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                                             </span>
                                         </div>
 
-                                        :
+                                        : (
+                                            <>
+                                                {recentChats.map((chat) => (
+                                                    <li
+                                                        key={chat.conversation_id}
+                                                        onClick={() => onOpenRecentChat(chat.conversation_id)}
+                                                        className="recent-main-text">
 
-                                        recentChats.map((chat) => (
-                                            <li
-                                                key={chat.conversation_id}
-                                                onClick={() => onOpenRecentChat(chat.conversation_id)}
-                                                className="recent-main-text">
-                                                    
-                                                <a className="recent-text-details">
-                                                    <span className="msg-icon">
-                                                        <MessageOutlined />
-                                                    </span>
-                                                    {/* {totalRecentCount == 0 ? <span>No Recent Thread Availae</span> : <span className="text-ellipsis">
-                                                        {chat.summarized_name || "Untitled Chat"}
-                                                    </span>} */}
-                                                    <span className="text-ellipsis">
-                                                        {chat.summarized_name || "Untitled Chat"}
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        ))}
+                                                        <a className="recent-text-details">
+                                                            <span className="msg-icon">
+                                                                <MessageOutlined />
+                                                            </span>
+                                                            <span className="text-ellipsis">
+                                                                {chat.summarized_name || "Untitled Chat"}
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                                {totalRecentCount > 15 && (
+                                                    <li>
+                                                        <button className="text-ellipsis" onClick={() => showMoreData()}>
+                                                            Show More
+                                                        </button>
+                                                    </li>
+                                                )}
+                                            </>
+                                        )
+                                    }
                                 </ul>
                             </div>
                         </div>

@@ -425,39 +425,40 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [contextId, setContextId] = useState<string>(EMPTY_GUID);
     const [isContinueConversation, setIsContinueConversation] = useState(false);
     const [disableChat, setDisableChat] = useState(false);
-    const [totalRecentCount,setTotalRecentCount]=useState(0);
+    const [totalRecentCount, setTotalRecentCount] = useState(0);
     const [recentChats, setRecentChats] = useState<any[]>([]);
- // const [msgOffset, setMsgOffset] = useState(0);
- // const msgLimit = 6; 
+    const [msgOffset, setMsgOffset] = useState(0);
+    let msgLimit = 15; 
 
     const newThread = () => {
-        getRecentChatData(); 
+        getRecentChatData();
         setChatText('');
         setMessages([]);
         setMessageLoader(false);
         setIsContinueConversation(false);
         setContextId(EMPTY_GUID);
         localStorage.setItem("continue_chat_key", "false");
+        setMsgOffset(0);
+        msgLimit=15;
     };
 
-  
+    const loadMore=()=>{
+        setMsgOffset(msgLimit);
+        msgLimit+=5;
+    }
+
+
     function parseEventData(data: string): string {
-        let parsedData = "";
-        data.split('\n').forEach((line) => {
-            if (line.startsWith("data: ")) {
-                const value = line.slice(6);
+        let i=0;
 
-                if (value === "[DONE]") return;
-
-                if (value.trim() === "") {
-                    parsedData += "\n";
-                } else {
-                    parsedData += value;
-                }
-            }
-        });
-
-        return parsedData;
+        return data.replaceAll('data: ','').split('\n\n').map(line=>{
+      if(i>0 && line == ''){
+          line+='\n';
+      }
+      if(line == ''){i++}
+      
+      return line
+  }).join('').replace('[DONE]','');                  
     }
 
     useEffect(() => {
@@ -489,7 +490,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     //     getRecentChatData(); 
     // };
 
-    
+
     const CONTINUE_CHAT_KEY = "continue_chat_key";
 
     const getLastChatData = async () => {
@@ -578,9 +579,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 setMessages([]);
                 // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(EMPTY_GUID);
+                setIsContinueConversation(false);
                 setChatText('');
                 setMessageLoader(false);
-                // setRecentChats([]);
+                setMsgOffset(0);
+                msgLimit=15;
             } else {
                 console.error("curdRecentChat failed:", result.message);
             }
@@ -604,7 +607,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         // const keycloak_token = localStorage.getItem("keycloak_token");
 
         let user: UserDTO | null = null;
-        let project:ProjectDTO  |null = null;
+        let project: ProjectDTO | null = null;
 
 
         if (userEncoded) {
@@ -757,7 +760,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         chatId: string,
         wilfredResp: string,
         wilfredRespTimestamp: Date,
-        currentContextId : string 
+        currentContextId: string
     ) => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
@@ -798,7 +801,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (!response.ok) throw new Error("Failed to save chat");
 
             const result = await response.json();
-            console.log('Save / resume chat result ',result)
+            console.log('Save / resume chat result ', result)
             setIsContinueConversation(true);
             localStorage.setItem("continue_chat_key", "true");
         } catch (err) {
@@ -873,8 +876,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 projectId: project.P_ID,
                 dbId: EMPTY_GUID,
                 feature: "",
-                offset: 0,
-                limit: 15,
+                offset: msgOffset,
+                limit: msgLimit,
             };
 
             const queryString = new URLSearchParams(payload).toString();
@@ -932,7 +935,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
 
                     <div>
-                        {messages.length > 0  && (
+                        {messages.length > 0 && (
                             <>
                                 <Tooltip title="New Thread">
                                     <button className="new-thread-btn" onClick={() => newThread()} disabled={disableChat}>
@@ -958,7 +961,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     </div>
 
                 </div>
-                {console.log('chatpopup--------',totalRecentCount,'--------',messages.length)}
+                {console.log('chatpopup--------', totalRecentCount, '--------', messages.length)}
                 <ChatPopupBody
                     // showGreeting={showGreeting}
                     messages={messages}
@@ -968,7 +971,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     userName={userName}
                     // today={today}
                     messagesEndRef={messagesEndRef}
-                    onOpenRecentChat={handleOpenRecentChat} 
+                    onOpenRecentChat={handleOpenRecentChat}
+                    showMoreData={loadMore}
                 />
 
                 <div className="popupFooter">
