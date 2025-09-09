@@ -421,8 +421,9 @@ const PropertiesModal = ({
             certifiedBy && certificationDetails ? certificationDetails : null,
           ...morePutProps,
         }),
-      }).then(() => {
-        onSubmit(onSubmitProps);
+      }).then(({ json }) => {
+        const updatedDashboard = { id: json.id, ...json.result }; 
+        onSubmit(updatedDashboard);
         onHide();
         addSuccessToast(t('The dashboard has been saved'));
       }, handleErrorResponse);

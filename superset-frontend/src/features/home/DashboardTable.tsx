@@ -17,7 +17,7 @@
  * under the License.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { SupersetClient, t } from '@superset-ui/core';
+import {  t } from '@superset-ui/core';
 import { filter } from 'lodash';
 import { useFavoriteStatus, useListViewResource } from 'src/views/CRUD/hooks';
 import { Dashboard, DashboardTableProps, TableTab } from 'src/views/CRUD/types';
@@ -31,7 +31,7 @@ import {
 import { LoadingCards } from 'src/pages/Home';
 import {
   CardContainer,
-  createErrorHandler,
+  // createErrorHandler,
   getFilterValues,
   PAGE_SIZE,
   handleDashboardDelete,
@@ -139,26 +139,13 @@ function DashboardTable({
     }
   };
 
-  const handleDashboardEdit = (edits: Dashboard) =>
-    SupersetClient.get({
-      endpoint: `/api/v1/dashboard/${edits.id}`,
-    }).then(
-      ({ json = {} }) => {
-        setDashboards(
-          dashboards.map(dashboard => {
-            if (dashboard.id === json.id) {
-              return json.result;
-            }
-            return dashboard;
-          }),
-        );
-      },
-      createErrorHandler(errMsg =>
-        addDangerToast(
-          t('An error occurred while fetching dashboards: %s', errMsg),
-        ),
+  const handleDashboardEdit = (edits: Dashboard) => {
+    setDashboards(
+      dashboards.map(dashboard =>
+        dashboard.id === edits.id ? { ...dashboard, ...edits } : dashboard,
       ),
     );
+  };
 
   const menuTabs = [
     {
