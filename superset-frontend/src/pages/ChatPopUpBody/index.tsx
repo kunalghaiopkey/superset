@@ -30,7 +30,6 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
 }) => {
     return (
         <div className="popupBody">
-            {console.log('--------', totalRecentCount, '--------', messages.length)}
             {/* 1. Greeting screen */}
             {/* {showGreeting && messages.length == 0 && (
                 <div className="greeting">
@@ -136,7 +135,7 @@ const ChatPopupBody: React.FC<PopupBodyProps> = ({
                                                 {recentChats.length < totalRecentCount && (
                                                     <li>
                                                         <div className="recent-showmore">
-                                                            <button onClick={showMoreData} className="text-ellipsis">
+                                                            <button onClick={showMoreData} className="recent-showmore-btn">
                                                                 Show More
                                                             </button>
                                                         </div>

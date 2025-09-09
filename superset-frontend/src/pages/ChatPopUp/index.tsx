@@ -280,7 +280,7 @@ const PopupContainer = styled.div`
                 cursor: pointer;
                 padding: 0rem !important;
                 border-left: 5px solid #b27ae7;
-                max-height: 22rem;
+                max-height: 29rem;
                 min-height: 2rem;
                 overflow: auto;
 
@@ -338,6 +338,20 @@ const PopupContainer = styled.div`
 
                         .ant-dropdown-trigger:hover .ant-dropdown {
                             display: block;
+                        }
+                    }
+                    .recent-showmore{
+                        display:flex;
+                        align-item:center;
+                        justify-content:center;
+                        font-size: 0.875rem;
+                        padding: 0.5rem 0rem;
+
+                        .recent-showmore-btn{
+                            color: #116173;
+                            font-weight: 500;
+                            border: none;
+                            background: none;
                         }
                     }
                 }
@@ -684,8 +698,9 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             }
 
                             const chunk = decoder.decode(value, { stream: true });
-
+                            console.log("chunk "+chunk)
                             const parsedText = parseEventData(chunk);
+                            console.log("parsedText"+parsedText)
                             if (parsedText) {
                                 assistantReply += parsedText;
 
@@ -885,7 +900,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             const result = await resp.json();
 
             if (result.data) {
-                setRecentChats(result.data);
+                // setRecentChats(result.data);
+                setRecentChats((prev) => [...prev, ...result.data]);
                 setTotalRecentCount(result.total_count ?? 0);
                 // result.total_count == 0 ? setShowGreeting(true) : setShowGreeting(false);
             }
@@ -894,7 +910,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             console.error("getRecentChatData failed:", err);
         }
     };
-
 
 
     // const today = new Date().toLocaleDateString("en-US", {
@@ -951,7 +966,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     </div>
 
                 </div>
-                {console.log('chatpopup--------', totalRecentCount, '--------', messages.length)}
                 <ChatPopupBody
                     // showGreeting={showGreeting}
                     messages={messages}
