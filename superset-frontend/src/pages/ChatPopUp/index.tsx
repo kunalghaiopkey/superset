@@ -442,10 +442,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [totalRecentCount, setTotalRecentCount] = useState(0);
     const [recentChats, setRecentChats] = useState<any[]>([]);
     const [msgOffset, setMsgOffset] = useState(0);
-    let msgLimit = 10; 
+    const msgLimit = 10; 
 
     const newThread = () => {
-        getRecentChatData();
+        setRecentChats([]);
+        getRecentChatData(0);
         setChatText('');
         setMessages([]);
         setMessageLoader(false);
@@ -458,7 +459,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const loadMore = () => {
         const newOffset = msgOffset + msgLimit;
         setMsgOffset(newOffset);
-        getRecentChatData();
+        getRecentChatData(newOffset);
     }
 
 
@@ -493,7 +494,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
     useEffect(() => {
         getLastChatData();
-        // getRecentChatData(); 
+        // getRecentChatData(msgOffset); 
     }, []);
 
     const CONTINUE_CHAT_KEY = "continue_chat_key";
@@ -526,7 +527,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 setMessages([]);
                 // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(crypto.randomUUID());
-                getRecentChatData();
+                getRecentChatData(msgOffset);
                 localStorage.setItem(CONTINUE_CHAT_KEY, "false");
             } else {
                 const isContinueChat = localStorage.getItem(CONTINUE_CHAT_KEY);
@@ -540,7 +541,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                     // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                     // setContextId(crypto.randomUUID());
                     localStorage.setItem(CONTINUE_CHAT_KEY, "false");
-                    getRecentChatData();
+                    getRecentChatData(msgOffset);
                 }
             }
         } catch (err) {
@@ -580,7 +581,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             const result = await resp.json();
             if (result.status !== "fail") {
-                getRecentChatData();
+                getRecentChatData(msgOffset);
                 setMessages([]);
                 // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(EMPTY_GUID);
@@ -866,7 +867,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    const getRecentChatData = async () => {
+    const getRecentChatData = async (offset:number) => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
         if (!userEncoded || !projectEncoded) return;
@@ -881,8 +882,8 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 projectId: project.P_ID,
                 dbId: EMPTY_GUID,
                 feature: "",
-                offset: msgOffset,
-                limit: msgLimit,
+                offset,
+                limit:msgLimit,
             };
 
             const queryString = new URLSearchParams(payload).toString();
