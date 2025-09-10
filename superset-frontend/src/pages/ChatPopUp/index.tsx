@@ -581,10 +581,13 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             const result = await resp.json();
             if (result.status !== "fail") {
+                setRecentChats([]);
+                setMsgOffset(0);
                 getRecentChatData(msgOffset);
                 setMessages([]);
                 // totalRecentCount ==0 ? setShowGreeting(true) :setShowGreeting(false);
                 setContextId(EMPTY_GUID);
+                localStorage.setItem("continue_chat_key", "false");
                 setIsContinueConversation(false);
                 setChatText('');
                 setMessageLoader(false);
