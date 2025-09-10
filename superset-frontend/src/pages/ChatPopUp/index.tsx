@@ -442,7 +442,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
     const [totalRecentCount, setTotalRecentCount] = useState(0);
     const [recentChats, setRecentChats] = useState<any[]>([]);
     const [msgOffset, setMsgOffset] = useState(0);
-    const msgLimit = 10; 
+    const msgLimit = 10;
 
     const newThread = () => {
         setRecentChats([]);
@@ -464,16 +464,23 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
 
     function parseEventData(data: string): string {
-        let i = 0;
+        let parsedData = "";
+        let nextLineFound = 0;
 
-        return data.replaceAll('data: ', '').split('\n\n').map(line => {
-            if (i > 0 && line == '') {
-                line += '\n';
+        data.split('\n').forEach((line) => {
+            const parts = line.split(': ');
+            const value = parts.length > 1 ? parts[1] : undefined;
+
+            if (value !== undefined && value !== '[DONE]') {
+                nextLineFound = 0;
+                parsedData += value;
+            } else {
+                if (nextLineFound > 0) parsedData += '\n';
+                nextLineFound++;
             }
-            if (line == '') { i++ }
+        });
 
-            return line
-        }).join('').replace('[DONE]', '');
+        return parsedData;
     }
 
     useEffect(() => {
@@ -599,6 +606,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             console.error("curdRecentChat error:", err);
         }
     };
+    let buffer = "";
 
     const handleSend = () => {
         if (!chatText.trim()) return;
@@ -702,11 +710,11 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                             }
 
                             const chunk = decoder.decode(value, { stream: true });
-                            console.log("chunk "+chunk)
-                            const parsedText = parseEventData(chunk);
-                            console.log("parsedText"+parsedText)
+                            buffer += chunk;
+                            const parsedText = parseEventData(buffer);
+                            console.log(" parsed data : ", parsedText);
                             if (parsedText) {
-                                assistantReply += parsedText;
+                                assistantReply = parsedText;
 
                                 setMessages((prev: any) => {
                                     const updated = [...prev];
@@ -809,8 +817,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
 
             if (!response.ok) throw new Error("Failed to save chat");
 
-            const result = await response.json();
-            console.log('Save / resume chat result ', result)
             setIsContinueConversation(true);
             localStorage.setItem("continue_chat_key", "true");
         } catch (err) {
@@ -850,8 +856,6 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
             if (!resp.ok) throw new Error(`Error: ${resp.status} ${resp.statusText}`);
             const result = await resp.json();
 
-            console.log("result.userConversationDto ====", result.userConversationDto);
-
             setContextId(conversationId);
 
             if (result.userConversationDto && result.userConversationDto.length > 0) {
@@ -870,7 +874,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    const getRecentChatData = async (offset:number) => {
+    const getRecentChatData = async (offset: number) => {
         const userEncoded = localStorage.getItem("UserDTO");
         const projectEncoded = localStorage.getItem("ProjectDTO");
         if (!userEncoded || !projectEncoded) return;
@@ -886,7 +890,7 @@ const ChatPopup = ({ onClose }: { onClose: () => void }) => {
                 dbId: EMPTY_GUID,
                 feature: "",
                 offset,
-                limit:msgLimit,
+                limit: msgLimit,
             };
 
             const queryString = new URLSearchParams(payload).toString();
