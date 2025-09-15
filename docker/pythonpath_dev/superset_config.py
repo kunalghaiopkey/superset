@@ -99,7 +99,7 @@ class CeleryConfig:
 
 CELERY_CONFIG = CeleryConfig
 
-
+MAX_ROLES_PER_REQUEST = 10000
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
 # The base URL for the email report hyperlinks.
@@ -180,6 +180,7 @@ FEATURE_FLAGS = {
 }
 
 FAB_ADD_SECURITY_API = True
+FAB_API_MAX_PAGE_SIZE = 10000
 
 ENABLE_RECAPTCHA = False
 RECAPTCHA_PUBLIC_KEY = ""
