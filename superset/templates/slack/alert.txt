@@ -21,4 +21,4 @@
 *Result*: {{observation_value}}
 *Reason*: {{validation_error_message}}
 <{{alert_url}}|View Alert Details>
-<{{url}}|*Explore in Superset*>
+<{{url}}|*explore in  Opkey BI-Studio*>

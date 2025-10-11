@@ -1479,7 +1479,7 @@ REPORT_MINIMUM_INTERVAL = int(timedelta(minutes=0).total_seconds())
 EMAIL_REPORTS_SUBJECT_PREFIX = "[Report] "
 
 # The text for call-to-action link in Alerts & Reports emails
-EMAIL_REPORTS_CTA = "Explore in Superset"
+EMAIL_REPORTS_CTA = "explore in  Opkey BI-Studio"
 
 # Slack API token for the superset reports, either string or callable
 SLACK_API_TOKEN: Callable[[], str] | str | None = None

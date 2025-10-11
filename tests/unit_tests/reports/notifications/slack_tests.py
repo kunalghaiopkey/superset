@@ -228,7 +228,7 @@ def test_send_slackv2(
 
 <p>This is <a href="#">a test</a> alert</p><br />
 
-<None|Explore in Superset>
+<None|explore in  Opkey BI-Studio>
 
 ```
 |    |   A |   B | C                                        |
@@ -296,7 +296,7 @@ def test_send_slack(
 
 <p>This is <a href="#">a test</a> alert</p><br />
 
-<None|Explore in Superset>
+<None|explore in  Opkey BI-Studio>
 
 ```
 |    |   A |   B | C                                        |
@@ -365,7 +365,7 @@ def test_send_slack_no_feature_flag(
 
 <p>This is <a href="#">a test</a> alert</p><br />
 
-<None|Explore in Superset>
+<None|explore in  Opkey BI-Studio>
 
 ```
 |    |   A |   B | C                                        |

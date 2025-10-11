@@ -36,7 +36,7 @@ class SlackMixin:
 
 %(description)s
 
-<%(url)s|Explore in Superset>
+<%(url)s|explore in  Opkey BI-Studio>
 
 %(table)s
 """,
