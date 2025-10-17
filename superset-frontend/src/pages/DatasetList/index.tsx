@@ -205,6 +205,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   const canCreate = hasPerm('can_write');
   const canDuplicate = hasPerm('can_duplicate');
   const canExport = hasPerm('can_export');
+  const validUser=isUserAdmin(user);
 
   const initialSort = SORT_BY;
 
@@ -393,6 +394,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         Header: t('Last modified'),
         accessor: 'changed_on_delta_humanized',
         size: 'xl',
+        hidden: !validUser,
       },
       {
         accessor: 'sql',
@@ -490,7 +492,8 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Actions'),
         id: 'actions',
-        hidden: !canEdit && !canDelete && !canDuplicate,
+        hidden: !validUser ,
+        // hidden: !validUser && !canEdit && !canDelete && !canDuplicate,
         disableSortBy: true,
       },
       {
@@ -638,20 +641,21 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       },
       buttonStyle: 'primary',
     });
-
-    buttonArr.push({
-      name: (
-        <Tooltip
-          id="import-tooltip"
-          title={t('Import datasets')}
-          placement="bottomRight"
-        >
-          <Icons.Import data-test="import-button" />
-        </Tooltip>
-      ),
-      buttonStyle: 'link',
-      onClick: openDatasetImportModal,
-    });
+    if (validUser) {
+      buttonArr.push({
+        name: (
+          <Tooltip
+            id="import-tooltip"
+            title={t('Import datasets')}
+            placement="bottomRight"
+          >
+            <Icons.Import data-test="import-button" />
+          </Tooltip>
+        ),
+        buttonStyle: 'link',
+        onClick: openDatasetImportModal,
+      });
+    }
   }
 
   menuData.buttons = buttonArr;
