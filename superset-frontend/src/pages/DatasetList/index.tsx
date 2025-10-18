@@ -202,7 +202,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canCreate = hasPerm('can_write');
+  // const canCreate = hasPerm('can_write');
   const canDuplicate = hasPerm('can_duplicate');
   const canExport = hasPerm('can_export');
   const validUser=isUserAdmin(user);
@@ -629,7 +629,8 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
     });
   }
 
-  if (canCreate) {
+  // if (canCreate) {
+    if (validUser) {
     buttonArr.push({
       name: (
         <>
@@ -641,7 +642,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       },
       buttonStyle: 'primary',
     });
-    if (validUser) {
       buttonArr.push({
         name: (
           <Tooltip
@@ -655,7 +655,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         buttonStyle: 'link',
         onClick: openDatasetImportModal,
       });
-    }
+    // }
   }
 
   menuData.buttons = buttonArr;
