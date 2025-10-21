@@ -621,7 +621,8 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const buttonArr: Array<ButtonProps> = [];
 
-  if (canDelete || canExport) {
+  if (validUser) {
+  // if (canDelete || canExport) {
     buttonArr.push({
       name: t('Bulk select'),
       onClick: toggleBulkSelect,
