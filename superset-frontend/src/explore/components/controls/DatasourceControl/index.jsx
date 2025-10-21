@@ -135,6 +135,7 @@ const VIEW_IN_SQL_LAB = 'view_in_sql_lab';
 const EDIT_DATASET = 'edit_dataset';
 const QUERY_PREVIEW = 'query_preview';
 const SAVE_AS_DATASET = 'save_as_dataset';
+const Hide_VIEW_IN_SQL_LAB = true;
 
 // If the string is longer than this value's number characters we add
 // a tooltip for user can see the full name by hovering over the visually truncated string in UI
@@ -326,7 +327,7 @@ class DatasourceControl extends PureComponent {
           </Menu.Item>
         )}
         <Menu.Item key={CHANGE_DATASET}>{t('Swap dataset')}</Menu.Item>
-        {!isMissingDatasource && canAccessSqlLab && (
+        {!Hide_VIEW_IN_SQL_LAB &&!isMissingDatasource && canAccessSqlLab && (
           <Menu.Item key={VIEW_IN_SQL_LAB}>
             <Link
               to={{
