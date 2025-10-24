@@ -48,6 +48,7 @@ import {
 import ViewQueryModal from '../controls/ViewQueryModal';
 import EmbedCodeContent from '../EmbedCodeContent';
 import DashboardsSubMenu from './DashboardsSubMenu';
+import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 
 const MENU_KEYS = {
   EDIT_PROPERTIES: 'edit_properties',
@@ -135,7 +136,8 @@ export const useExploreAdditionalActionsMenu = (
   );
 
   const { datasource } = latestQueryFormData;
-  const Hide_Menu_Item= true;
+  const user = useSelector(state => state.user);
+  const Hide_Menu_Item = isUserAdmin(user) ? false : true;
 
   const shareByEmail = useCallback(async () => {
     try {
@@ -401,7 +403,7 @@ export const useExploreAdditionalActionsMenu = (
             </Menu.Item>
           ) : null}
         </Menu.SubMenu>
-        {!Hide_Menu_Item && <Menu.Divider />}
+        {<Menu.Divider />}
         {showReportSubMenu ? (
           <>
             <Menu.SubMenu title={t('Manage email report')}>

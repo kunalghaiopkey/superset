@@ -327,7 +327,7 @@ class DatasourceControl extends PureComponent {
           </Menu.Item>
         )}
         <Menu.Item key={CHANGE_DATASET}>{t('Swap dataset')}</Menu.Item>
-        {!Hide_VIEW_IN_SQL_LAB &&!isMissingDatasource && canAccessSqlLab && (
+        {(isUserAdmin(user)|| !Hide_VIEW_IN_SQL_LAB) &&!isMissingDatasource && canAccessSqlLab && (
           <Menu.Item key={VIEW_IN_SQL_LAB}>
             <Link
               to={{
