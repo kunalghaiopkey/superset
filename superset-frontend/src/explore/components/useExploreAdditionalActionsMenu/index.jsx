@@ -403,7 +403,7 @@ export const useExploreAdditionalActionsMenu = (
             </Menu.Item>
           ) : null}
         </Menu.SubMenu>
-        {<Menu.Divider />}
+        {!Hide_Menu_Item && <Menu.Divider />}
         {showReportSubMenu ? (
           <>
             <Menu.SubMenu title={t('Manage email report')}>
