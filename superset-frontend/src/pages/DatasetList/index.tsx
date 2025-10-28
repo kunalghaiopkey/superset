@@ -394,7 +394,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         Header: t('Last modified'),
         accessor: 'changed_on_delta_humanized',
         size: 'xl',
-        hidden: !validUser,
+        // hidden: !validUser,
       },
       {
         accessor: 'sql',
@@ -492,7 +492,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Actions'),
         id: 'actions',
-        hidden: !validUser ,
         // hidden: !validUser && !canEdit && !canDelete && !canDuplicate,
         disableSortBy: true,
       },
