@@ -220,46 +220,50 @@ const RightMenu = ({
   const isAdmin = isUserAdmin(user);
   const showUploads = allowUploads || isAdmin;
   const dropdownItems: MenuObjectProps[] = [
-    {
-      label: t('Data'),
-      icon: 'fa-database',
-      childs: [
-        {
-          label: t('Connect database'),
-          name: GlobalMenuDataOptions.DbConnection,
-          perm: canDatabase && !nonExamplesDBConnected,
-        },
-        {
-          label: t('Create dataset'),
-          name: GlobalMenuDataOptions.DatasetCreation,
-          url: '/dataset/add/',
-          perm: canDataset && nonExamplesDBConnected,
-        },
-        {
-          label: t('Connect Google Sheet'),
-          name: GlobalMenuDataOptions.GoogleSheets,
-          perm: canDatabase && HAS_GSHEETS_INSTALLED,
-        },
-        {
-          label: t('Upload CSV to database'),
-          name: GlobalMenuDataOptions.CSVUpload,
-          perm: canUploadCSV && showUploads,
-          disable: isAdmin && !allowUploads,
-        },
-        {
-          label: t('Upload Excel to database'),
-          name: GlobalMenuDataOptions.ExcelUpload,
-          perm: canUploadExcel && showUploads,
-          disable: isAdmin && !allowUploads,
-        },
-        {
-          label: t('Upload Columnar file to database'),
-          name: GlobalMenuDataOptions.ColumnarUpload,
-          perm: canUploadColumnar && showUploads,
-          disable: isAdmin && !allowUploads,
-        },
-      ],
-    },
+    ...(isAdmin
+      ? [
+          {
+            label: t('Data'),
+            icon: 'fa-database',
+            childs: [
+              {
+                label: t('Connect database'),
+                name: GlobalMenuDataOptions.DbConnection,
+                perm: canDatabase && !nonExamplesDBConnected,
+              },
+              {
+                label: t('Create dataset'),
+                name: GlobalMenuDataOptions.DatasetCreation,
+                url: '/dataset/add/',
+                perm: canDataset && nonExamplesDBConnected,
+              },
+              {
+                label: t('Connect Google Sheet'),
+                name: GlobalMenuDataOptions.GoogleSheets,
+                perm: canDatabase && HAS_GSHEETS_INSTALLED,
+              },
+              {
+                label: t('Upload CSV to database'),
+                name: GlobalMenuDataOptions.CSVUpload,
+                perm: canUploadCSV && showUploads,
+                disable: isAdmin && !allowUploads,
+              },
+              {
+                label: t('Upload Excel to database'),
+                name: GlobalMenuDataOptions.ExcelUpload,
+                perm: canUploadExcel && showUploads,
+                disable: isAdmin && !allowUploads,
+              },
+              {
+                label: t('Upload Columnar file to database'),
+                name: GlobalMenuDataOptions.ColumnarUpload,
+                perm: canUploadColumnar && showUploads,
+                disable: isAdmin && !allowUploads,
+              },
+            ],
+          },
+        ]
+      : []),
     {
       label: t('SQL query'),
       url: '/sqllab?new=true',
