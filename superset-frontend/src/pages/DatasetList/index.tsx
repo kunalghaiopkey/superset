@@ -442,8 +442,10 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                   <span
                     role="button"
                     tabIndex={0}
-                    className="action-button"
-                    onClick={handleExport}
+                    // className="action-button"
+                    // onClick={handleExport}
+                    className={validUser ? 'action-button' : 'disabled'}
+                    onClick={validUser ? handleExport : undefined}
                   >
                     <Icons.Share />
                   </span>
