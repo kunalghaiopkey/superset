@@ -2262,11 +2262,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                 else:
                     denied.add(table_)
 
-            if denied:
-                raise SupersetSecurityException(
-                    self.get_table_access_error_object(denied)
-                )
-
+             
         # Guest users MUST not modify the payload so it's requesting a
         # different chart or different ad-hoc metrics from what's saved.
         if (

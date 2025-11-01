@@ -48,6 +48,7 @@ import {
 import ViewQueryModal from '../controls/ViewQueryModal';
 import EmbedCodeContent from '../EmbedCodeContent';
 import DashboardsSubMenu from './DashboardsSubMenu';
+import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 
 const MENU_KEYS = {
   EDIT_PROPERTIES: 'edit_properties',
@@ -135,6 +136,8 @@ export const useExploreAdditionalActionsMenu = (
   );
 
   const { datasource } = latestQueryFormData;
+  const user = useSelector(state => state.user);
+  const Hide_Menu_Item = isUserAdmin(user) ? false : true;
 
   const shareByEmail = useCallback(async () => {
     try {
@@ -400,7 +403,7 @@ export const useExploreAdditionalActionsMenu = (
             </Menu.Item>
           ) : null}
         </Menu.SubMenu>
-        <Menu.Divider />
+        {!Hide_Menu_Item && <Menu.Divider />}
         {showReportSubMenu ? (
           <>
             <Menu.SubMenu title={t('Manage email report')}>
@@ -426,21 +429,24 @@ export const useExploreAdditionalActionsMenu = (
             />
           </Menu>
         )}
-        <Menu.Item key={MENU_KEYS.VIEW_QUERY}>
-          <ModalTrigger
-            triggerNode={
-              <div data-test="view-query-menu-item">{t('View query')}</div>
-            }
-            modalTitle={t('View query')}
-            modalBody={
-              <ViewQueryModal latestQueryFormData={latestQueryFormData} />
-            }
-            draggable
-            resizable
-            responsive
-          />
-        </Menu.Item>
-        {datasource && (
+        {!Hide_Menu_Item && (
+          <Menu.Item key={MENU_KEYS.VIEW_QUERY}>
+            <ModalTrigger
+              triggerNode={
+                <div data-test="view-query-menu-item">{t('View query')}</div>
+              }
+              modalTitle={t('View query')}
+              modalBody={
+                <ViewQueryModal latestQueryFormData={latestQueryFormData} />
+              }
+              draggable
+              resizable
+              responsive
+            />
+          </Menu.Item>
+        )
+        }
+        {!Hide_Menu_Item && datasource && (
           <Menu.Item key={MENU_KEYS.RUN_IN_SQL_LAB}>
             {t('Run in SQL Lab')}
           </Menu.Item>

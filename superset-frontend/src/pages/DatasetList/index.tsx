@@ -394,7 +394,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         Header: t('Last modified'),
         accessor: 'changed_on_delta_humanized',
         size: 'xl',
-        hidden: !validUser,
+        // hidden: !validUser,
       },
       {
         accessor: 'sql',
@@ -442,8 +442,10 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                   <span
                     role="button"
                     tabIndex={0}
-                    className="action-button"
-                    onClick={handleExport}
+                    // className="action-button"
+                    // onClick={handleExport}
+                    className={validUser ? 'action-button' : 'disabled'}
+                    onClick={validUser ? handleExport : undefined}
                   >
                     <Icons.Share />
                   </span>
@@ -492,7 +494,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Actions'),
         id: 'actions',
-        hidden: !validUser ,
         // hidden: !validUser && !canEdit && !canDelete && !canDuplicate,
         disableSortBy: true,
       },
@@ -621,7 +622,8 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const buttonArr: Array<ButtonProps> = [];
 
-  if (canDelete || canExport) {
+  if (validUser) {
+  // if (canDelete || canExport) {
     buttonArr.push({
       name: t('Bulk select'),
       onClick: toggleBulkSelect,

@@ -87,7 +87,7 @@ export default function setupColors(
       ...CategoricalWavesOfBlue,
       ...extraCategoricalColorSchemes,
     ],
-    'supersetColors',
+    'Bi Studio Colors',
   );
   registerColorSchemes(
     // @ts-ignore
