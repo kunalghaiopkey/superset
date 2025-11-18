@@ -150,7 +150,7 @@ export class HeaderActionsDropdown extends PureComponent<
     const emailTitle = t('Superset dashboard');
     const emailSubject = `${emailTitle} ${dashboardTitle}`;
     const emailBody = t('Check out this dashboard: ');
-    const Hide_Menu_Item= true;
+
     const isEmbedded = !dashboardInfo?.userId;
 
     const url = getDashboardUrl({
