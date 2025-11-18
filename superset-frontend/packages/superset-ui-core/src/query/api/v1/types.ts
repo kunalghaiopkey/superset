@@ -128,7 +128,7 @@ export class SupersetApiError extends Error {
             ...originalErrorStack.split('\n').slice(1),
           ].join('\n')
         : this.stack;
-    this.name = 'SupersetApiError';
+    this.name = 'BI-StudioApiError';
     this.errorType = errorType || SupersetApiErrorType.UnknownError;
     this.extra = extra || {};
     if (link) {
