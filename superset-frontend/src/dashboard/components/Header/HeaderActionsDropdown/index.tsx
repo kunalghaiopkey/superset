@@ -259,7 +259,7 @@ export class HeaderActionsDropdown extends PureComponent<
             dashboardComponentId={dashboardComponentId}
           />
         )}
-        { !Hide_Menu_Item && !editMode && userCanCurate && (
+        {!editMode && userCanCurate && (
           <Menu.Item
             key={MenuKeys.ManageEmbedded}
             onClick={this.handleMenuClick}
