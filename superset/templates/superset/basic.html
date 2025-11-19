@@ -19,10 +19,9 @@
     <head>
       {% include "head_custom_extra.html" %}
       <title>
-        {% block title %} {% if title %} {{ title }} {% elif appbuilder and
-        appbuilder.app_name %} {{ appbuilder.app_name }} {% endif %} {% endblock
-        %}
+        Opkey BI-studio
       </title>
+      
       {% block head_meta %}{% endblock %} {% block head_css %} {% for favicon in
       favicons %} <link rel="{{favicon.rel if favicon.rel else "icon"}}"
       type="{{favicon.type if favicon.type else "image/png"}}" {% if favicon.sizes
