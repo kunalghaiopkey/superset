@@ -349,12 +349,22 @@ export default function transformProps(
         type: 'sunburst',
         ...padding,
         nodeClick: false,
+        clip: false,                    
+        animation: false,              
+        avoidLabelOverlap: false,       
+    
         emphasis: {
-          focus: 'ancestor',
+          focus: 'none',               
           label: {
             show: showLabels,
           },
         },
+    
+        downplay: {
+          label: { show: true },       
+          itemStyle: { opacity: 1 },    
+        },
+    
         label: {
           width: (radius * 0.6) / (columns.length || 1),
           show: showLabels,
@@ -363,10 +373,12 @@ export default function transformProps(
           minAngle: minShowLabelAngle,
           overflow: 'breakAll',
         },
+    
         radius: [radius * 0.3, radius],
         data: traverse(treeData, []),
       },
     ],
+    
     graphic: showTotal
       ? {
           type: 'text',
