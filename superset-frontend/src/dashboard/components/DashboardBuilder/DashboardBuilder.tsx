@@ -348,6 +348,7 @@ const StyledDashboardContent = styled.div<{
 
       &.fade-in {
         border-radius: ${theme.borderRadius}px;
+        border: 1px solid darkgreen;
         box-shadow:
           inset 0 0 0 2px ${theme.colors.primary.base},
           0 0 0 3px
