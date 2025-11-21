@@ -209,7 +209,7 @@ LOGO_TOOLTIP = "Opkey BI-Studio"
 
 WTF_CSRF_ENABLED = False  # Enabled by default
 
-ENABLE_CORS = False
+ENABLE_CORS = True
 
 # CORS_OPTIONS = {
     # "origins": ["https://opkeyone.com"],
@@ -227,7 +227,7 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 
 
-TALISMAN_ENABLED = False
+TALISMAN_ENABLED = True
 
 TALISMAN_CONFIG = {
     "content_security_policy": {

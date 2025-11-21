@@ -1,6 +1,20 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) ...
- * (license header unchanged)
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 import {
   CategoricalColorNamespace,
@@ -18,7 +32,7 @@ import {
 } from '@superset-ui/core';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { CallbackDataParams } from 'echarts/types/src/util/types';
-import { NULL_STRING } from '../constants';
+import { NULL_STRING, OpacityEnum } from '../constants';
 import { defaultGrid } from '../defaults';
 import { Refs } from '../types';
 import { formatSeriesName, getColtypesMapping } from '../utils/series';
@@ -158,7 +172,6 @@ export default function transformProps(
   } = chartProps;
   const { data = [] } = queriesData[0];
   const coltypeMapping = getColtypesMapping(queriesData[0]);
-
   const {
     groupby = [],
     columns = [],
@@ -175,15 +188,12 @@ export default function transformProps(
     showTotal,
     sliceId,
   } = formData;
-
   const {
     currencyFormats = {},
     columnFormats = {},
     verboseMap = {},
   } = datasource;
-
   const refs: Refs = {};
-
   const primaryValueFormatter = getValueFormatter(
     metric,
     currencyFormats,
@@ -191,7 +201,6 @@ export default function transformProps(
     numberFormat,
     currencyFormat,
   );
-
   const secondaryValueFormatter = secondaryMetric
     ? getValueFormatter(
         secondaryMetric,
@@ -203,51 +212,41 @@ export default function transformProps(
     : undefined;
 
   const numberFormatter = getNumberFormatter(numberFormat);
-
   const formatter = (params: CallbackDataParams) =>
     formatLabel({
       params,
       numberFormatter: primaryValueFormatter,
       labelType,
     });
-
   const minShowLabelAngle = (showLabelsThreshold || 0) * 3.6;
-
   const padding = {
     top: theme.gridUnit * 3,
     right: theme.gridUnit,
     bottom: theme.gridUnit * 3,
     left: theme.gridUnit,
   };
-
   const containerWidth = width;
   const containerHeight = height;
   const visWidth = containerWidth - padding.left - padding.right;
   const visHeight = containerHeight - padding.top - padding.bottom;
   const radius = Math.min(visWidth, visHeight) / 2;
-
   const { setDataMask = () => {}, onContextMenu } = hooks;
-
   const columnsLabelMap = new Map<string, string[]>();
   const metricLabel = getMetricLabel(metric);
   const secondaryMetricLabel = secondaryMetric
     ? getMetricLabel(secondaryMetric)
     : undefined;
-
   const columnLabels = columns.map(getColumnLabel);
-
   const treeData = treeBuilder(
     data,
     columnLabels,
     metricLabel,
     secondaryMetricLabel,
   );
-
   const totalValue = treeData.reduce(
     (result, treeNode) => result + treeNode.value,
     0,
   );
-
   const totalSecondaryValue = treeData.reduce(
     (result, treeNode) => result + treeNode.secondaryValue,
     0,
@@ -256,10 +255,8 @@ export default function transformProps(
   const categoricalColorScale = CategoricalColorNamespace.getScale(
     colorScheme as string,
   );
-
   let linearColorScale: any;
   let colorByCategory = true;
-
   if (secondaryMetric && metric !== secondaryMetric) {
     const domain = getLinearDomain(
       treeData,
@@ -271,16 +268,12 @@ export default function transformProps(
       ?.createLinearScale(domain);
   }
 
-  // keep parity: seed color
+  // add a base color to keep feature parity
   if (colorByCategory) {
     categoricalColorScale(metricLabel, sliceId);
   } else {
     linearColorScale(totalSecondaryValue / totalValue);
   }
-
-  // ----------------------------------------------------
-  // 🚫 REMOVED fading logic (no opacity manipulation)
-  // ----------------------------------------------------
 
   const traverse = (
     treeNodes: TreeNode[],
@@ -289,9 +282,7 @@ export default function transformProps(
   ) =>
     treeNodes.map(treeNode => {
       const { name: nodeName, value, secondaryValue, groupBy } = treeNode;
-
       const records = [...(pathRecords || []), nodeName];
-
       let name = formatSeriesName(nodeName, {
         numberFormatter,
         timeFormatter: getTimeFormatter(dateFormat),
@@ -299,10 +290,8 @@ export default function transformProps(
           coltype: coltypeMapping[groupBy],
         }),
       });
-
       const newPath = path.concat(name);
-
-      const item: NodeItemOption = {
+      let item: NodeItemOption = {
         records,
         name,
         value,
@@ -313,15 +302,24 @@ export default function transformProps(
             : linearColorScale(secondaryValue / value),
         },
       };
-
       if (treeNode.children?.length) {
         item.children = traverse(treeNode.children, newPath, records);
       } else {
         name = newPath.join(',');
       }
-
       columnsLabelMap.set(name, newPath);
-
+      if (filterState.selectedValues?.[0]?.includes(name) === false) {
+        item = {
+          ...item,
+          itemStyle: {
+            ...item.itemStyle,
+            opacity: OpacityEnum.SemiTransparent,
+          },
+          label: {
+            color: `rgba(0, 0, 0, ${OpacityEnum.SemiTransparent})`,
+          },
+        };
+      }
       return item;
     });
 
@@ -351,20 +349,22 @@ export default function transformProps(
         type: 'sunburst',
         ...padding,
         nodeClick: false,
-        clip: false,
-        animation: false,
-        avoidLabelOverlap: false,
-
-        // remove opacity manipulation in emphasis/downplay
+        clip: false,                    
+        animation: false,              
+        avoidLabelOverlap: false,       
+    
         emphasis: {
-          focus: 'none',
-          label: { show: showLabels },
+          focus: 'none',               
+          label: {
+            show: showLabels,
+          },
         },
+    
         downplay: {
-          label: { show: true },
-          itemStyle: { opacity: 1 },
+          label: { show: true },       
+          itemStyle: { opacity: 1 },    
         },
-
+    
         label: {
           width: (radius * 0.6) / (columns.length || 1),
           show: showLabels,
@@ -373,12 +373,12 @@ export default function transformProps(
           minAngle: minShowLabelAngle,
           overflow: 'breakAll',
         },
-
+    
         radius: [radius * 0.3, radius],
         data: traverse(treeData, []),
       },
     ],
-
+    
     graphic: showTotal
       ? {
           type: 'text',
