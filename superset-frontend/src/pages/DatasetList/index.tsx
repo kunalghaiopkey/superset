@@ -473,7 +473,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                   </span>
                 </Tooltip>
               )}
-              {canDuplicate && original.kind === 'virtual' && (
+              { validUser && canDuplicate && original.kind === 'virtual' && (
                 <Tooltip
                   id="duplicate-action-tooltip"
                   title={t('Duplicate')}
