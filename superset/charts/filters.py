@@ -99,43 +99,17 @@ class ChartCertifiedFilter(BaseFilter):  # pylint: disable=too-few-public-method
         return query
 
 
-class ChartFilter(BaseFilter):
-    model = models.Slice  # Chart model
-
+class ChartFilter(BaseFilter):  # pylint: disable=too-few-public-methods
     def apply(self, query: Query, value: Any) -> Query:
-        # Admins / superusers see everything
         if security_manager.can_access_all_datasources():
             return query
 
-        #  Get dataset permissions user already has
-        perms = security_manager.user_view_menu_names("datasource_access")
-        allowed_dataset_ids = [
-            int(p.split("(id:")[1].split(")")[0])
-            for p in perms if "(id:" in p
-        ]
-
-        if not allowed_dataset_ids:
-            # user has no datasets → return empty
-            return query.filter(False)
-
-        #  Find the database(s) of these datasets
-        allowed_db_ids = (
-            db.session.query(models.SqlaTable.database_id)
-            .filter(models.SqlaTable.id.in_(allowed_dataset_ids))
-            .distinct()
+        table_alias = aliased(SqlaTable)
+        query = query.join(table_alias, self.model.datasource_id == table_alias.id)
+        query = query.join(
+            models.Database, table_alias.database_id == models.Database.id
         )
-
-        # Include all datasets in these databases (includes Jinja-created datasets)
-        all_dataset_ids = (
-            db.session.query(models.SqlaTable.id)
-            .filter(models.SqlaTable.database_id.in_(allowed_db_ids))
-            .distinct()
-        )
-
-        #  Filter charts whose datasource is in these dataset IDs
-        return query.filter(self.model.datasource_id.in_(all_dataset_ids))
-
-
+        return query.filter(get_dataset_access_filters(self.model))
 
 
 class ChartHasCreatedByFilter(BaseFilter):  # pylint: disable=too-few-public-methods

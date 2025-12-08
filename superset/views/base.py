@@ -441,35 +441,13 @@ class DeleteMixin:  # pylint: disable=too-few-public-methods
 
 class DatasourceFilter(BaseFilter):  # pylint: disable=too-few-public-methods
     def apply(self, query: Query, value: Any) -> Query:
-        # Admin: return everything
         if security_manager.can_access_all_datasources():
             return query
-
-        # Get dataset permissions the user already has
-        # permissions look like: datasource_access_on_[schema].[table](id:16)
-        user_perms = security_manager.user_view_menu_names("datasource_access")
-
-        allowed_dataset_ids = []
-        for perm in user_perms:
-            if "(id:" in perm:
-                ds_id = int(perm.split("(id:")[1].split(")")[0])
-                allowed_dataset_ids.append(ds_id)
-
-        if not allowed_dataset_ids:
-            # no dataset permissions → return empty
-            return query.filter(False)
-
-        # Fetch the database_ids for those datasets
-        allowed_db_ids = (
-            db.session.query(models.SqlaTable.database_id)
-            .filter(models.SqlaTable.id.in_(allowed_dataset_ids))
-            .distinct()
+        query = query.join(
+            models.Database,
+            models.Database.id == self.model.database_id,
         )
-
-        # Show ALL datasets from those databases
-        return query.filter(self.model.database_id.in_(allowed_db_ids))
-
-
+        return query.filter(get_dataset_access_filters(self.model))
 
 
 class CsvResponse(Response):
