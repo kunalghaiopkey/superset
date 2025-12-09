@@ -44,6 +44,7 @@ from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_wtf.form import FlaskForm
 from sqlalchemy.orm import Query
 from wtforms.fields.core import Field, UnboundField
+from sqlalchemy import or_
 
 from superset import (
     app as superset_app,
@@ -64,6 +65,7 @@ from superset.translations.utils import get_language_pack
 from superset.utils import core as utils, json
 from superset.utils.filters import get_dataset_access_filters
 from superset.views.error_handling import json_error_response
+from flask_login import current_user
 
 from .utils import bootstrap_user_data
 
@@ -439,15 +441,37 @@ class DeleteMixin:  # pylint: disable=too-few-public-methods
         return redirect(self.get_redirect())
 
 
-class DatasourceFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class DatasourceFilter(BaseFilter):
     def apply(self, query: Query, value: Any) -> Query:
+        # Admin -> return all
         if security_manager.can_access_all_datasources():
             return query
-        query = query.join(
-            models.Database,
-            models.Database.id == self.model.database_id,
+
+        #  Get dataset IDs from role permissions
+        user_perms = security_manager.user_view_menu_names("datasource_access")
+
+        allowed_dataset_ids = []
+        for perm in user_perms:
+            if "(id:" in perm:
+                ds_id = int(perm.split("(id:")[1].split(")")[0])
+                allowed_dataset_ids.append(ds_id)
+
+        # Get datasets owned by the current user
+        # owner_id is stored in SqlaTable.owners (relationship table)
+        owned_ids_subquery = (
+            db.session.query(models.SqlaTable.id)
+            .join(models.SqlaTable.owners)
+            .filter(security_manager.user_model.id == current_user.id)
         )
-        return query.filter(get_dataset_access_filters(self.model))
+
+        # Combine: role-datasets + user-owned datasets
+        filters = or_(
+            self.model.id.in_(allowed_dataset_ids),
+            self.model.id.in_(owned_ids_subquery),
+        )
+
+        return query.filter(filters)
+
 
 
 class CsvResponse(Response):

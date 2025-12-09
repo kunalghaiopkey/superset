@@ -31,6 +31,8 @@ from superset.utils.core import get_user_id
 from superset.utils.filters import get_dataset_access_filters
 from superset.views.base import BaseFilter
 from superset.views.base_api import BaseFavoriteFilter
+from flask_login import current_user
+from sqlalchemy import or_
 
 
 class ChartAllTextFilter(BaseFilter):  # pylint: disable=too-few-public-methods
@@ -99,17 +101,50 @@ class ChartCertifiedFilter(BaseFilter):  # pylint: disable=too-few-public-method
         return query
 
 
-class ChartFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+
+class ChartFilter(BaseFilter):
+    model = models.Slice  # Charts
+
     def apply(self, query: Query, value: Any) -> Query:
+        # Admin: return everything
         if security_manager.can_access_all_datasources():
             return query
 
-        table_alias = aliased(SqlaTable)
-        query = query.join(table_alias, self.model.datasource_id == table_alias.id)
-        query = query.join(
-            models.Database, table_alias.database_id == models.Database.id
+        #  Role-based dataset permissions
+        perms = security_manager.user_view_menu_names("datasource_access")
+        allowed_dataset_ids = []
+        for p in perms:
+            if "(id:" in p:
+                ds_id = int(p.split("(id:")[1].split(")")[0])
+                allowed_dataset_ids.append(ds_id)
+
+        #  Datasets owned by the current user
+        owned_dataset_ids = (
+            db.session.query(models.SqlaTable.id)
+            .join(models.SqlaTable.owners)
+            .filter(security_manager.user_model.id == current_user.id)
         )
-        return query.filter(get_dataset_access_filters(self.model))
+
+        #  Charts owned by the current user
+        owned_chart_ids = (
+            db.session.query(models.Slice.id)
+            .join(models.Slice.owners)
+            .filter(security_manager.user_model.id == current_user.id)
+        )
+
+        #  Combine dataset & chart access rules
+        filters = or_(
+            # User has access to dataset through role
+            self.model.datasource_id.in_(allowed_dataset_ids),
+
+            # User owns the dataset
+            self.model.datasource_id.in_(owned_dataset_ids),
+
+            # User owns the chart
+            self.model.id.in_(owned_chart_ids),
+        )
+
+        return query.filter(filters)
 
 
 class ChartHasCreatedByFilter(BaseFilter):  # pylint: disable=too-few-public-methods
