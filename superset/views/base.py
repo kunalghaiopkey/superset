@@ -443,11 +443,24 @@ class DeleteMixin:  # pylint: disable=too-few-public-methods
 
 class DatasourceFilter(BaseFilter):
     def apply(self, query: Query, value: Any) -> Query:
-        # Admin -> return all
+        # Admin -> return all (UNCHANGED)
         if security_manager.can_access_all_datasources():
             return query
 
-        #  Get dataset IDs from role permissions
+        # REQUIRED for schema/database permissions (SAFE JOIN)
+        query = query.join(
+            models.Database,
+            models.Database.id == self.model.database_id,
+        )
+
+        # -------------------------------
+        #  Native Superset schema/db access
+        # -------------------------------
+        schema_filter = get_dataset_access_filters(self.model)
+
+        # -------------------------------
+        #  Existing datasource-level access (UNCHANGED)
+        # -------------------------------
         user_perms = security_manager.user_view_menu_names("datasource_access")
 
         allowed_dataset_ids = []
@@ -456,21 +469,29 @@ class DatasourceFilter(BaseFilter):
                 ds_id = int(perm.split("(id:")[1].split(")")[0])
                 allowed_dataset_ids.append(ds_id)
 
-        # Get datasets owned by the current user
-        # owner_id is stored in SqlaTable.owners (relationship table)
+        # -------------------------------
+        #  Existing owner access (UNCHANGED)
+        # -------------------------------
         owned_ids_subquery = (
             db.session.query(models.SqlaTable.id)
             .join(models.SqlaTable.owners)
             .filter(security_manager.user_model.id == current_user.id)
         )
 
-        # Combine: role-datasets + user-owned datasets
-        filters = or_(
+        datasource_and_owner_filter = or_(
             self.model.id.in_(allowed_dataset_ids),
             self.model.id.in_(owned_ids_subquery),
         )
 
-        return query.filter(filters)
+        # -------------------------------
+        # Final: schema OR existing logic
+        # -------------------------------
+        return query.filter(
+            or_(
+                schema_filter,
+                datasource_and_owner_filter,
+            )
+        )
 
 
 
