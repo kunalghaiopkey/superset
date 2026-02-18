@@ -159,6 +159,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.sqllab.permalink.api import SqlLabPermalinkRestApi
         from superset.tags.api import TagRestApi
         from superset.views.alerts import AlertView, ReportView
+        from superset.views.keycloak_auth import KeycloakAuthApi
         
         from superset.views.all_entities import TaggedObjectsModelView
         from superset.views.license_error import LicenseErrorView
@@ -223,6 +224,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(RLSRestApi)
         appbuilder.add_api(SavedQueryRestApi)
         appbuilder.add_api(TagRestApi)
+        appbuilder.add_api(KeycloakAuthApi)
         appbuilder.add_api(SqlLabRestApi)
         appbuilder.add_api(SqlLabPermalinkRestApi)
         #
