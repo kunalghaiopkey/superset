@@ -106,11 +106,32 @@ class KeycloakAuthApi(BaseApi):
         """
         try:
             data = request.json or {}
-            user_info = data.get("user_profile")
-            
-            if not user_info:
-                return self.response_401()
+            access_token = data.get("access_token")
+            user_profile_override = data.get("user_profile", {})
 
+
+            logger.info("=== Token Login Attempt ===")
+            logger.info(f"Request data keys: {list(data.keys())}")
+            logger.info(f"Access token present: {bool(access_token)}")
+            if access_token:
+                logger.info(f"Token length: {len(access_token)}")
+                logger.info(f"Token prefix: {access_token[:50]}...")
+
+            if not access_token:
+                logger.error("No access_token in request")
+                return self.response_400(message="access_token is required")
+
+            # Validate and decode Keycloak token
+            logger.info("Starting token validation...")
+            user_info = self._validate_keycloak_token(access_token)
+            if not user_info:
+                logger.error("Token validation returned None")
+                return self.response_401(message="Token validation failed")
+
+            # Merge with any provided user profile
+            user_info.update(user_profile_override)
+
+            # Get or create Superset user
             user = self._get_or_create_user(user_info)
             if not user:
                 return self.response(
@@ -143,6 +164,114 @@ class KeycloakAuthApi(BaseApi):
         except Exception as e:
             logger.exception("Error during token login")
             return self.response(500, message=str(e))
+
+    def _validate_keycloak_token(self, access_token: str) -> dict[str, Any] | None:
+        """
+        Validate Keycloak access token and extract user information.
+        
+        Returns user info dict or None if invalid.
+        """
+        try:
+            # Option 1: Skip verification if configured (for development/testing)
+            if current_app.config.get("KEYCLOAK_SKIP_TOKEN_VERIFICATION", False):
+                logger.warning(
+                    "Skipping Keycloak token verification - USE ONLY IN DEVELOPMENT"
+                )
+                decoded = jwt.decode(
+                    access_token,
+                    options={"verify_signature": False},
+                )
+                logger.info(f"Token decoded (no verification). Username: {decoded.get('preferred_username')}")
+                return decoded
+           
+            # Option 2: Get Keycloak config from OAUTH_PROVIDERS
+            oauth_providers = current_app.config.get("OAUTH_PROVIDERS", [])
+            keycloak_provider = next(
+                (cfg for cfg in oauth_providers if cfg.get("name") == "keycloak"),
+                None
+            )
+            
+            if not keycloak_provider:
+                logger.error("Keycloak provider not found in OAUTH_PROVIDERS")
+                # Fallback to unverified decode
+                logger.warning("Falling back to unverified token decode")
+                decoded = jwt.decode(
+                    access_token,
+                    options={"verify_signature": False},
+                )
+                return decoded
+            
+            # Get api_base_url from remote_app config
+            remote_app = keycloak_provider.get("remote_app", {})
+            api_base_url = remote_app.get("api_base_url", "")
+            
+            if not api_base_url:
+                logger.error("api_base_url not configured in Keycloak provider")
+                # Fallback to unverified decode
+                logger.warning("Falling back to unverified token decode")
+                decoded = jwt.decode(
+                    access_token,
+                    options={"verify_signature": False},
+                )
+                return decoded
+
+            # Fetch and verify with JWKS
+            jwks_url = f"{api_base_url}openid-connect/certs"
+            logger.info(f"Fetching JWKS from: {jwks_url}")
+            
+            try:
+                jwk_client = jwt.PyJWKClient(jwks_url)
+                signing_key = jwk_client.get_signing_key_from_jwt(access_token)
+                
+                # Decode with verification
+                decoded = jwt.decode(
+                    access_token,
+                    signing_key.key,
+                    algorithms=["RS256"],
+                    options={
+                        "verify_signature": True,
+                        "verify_exp": True,
+                        "verify_aud": False  # Disable audience verification by default
+                    },
+                )
+                logger.info(f"Token validated successfully. Username: {decoded.get('preferred_username')}")
+                return decoded
+                
+            except jwt.InvalidTokenError as e:
+                logger.error(f"JWT validation failed: {str(e)}")
+                logger.info("Attempting unverified decode to extract claims...")
+                # Try to decode without verification to see what's in the token
+                decoded = jwt.decode(
+                    access_token,
+                    options={"verify_signature": False},
+                )
+                logger.warning(f"Token decoded without verification. Claims: {list(decoded.keys())}")
+                # Return the decoded token anyway if configured to be lenient
+                if current_app.config.get("KEYCLOAK_LENIENT_VALIDATION", False):
+                    logger.warning("Using unverified token due to KEYCLOAK_LENIENT_VALIDATION=True")
+                    return decoded
+                return None
+            except requests.RequestException as e:
+                logger.error(f"Failed to fetch JWKS from Keycloak: {str(e)}")
+                # Fallback to unverified if JWKS fetch fails
+                if current_app.config.get("KEYCLOAK_LENIENT_VALIDATION", False):
+                    decoded = jwt.decode(
+                        access_token,
+                        options={"verify_signature": False},
+                    )
+                    logger.warning("Using unverified token due to JWKS fetch failure and KEYCLOAK_LENIENT_VALIDATION=True")
+                    return decoded
+                return None
+
+        except jwt.ExpiredSignatureError:
+            logger.warning("Token has expired")
+            raise  # Re-raise to be caught by calling method
+        except jwt.DecodeError as e:
+            logger.error(f"Token decode error: {str(e)}")
+            return None
+        except Exception as e:
+            logger.exception(f"Unexpected error validating token: {str(e)}")
+            return None
 
     def _get_or_create_user(self, user_info: dict[str, Any]) -> Any:
         """
@@ -299,4 +428,70 @@ class KeycloakAuthApi(BaseApi):
             return self.response_401(message="Invalid or expired session")
         except Exception as e:
             logger.exception("Error validating session")
+            return self.response(500, message=str(e))
+
+    @expose("/debug_token", methods=["POST"])
+    @safe
+    def debug_token(self) -> Response:
+        """
+        Debug endpoint to decode token without validation.
+        ---
+        post:
+          summary: Debug token
+          description: Decode token and show its contents (no validation)
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - access_token
+                  properties:
+                    access_token:
+                      type: string
+          responses:
+            200:
+              description: Token decoded
+            400:
+              description: Bad request
+        """
+        try:
+            data = request.json or {}
+            access_token = data.get("access_token")
+
+            if not access_token:
+                return self.response_400(message="access_token is required")
+
+            # Decode without verification to see what's in the token
+            try:
+                decoded = jwt.decode(
+                    access_token,
+                    options={"verify_signature": False},
+                )
+                return self.response(
+                    200,
+                    decoded=True,
+                    claims=list(decoded.keys()),
+                    username=decoded.get("preferred_username"),
+                    email=decoded.get("email"),
+                    exp=decoded.get("exp"),
+                    iat=decoded.get("iat"),
+                    realm_access=decoded.get("realm_access"),
+                )
+            except jwt.DecodeError as e:
+                return self.response(
+                    400,
+                    decoded=False,
+                    error=f"Failed to decode token: {str(e)}",
+                )
+            except Exception as e:
+                return self.response(
+                    500,
+                    decoded=False,
+                    error=f"Unexpected error: {str(e)}",
+                )
+
+        except Exception as e:
+            logger.exception("Error in debug_token")
             return self.response(500, message=str(e))
