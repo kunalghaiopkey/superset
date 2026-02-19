@@ -106,21 +106,11 @@ class KeycloakAuthApi(BaseApi):
         """
         try:
             data = request.json or {}
-            access_token = data.get("access_token")
-            user_profile_override = data.get("user_profile", {})
-
-            if not access_token:
-                return self.response_400(message="access_token is required")
-
-            # Validate and decode Keycloak token
-            user_info = self._validate_keycloak_token(access_token)
+            user_info = data.get("user_profile")
+            
             if not user_info:
                 return self.response_401()
 
-            # Merge with any provided user profile
-            user_info.update(user_profile_override)
-
-            # Get or create Superset user
             user = self._get_or_create_user(user_info)
             if not user:
                 return self.response(
@@ -153,63 +143,6 @@ class KeycloakAuthApi(BaseApi):
         except Exception as e:
             logger.exception("Error during token login")
             return self.response(500, message=str(e))
-
-    def _validate_keycloak_token(self, access_token: str) -> dict[str, Any] | None:
-        """
-        Validate Keycloak access token and extract user information.
-        
-        Returns user info dict or None if invalid.
-        """
-        try:
-            # Get Keycloak configuration
-            keycloak_config = current_app.config.get("KEYCLOAK_CONFIG", {})
-            
-            # Option 1: Decode without verification (if you trust the source)
-            # Use this ONLY if token comes from a trusted backend service
-            if current_app.config.get("KEYCLOAK_SKIP_TOKEN_VERIFICATION", False):
-                logger.warning(
-                    "Skipping Keycloak token verification - USE ONLY IN TRUSTED ENVIRONMENTS"
-                )
-                decoded = jwt.decode(
-                    access_token,
-                    options={"verify_signature": False},
-                )
-                return decoded
-
-            # Option 2: Verify token with Keycloak public key (recommended)
-            # Get public key from Keycloak
-            realm = keycloak_config.get("realm")
-            server_url = keycloak_config.get("server_url")
-            
-            if not realm or not server_url:
-                logger.error("Keycloak realm or server_url not configured")
-                return None
-
-            # Fetch public key from Keycloak
-            jwks_url = f"{server_url}/realms/{realm}/protocol/openid-connect/certs"
-            jwks_response = requests.get(jwks_url, timeout=5)
-            jwks_response.raise_for_status()
-
-            # Decode and verify token
-            jwk_client = jwt.PyJWKClient(jwks_url)
-            signing_key = jwk_client.get_signing_key_from_jwt(access_token)
-            
-            decoded = jwt.decode(
-                access_token,
-                signing_key.key,
-                algorithms=["RS256"],
-                audience=keycloak_config.get("client_id"),
-                options={"verify_exp": True, "verify_aud": True},
-            )
-            
-            return decoded
-
-        except requests.RequestException as e:
-            logger.error("Failed to fetch Keycloak public key: %s", str(e))
-            return None
-        except Exception as e:
-            logger.error("Token validation error: %s", str(e))
-            return None
 
     def _get_or_create_user(self, user_info: dict[str, Any]) -> Any:
         """
