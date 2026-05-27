@@ -24,18 +24,6 @@ import {
 } from './types/Filter';
 import { QueryObjectFilterClause } from './types/Query';
 
-function trimComparator(comparator: unknown): any {
-  if (typeof comparator === 'string') {
-    return comparator.trim();
-  }
-  if (Array.isArray(comparator)) {
-    return comparator.map(item =>
-      typeof item === 'string' ? item.trim() : item,
-    );
-  }
-  return comparator;
-}
-
 export default function convertFilter(
   filter: SimpleAdhocFilter,
 ): QueryObjectFilterClause {
@@ -54,7 +42,7 @@ export default function convertFilter(
     return {
       col: subject,
       op: operator,
-      val: trimComparator(filter.comparator),
+      val: filter.comparator,
     };
   }
 
@@ -63,6 +51,6 @@ export default function convertFilter(
   return {
     col: subject,
     op: operator,
-    val: trimComparator(filter.comparator),
+    val: filter.comparator,
   };
 }
