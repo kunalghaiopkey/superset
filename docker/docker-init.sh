@@ -45,7 +45,47 @@ if [ "$CYPRESS_CONFIG" == "true" ]; then
 fi
 # Initialize the database
 echo_step "1" "Starting" "Applying DB migrations"
-superset db upgrade
+# The metadata DB can be stamped with an alembic revision that this codebase
+# does not ship (e.g. another Superset build pointed at the same schema ran its
+# own migration). `db upgrade` then dies with "Can't locate revision ...".
+# Instead of dropping the schema, re-stamp it to this codebase's head and retry.
+# Disable with SUPERSET_RESTAMP_UNKNOWN_REVISION=false.
+UPGRADE_LOG=$(mktemp)
+set +e
+superset db upgrade 2>&1 | tee "$UPGRADE_LOG"
+UPGRADE_RC=${PIPESTATUS[0]}
+set -e
+if [ "$UPGRADE_RC" -ne 0 ]; then
+    if grep -q "Can't locate revision identified by" "$UPGRADE_LOG" \
+        && [ "${SUPERSET_RESTAMP_UNKNOWN_REVISION:-true}" = "true" ]; then
+        echo "WARNING: metadata DB is stamped with a revision unknown to this code."
+        echo "WARNING: re-stamping alembic_version to this code's head and retrying."
+        python - <<'PYEOF'
+from alembic.script import ScriptDirectory
+from flask import current_app
+from sqlalchemy import text
+
+from superset.app import create_app
+
+app = create_app()
+with app.app_context():
+    from superset.extensions import db
+
+    cfg = current_app.extensions["migrate"].migrate.get_config()
+    head = ScriptDirectory.from_config(cfg).get_current_head()
+    old = [r[0] for r in db.session.execute(text("SELECT version_num FROM alembic_version"))]
+    db.session.execute(text("DELETE FROM alembic_version"))
+    db.session.execute(text("INSERT INTO alembic_version (version_num) VALUES (:v)"), {"v": head})
+    db.session.commit()
+    print(f"Re-stamped alembic_version {old} -> {head}")
+PYEOF
+        superset db upgrade
+    else
+        rm -f "$UPGRADE_LOG"
+        exit "$UPGRADE_RC"
+    fi
+fi
+rm -f "$UPGRADE_LOG"
 echo_step "1" "Complete" "Applying DB migrations"
 
 # Create an admin user
