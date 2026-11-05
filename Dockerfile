@@ -221,9 +221,9 @@ FROM python-common AS lean
 COPY requirements/base.txt requirements/
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     /app/docker/pip-install.sh --requires-build-essential -r requirements/base.txt
-# Install the superset package
+# Install the superset package and ClickHouse drivers for prod deployments
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    uv pip install .
+    uv pip install .[clickhouse]
 RUN python -m compileall /app/superset
 
 USER superset
@@ -244,9 +244,9 @@ COPY requirements/*.txt requirements/
 # Install Python dependencies using docker/pip-install.sh
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     /app/docker/pip-install.sh --requires-build-essential -r requirements/development.txt
-# Install the superset package
+# Install the superset package and ClickHouse drivers for dev/test builds
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    uv pip install .
+    uv pip install .[clickhouse]
 
 RUN uv pip install .[postgres]
 RUN python -m compileall /app/superset
