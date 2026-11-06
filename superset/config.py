@@ -195,6 +195,14 @@ SQLALCHEMY_DATABASE_URI = (
     f"""sqlite:///{os.path.join(DATA_DIR, "superset.db")}?check_same_thread=false"""
 )
 
+# Name of the table alembic uses to track the applied migration revision.
+# Override it when several Superset versions share one metadata schema (e.g.
+# Superset 5 and Superset 6), so each version tracks its own revision instead of
+# overwriting the other's and failing with "Can't locate revision ...".
+ALEMBIC_VERSION_TABLE = os.environ.get(
+    "SUPERSET_ALEMBIC_VERSION_TABLE", "alembic_version"
+)
+
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
 

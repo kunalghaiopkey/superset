@@ -77,7 +77,12 @@ def run_migrations_offline() -> None:
     logger.info("Starting the migration scripts.")
 
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url)
+    context.configure(
+        url=url,
+        version_table=current_app.config.get(
+            "ALEMBIC_VERSION_TABLE", "alembic_version"
+        ),
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -125,6 +130,9 @@ def run_migrations_online() -> None:
         target_metadata=target_metadata,
         # compare_type=True,
         process_revision_directives=process_revision_directives,
+        version_table=current_app.config.get(
+            "ALEMBIC_VERSION_TABLE", "alembic_version"
+        ),
         **kwargs,
     )
 
