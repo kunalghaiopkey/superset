@@ -18,6 +18,7 @@
 # pylint: disable=invalid-name, unused-argument, redefined-outer-name
 
 import json
+import re
 
 import pytest
 from flask_appbuilder.security.sqla.models import Role, User
@@ -445,7 +446,7 @@ def test_raise_for_access_jinja_sql(mocker: MockerFixture, app_context: None) ->
 def tenant_query(mocker: MockerFixture, app_context: None):
     """
     A security manager and a SQL Lab query for a tenant user who can read only the
-    `vulcan` schema of the `vulcan` MySQL database, which is the schema selected in
+    `tenant_a` schema of the `tenants` MySQL database, which is the schema selected in
     SQL Lab.
     """
     sm = SupersetSecurityManager(appbuilder)
@@ -455,13 +456,13 @@ def tenant_query(mocker: MockerFixture, app_context: None):
     mocker.patch.object(
         sm,
         "get_schema_perm",
-        side_effect=lambda database, catalog, schema: f"[vulcan].[{schema}]",
+        side_effect=lambda database, catalog, schema: f"[tenants].[{schema}]",
     )
     mocker.patch.object(
         sm,
         "can_access",
         side_effect=lambda permission, view: (permission, view)
-        == ("schema_access", "[vulcan].[vulcan]"),
+        == ("schema_access", "[tenants].[tenant_a]"),
     )
     SqlaTable = mocker.patch("superset.connectors.sqla.models.SqlaTable")  # noqa: N806
     SqlaTable.query_datasources_by_name.return_value = []
@@ -469,7 +470,7 @@ def tenant_query(mocker: MockerFixture, app_context: None):
     database = mocker.MagicMock()
     database.db_engine_spec.engine = "mysql"
     database.get_default_catalog.return_value = None
-    database.get_default_schema_for_query.return_value = "vulcan"
+    database.get_default_schema_for_query.return_value = "tenant_a"
     query = mocker.MagicMock()
     query.catalog = None
     query.database = database
@@ -480,10 +481,10 @@ def tenant_query(mocker: MockerFixture, app_context: None):
 @pytest.mark.parametrize(
     "sql",
     [
-        "SELECT * FROM bi_artifact_linking",
-        "SELECT * FROM vulcan.bi_artifact_linking",
-        "WITH t AS (SELECT * FROM bi_artifact_linking) SELECT * FROM t",
-        "DESCRIBE bi_artifact_linking",
+        "SELECT * FROM orders",
+        "SELECT * FROM tenant_a.orders",
+        "WITH t AS (SELECT * FROM orders) SELECT * FROM t",
+        "DESCRIBE orders",
     ],
 )
 def test_raise_for_access_query_own_tenant_schema(tenant_query, sql: str) -> None:
@@ -500,21 +501,19 @@ def test_raise_for_access_query_own_tenant_schema(tenant_query, sql: str) -> Non
     "sql, denied",
     [
         ("SELECT * FROM information_schema.tables", "information_schema.tables"),
-        ("SELECT * FROM mosaic.bi_datasheet_runs", "mosaic.bi_datasheet_runs"),
+        ("SELECT * FROM tenant_b.customers", "tenant_b.customers"),
         ("SELECT * FROM superset.ab_user", "superset.ab_user"),
         (
-            "SELECT * FROM bi_artifact_linking a "
-            "JOIN mosaic.bi_datasheet_runs b ON a.id = b.id",
-            "mosaic.bi_datasheet_runs",
+            "SELECT * FROM orders a " "JOIN tenant_b.customers b ON a.id = b.id",
+            "tenant_b.customers",
         ),
         (
-            "SELECT * FROM bi_artifact_linking "
-            "WHERE id IN (SELECT id FROM mosaic.bi_datasheet_runs)",
-            "mosaic.bi_datasheet_runs",
+            "SELECT * FROM orders " "WHERE id IN (SELECT id FROM tenant_b.customers)",
+            "tenant_b.customers",
         ),
         (
-            "SELECT * FROM bi_artifact_linking; SELECT * FROM mosaic.bi_datasheet_runs",
-            "mosaic.bi_datasheet_runs",
+            "SELECT * FROM orders; SELECT * FROM tenant_b.customers",
+            "tenant_b.customers",
         ),
     ],
 )
@@ -540,18 +539,18 @@ def test_raise_for_access_query_other_tenant_schema(
 @pytest.mark.parametrize(
     "sql, statements",
     [
-        ("SET @x = (SELECT secret FROM mosaic.bi_datasheet_runs LIMIT 1)", "SET"),
+        ("SET @x = (SELECT secret FROM tenant_b.customers LIMIT 1)", "SET"),
         (
-            "SET @q = CONCAT('SELECT * FROM mo', 'saic.bi_datasheet_runs'); "
+            "SET @q = CONCAT('SELECT * FROM tenant', '_b.customers'); "
             "PREPARE s FROM @q; EXECUTE s",
             "EXECUTE, PREPARE, SET",
         ),
-        ("USE mosaic; SELECT * FROM bi_datasheet_runs", "USE"),
-        ("SHOW TABLES FROM mosaic", "SHOW"),
+        ("USE tenant_b; SELECT * FROM customers", "USE"),
+        ("SHOW TABLES FROM tenant_b", "SHOW"),
         ("SHOW DATABASES", "SHOW"),
-        ("CALL mosaic.some_procedure()", "CALL"),
-        ("SELECT 1 /*! UNION SELECT * FROM mosaic.bi_datasheet_runs */", "/*! */"),
-        ("SELECT 1 /*!50000 UNION SELECT * FROM mosaic.bi_datasheet_runs */", "/*! */"),
+        ("CALL tenant_b.some_procedure()", "CALL"),
+        ("SELECT 1 /*! UNION SELECT * FROM tenant_b.customers */", "/*! */"),
+        ("SELECT 1 /*!50000 UNION SELECT * FROM tenant_b.customers */", "/*! */"),
     ],
 )
 def test_raise_for_access_query_unverifiable_statements(
@@ -581,7 +580,7 @@ def test_raise_for_access_query_unverifiable_statements(
     "template_params, denied",
     [
         ({}, None),
-        ({"t": ", mosaic.bi_datasheet_runs m"}, "mosaic.bi_datasheet_runs"),
+        ({"t": ", tenant_b.customers m"}, "tenant_b.customers"),
         ({"t": "JOIN information_schema.tables ON 1 = 1"}, "information_schema.tables"),
     ],
 )
@@ -600,7 +599,7 @@ def test_raise_for_access_query_template_params(
         return_value=True,
     )
     sm, query = tenant_query
-    query.sql = "SELECT * FROM bi_artifact_linking {{ t }}"
+    query.sql = "SELECT * FROM orders {{ t }}"
 
     if denied is None:
         assert sm.raise_for_access(query=query, template_params=template_params) is None
@@ -611,23 +610,43 @@ def test_raise_for_access_query_template_params(
     assert excinfo.value.error.extra["tables"] == [denied]
 
 
+DATABASE_ID = 1
+OTHER_DATABASE_ID = 2
+
+# The datasets of `dataset_macro_query`, by name
+DATASET_IDS = {
+    # A physical dataset on `tenant_a.customers`
+    "physical": 1,
+    # A virtual dataset in `tenant_a` reading `orders`, unqualified
+    "virtual": 2,
+    # A dataset on another database
+    "other_database": 3,
+    # A dataset of another tenant, which the user can't explore
+    "other_tenant": 4,
+}
+
+
+def with_dataset_ids(sql: str) -> str:
+    """
+    `sql` with each `<name>` replaced by the ID of that dataset of `DATASET_IDS`.
+    """
+    return re.sub(r"<(\w+)>", lambda match: str(DATASET_IDS[match[1]]), sql)
+
+
 @pytest.fixture
 def dataset_macro_query(mocker: MockerFixture, app_context: None):
     """
-    A security manager and a SQL Lab query, in the `myqlm` schema of the database
-    with ID 1, for a user who can explore datasets 103 and 104, with row level
-    security, but has no access to any schema or table.
-
-    Dataset 103 is the `myqlm.bi_datasheet_runs` table, dataset 104 a virtual
-    dataset in `myqlm` reading `bi_artifact_linking` (unqualified), dataset 105 is
-    on another database and dataset 500 belongs to another client.
+    A security manager and a SQL Lab query, in the `tenant_a` schema of the database
+    `DATABASE_ID`, for a user who can explore the physical, virtual and other
+    database datasets, with row level security, but has no access to any schema or
+    table.
     """
     mocker.patch(
         "superset.jinja_context.feature_flag_manager.is_feature_enabled",
         return_value=True,
     )
 
-    def dataset(id_, database_id=1, schema="myqlm"):
+    def dataset(id_, database_id=DATABASE_ID, schema="tenant_a"):
         return mocker.MagicMock(
             id=id_,
             database_id=database_id,
@@ -639,18 +658,22 @@ def dataset_macro_query(mocker: MockerFixture, app_context: None):
             ],
         )
 
+    ids = DATASET_IDS
     datasets = {
-        103: dataset(103),
-        104: dataset(104),
-        105: dataset(105, database_id=2),
-        500: dataset(500, schema="mosaic"),
+        ids["physical"]: dataset(ids["physical"]),
+        ids["virtual"]: dataset(ids["virtual"]),
+        ids["other_database"]: dataset(
+            ids["other_database"], database_id=OTHER_DATABASE_ID
+        ),
+        ids["other_tenant"]: dataset(ids["other_tenant"], schema="tenant_b"),
     }
     sources = {
-        103: "myqlm.bi_datasheet_runs",
-        104: "(SELECT id, name FROM bi_artifact_linking) AS virtual_table",
-        105: "myqlm.bi_datasheet_runs",
-        500: "mosaic.bi_datasheet_runs",
+        ids["physical"]: "tenant_a.customers",
+        ids["virtual"]: "(SELECT id, name FROM orders) AS virtual_table",
+        ids["other_database"]: "tenant_a.customers",
+        ids["other_tenant"]: "tenant_b.customers",
     }
+    explorable = {ids["physical"], ids["virtual"], ids["other_database"]}
 
     def dataset_macro(dataset_id, include_metrics=False, columns=None, **kwargs):
         columns = ", ".join(columns or ["id", "name"])
@@ -679,16 +702,16 @@ def dataset_macro_query(mocker: MockerFixture, app_context: None):
     mocker.patch.object(
         sm,
         "can_access_datasource",
-        side_effect=lambda dataset: dataset.id in {103, 104, 105},
+        side_effect=lambda dataset: dataset.id in explorable,
     )
     SqlaTable = mocker.patch("superset.connectors.sqla.models.SqlaTable")  # noqa: N806
     SqlaTable.query_datasources_by_name.return_value = []
 
-    database = mocker.MagicMock(id=1)
+    database = mocker.MagicMock(id=DATABASE_ID)
     database.db_engine_spec.engine = "mysql"
     database.db_engine_spec.supports_dynamic_schema = True
     database.get_default_catalog.return_value = None
-    database.get_default_schema_for_query.return_value = "myqlm"
+    database.get_default_schema_for_query.return_value = "tenant_a"
     query = mocker.MagicMock(catalog=None, database=database)
 
     return sm, query
@@ -697,12 +720,12 @@ def dataset_macro_query(mocker: MockerFixture, app_context: None):
 @pytest.mark.parametrize(
     "sql",
     [
-        "SELECT * FROM {{ dataset(103) }}",
-        "SELECT * FROM {{ dataset('103') }}",
-        "SELECT * FROM {{ dataset(103, columns=['id']) }}",
-        "SELECT * FROM {{ dataset(103) }} JOIN {{ dataset(104) }} ON dataset_103.id = "
-        "dataset_104.id",
-        "WITH r AS (SELECT * FROM {{ dataset(103) }}) SELECT COUNT(*) FROM r",
+        "SELECT * FROM {{ dataset(<physical>) }}",
+        "SELECT * FROM {{ dataset('<physical>') }}",
+        "SELECT * FROM {{ dataset(<physical>, columns=['id']) }}",
+        "SELECT * FROM {{ dataset(<physical>) }} JOIN {{ dataset(<virtual>) }} "
+        "ON dataset_<physical>.id = dataset_<virtual>.id",
+        "WITH r AS (SELECT * FROM {{ dataset(<physical>) }}) SELECT COUNT(*) FROM r",
     ],
 )
 def test_raise_for_access_query_dataset_macro(dataset_macro_query, sql: str) -> None:
@@ -711,7 +734,7 @@ def test_raise_for_access_query_dataset_macro(dataset_macro_query, sql: str) -> 
     can be read with access to the dataset alone, as when exploring it.
     """
     sm, query = dataset_macro_query
-    query.sql = sql
+    query.sql = with_dataset_ids(sql)
 
     assert sm.raise_for_access(query=query) is None
 
@@ -720,32 +743,41 @@ def test_raise_for_access_query_dataset_macro(dataset_macro_query, sql: str) -> 
     "sql, schema, denied",
     [
         # The dataset's table, read directly, skips its row level security
-        ("SELECT * FROM myqlm.bi_datasheet_runs", "myqlm", "myqlm.bi_datasheet_runs"),
+        ("SELECT * FROM tenant_a.customers", "tenant_a", "tenant_a.customers"),
         (
-            "SELECT * FROM {{ dataset(103) }} JOIN myqlm.bi_datasheet_runs r ON 1 = 1",
-            "myqlm",
-            "myqlm.bi_datasheet_runs",
+            "SELECT * FROM {{ dataset(<physical>) }} "
+            "JOIN tenant_a.customers r ON 1 = 1",
+            "tenant_a",
+            "tenant_a.customers",
         ),
         # A subquery made to look like a dataset() call
         (
-            "SELECT * FROM (\nSELECT id, name FROM myqlm.bi_datasheet_runs\n) AS "
-            "dataset_103",
-            "myqlm",
-            "myqlm.bi_datasheet_runs",
+            "SELECT * FROM (\nSELECT id, name FROM tenant_a.customers\n) AS "
+            "dataset_<physical>",
+            "tenant_a",
+            "tenant_a.customers",
         ),
         # A dataset the user can't explore
-        ("SELECT * FROM {{ dataset(500) }}", "myqlm", "mosaic.bi_datasheet_runs"),
+        (
+            "SELECT * FROM {{ dataset(<other_tenant>) }}",
+            "tenant_a",
+            "tenant_b.customers",
+        ),
         # SQL written by the user, passed as a column
         (
-            "SELECT * FROM {{ dataset(103, columns=['(SELECT secret FROM mosaic.t)']) "
-            "}}",
-            "myqlm",
-            "mosaic.t",
+            "SELECT * FROM {{ dataset(<physical>, "
+            "columns=['(SELECT secret FROM tenant_b.t)']) }}",
+            "tenant_a",
+            "tenant_b.t",
         ),
         # A dataset on another database: its SQL would run on this one
-        ("SELECT * FROM {{ dataset(105) }}", "myqlm", "myqlm.bi_datasheet_runs"),
+        (
+            "SELECT * FROM {{ dataset(<other_database>) }}",
+            "tenant_a",
+            "tenant_a.customers",
+        ),
         # An unqualified table, which would resolve to the schema picked in SQL Lab
-        ("SELECT * FROM {{ dataset(104) }}", "mosaic", "mosaic.bi_artifact_linking"),
+        ("SELECT * FROM {{ dataset(<virtual>) }}", "tenant_b", "tenant_b.orders"),
     ],
 )
 def test_raise_for_access_query_dataset_macro_denied(
@@ -759,7 +791,7 @@ def test_raise_for_access_query_dataset_macro_denied(
     doesn't cover them, need access of their own.
     """
     sm, query = dataset_macro_query
-    query.sql = sql
+    query.sql = with_dataset_ids(sql)
     query.database.get_default_schema_for_query.return_value = schema
 
     with pytest.raises(SupersetSecurityException) as excinfo:
@@ -768,7 +800,7 @@ def test_raise_for_access_query_dataset_macro_denied(
     assert denied in excinfo.value.error.extra["tables"]
 
 
-@pytest.mark.parametrize("dataset_schema", ["myqlm", None])
+@pytest.mark.parametrize("dataset_schema", ["tenant_a", None])
 def test_raise_for_access_query_dataset_macro_static_schema(
     dataset_macro_query,
     mocker: MockerFixture,
@@ -786,22 +818,24 @@ def test_raise_for_access_query_dataset_macro_static_schema(
     mocker.patch(
         "superset.daos.dataset.DatasetDAO.find_by_id",
         return_value=mocker.MagicMock(
-            id=104,
-            database_id=1,
+            id=DATASET_IDS["virtual"],
+            database_id=DATABASE_ID,
             schema=dataset_schema,
             catalog=None,
             columns=[mocker.MagicMock(column_name="id")],
         ),
     )
-    query.sql = "SELECT * FROM {{ dataset(104) }}"
+    query.sql = with_dataset_ids("SELECT * FROM {{ dataset(<virtual>) }}")
 
     assert sm.raise_for_access(query=query) is None
 
     # Tables outside the call are still checked
-    query.sql = "SELECT * FROM {{ dataset(104) }} JOIN bi_artifact_linking b ON 1 = 1"
+    query.sql = with_dataset_ids(
+        "SELECT * FROM {{ dataset(<virtual>) }} JOIN orders b ON 1 = 1"
+    )
     with pytest.raises(SupersetSecurityException) as excinfo:
         sm.raise_for_access(query=query)
-    assert excinfo.value.error.extra["tables"] == ["default.bi_artifact_linking"]
+    assert excinfo.value.error.extra["tables"] == ["default.orders"]
 
 
 def test_raise_for_access_query_dataset_macro_executable_comment(
@@ -811,9 +845,9 @@ def test_raise_for_access_query_dataset_macro_executable_comment(
     A `dataset()` call can't hide SQL from the check in a MySQL executable comment.
     """
     sm, query = dataset_macro_query
-    query.sql = (
-        "SELECT * FROM {{ dataset(103) }} "
-        "/*! UNION SELECT * FROM mosaic.bi_datasheet_runs */"
+    query.sql = with_dataset_ids(
+        "SELECT * FROM {{ dataset(<physical>) }} "
+        "/*! UNION SELECT * FROM tenant_b.customers */"
     )
 
     with pytest.raises(SupersetSecurityException) as excinfo:

@@ -232,9 +232,9 @@ def test_connect_make_label_compatible(column_name: str, expected_result: str) -
     [
         (
             "ClickHouseConnectEngineSpec",
-            "clickhousedb://user:pass@host:8123/myqlm",
+            "clickhousedb://user:pass@host:8123/analytics",
             {},
-            "myqlm",
+            "analytics",
         ),
         (
             "ClickHouseConnectEngineSpec",
@@ -244,7 +244,7 @@ def test_connect_make_label_compatible(column_name: str, expected_result: str) -
         ),
         (
             "ClickHouseConnectEngineSpec",
-            "clickhousedb://user:pass@host:8123/myqlm",
+            "clickhousedb://user:pass@host:8123/analytics",
             {"database": "other"},
             "other",
         ),
@@ -256,9 +256,9 @@ def test_connect_make_label_compatible(column_name: str, expected_result: str) -
         ),
         (
             "ClickHouseEngineSpec",
-            "clickhouse://user:pass@host:8123/myqlm",
+            "clickhouse://user:pass@host:8123/analytics",
             {},
-            "myqlm",
+            "analytics",
         ),
     ],
 )
