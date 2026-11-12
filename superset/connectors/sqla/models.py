@@ -31,6 +31,7 @@ import dateutil.parser
 import numpy as np
 import pandas as pd
 import sqlalchemy as sa
+from flask import g, has_app_context
 from flask_appbuilder import Model
 from flask_appbuilder.security.sqla.models import User
 from flask_babel import gettext as __, lazy_gettext as _
@@ -62,6 +63,7 @@ from sqlalchemy.orm import (
     reconstructor,
     relationship,
     RelationshipProperty,
+    Session,
 )
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.schema import UniqueConstraint
@@ -2078,6 +2080,121 @@ class SqlaTable(
             self.database = session.query(Database).filter_by(id=self.database_id).one()
 
 
+# The fields of a dataset that decide which tables any SQL in it reads
+DATASET_CONTEXT_FIELDS = (
+    "database",
+    "database_id",
+    "catalog",
+    "schema",
+    "template_params",
+)
+# The fields of a dataset that decide which tables its queries read
+DATASET_SQL_FIELDS = (
+    *DATASET_CONTEXT_FIELDS,
+    "table_name",
+    "sql",
+    "fetch_values_predicate",
+)
+
+
+def _has_changes(target: Model, fields: tuple[str, ...]) -> bool:
+    state = inspect(target)
+    return state.pending or any(
+        state.attrs[field].history.has_changes() for field in fields
+    )
+
+
+def _raise_for_dataset_sql_access(dataset: SqlaTable, session: Session) -> None:
+    if not _has_changes(dataset, DATASET_SQL_FIELDS):
+        return
+
+    database = dataset.database or (
+        session.get(Database, dataset.database_id) if dataset.database_id else None
+    )
+    if database is None:
+        return
+
+    if dataset.sql:
+        security_manager.raise_for_access(
+            database=database,
+            sql=dataset.sql,
+            catalog=dataset.catalog,
+            schema=dataset.schema,
+            template_params=dataset.template_params_dict,
+        )
+    else:
+        security_manager.raise_for_access(
+            database=database,
+            table=Table(
+                dataset.table_name,
+                dataset.schema or database.get_default_schema(dataset.catalog),
+                dataset.catalog,
+            ),
+        )
+
+    if dataset.fetch_values_predicate:
+        _raise_for_expression_access(
+            dataset,
+            f"SELECT 1 WHERE {dataset.fetch_values_predicate}",
+        )
+
+    # New columns and metrics are checked on their own
+    if not inspect(dataset).pending and _has_changes(dataset, DATASET_CONTEXT_FIELDS):
+        for item in [*dataset.columns, *dataset.metrics]:
+            if expression := (item.expression or "").strip():
+                _raise_for_expression_access(dataset, f"SELECT {expression}")
+
+
+def _raise_for_expression_access(dataset: SqlaTable, sql: str) -> None:
+    if database := dataset.database:
+        security_manager.raise_for_access(
+            database=database,
+            sql=sql,
+            catalog=dataset.catalog,
+            schema=dataset.schema,
+            template_params=dataset.template_params_dict,
+        )
+
+
+def raise_for_dataset_sql_access(
+    session: Session,
+    flush_context: Any,
+    instances: Any,
+) -> None:
+    """
+    Before a flush, check that the user may read every table read by the SQL they
+    put in a dataset: its SQL or table, and its calculated columns and metrics.
+
+    A dataset's queries are allowed by access to the dataset, not to the tables
+    they read, so SQL saved in a dataset reads with the access of whoever can
+    explore it. Checking here, on every write whatever the endpoint (the dataset
+    API, the legacy datasource save, import, duplication), keeps users from saving
+    SQL that reads tables they can't read themselves. SQL that didn't change isn't
+    checked again.
+
+    Columns and metrics written in bulk aren't seen here: see
+    `DatasetDAO.raise_for_expression_access`. Writes without a user (CLI,
+    migrations) aren't checked.
+    """
+    if not has_app_context() or getattr(g, "user", None) is None:
+        return
+
+    with session.no_autoflush:
+        for target in [*session.new, *session.dirty]:
+            if isinstance(target, SqlaTable):
+                _raise_for_dataset_sql_access(target, session)
+            elif isinstance(target, (TableColumn, SqlMetric)):
+                if not _has_changes(target, ("expression",)):
+                    continue
+                expression = (target.expression or "").strip()
+                dataset = target.table or (
+                    session.get(SqlaTable, target.table_id) if target.table_id else None
+                )
+                if expression and dataset:
+                    _raise_for_expression_access(dataset, f"SELECT {expression}")
+
+
+sa.event.listen(Session, "before_flush", raise_for_dataset_sql_access)
 sa.event.listen(SqlaTable, "before_update", SqlaTable.before_update)
 sa.event.listen(SqlaTable, "after_insert", SqlaTable.after_insert)
 sa.event.listen(SqlaTable, "after_delete", SqlaTable.after_delete)

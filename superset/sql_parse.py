@@ -23,11 +23,12 @@ import logging
 import re
 from collections.abc import Collection, Iterator
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Any, cast, TYPE_CHECKING
 
 import sqlparse
 from flask_babel import gettext as __
-from jinja2 import nodes, Template
+from jinja2 import nodes, Undefined
 from sqlalchemy import and_
 from sqlglot import exp, tokenize
 from sqlglot.errors import SqlglotError
@@ -1044,13 +1045,17 @@ class JinjaSQLAnalysis:
         return self.tables.union(*(call.tables for call in self.dataset_calls))
 
 
-def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
+def extract_tables_from_jinja_sql(
+    sql: str,
+    database: Database,
+    template_params: dict[str, Any] | None = None,
+) -> set[Table]:
     """
     Extract all table references in the Jinjafied SQL statement.
 
     See `analyze_jinja_sql`.
     """
-    return analyze_jinja_sql(sql, database).all_tables
+    return analyze_jinja_sql(sql, database, template_params).all_tables
 
 
 def _parse_dataset_macro_sql(sql: str, engine: str) -> tuple[str, set[Table]] | None:
@@ -1079,7 +1084,11 @@ def _parse_dataset_macro_sql(sql: str, engine: str) -> tuple[str, set[Table]] | 
         return None
 
 
-def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
+def analyze_jinja_sql(
+    sql: str,
+    database: Database,
+    template_params: dict[str, Any] | None = None,
+) -> JinjaSQLAnalysis:
     """
     Extract all table references in the Jinjafied SQL statement, and the keywords of
     its statements whose tables can't be determined (see
@@ -1096,8 +1105,13 @@ def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
     The tables read by the SQL of `{{ dataset(id) }}` calls are kept apart, in
     `dataset_calls`, for callers that authorize them by access to the dataset.
 
+    The SQL is rendered as it will be run, so the tables found are the ones it will
+    read: by the database's template processor, in one pass, with the template
+    parameters it will be run with. Undefined parameters render as empty.
+
     :param sql: The Jinjafied SQL statement
     :param database: The database associated with the SQL statement
+    :param template_params: The template parameters the SQL will be run with
     :returns: The analysis
     :raises SupersetSecurityException: If SQLGlot is unable to parse the SQL statement
     :raises jinja2.exceptions.TemplateError: If the Jinjafied SQL could not be rendered
@@ -1105,6 +1119,9 @@ def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
 
     from superset.jinja_context import (  # pylint: disable=import-outside-toplevel
         get_template_processor,
+        NoOpTemplateProcessor,
+        safe_proxy,
+        validate_template_context,
     )
 
     processor = get_template_processor(database)
@@ -1154,10 +1171,21 @@ def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
             dataset_macro_calls.append((dataset_id, columns, rendered))
             return rendered
 
-        context["dataset"] = record_dataset_macro
+        context["dataset"] = partial(safe_proxy, record_dataset_macro)
 
-    # re-render template back into a string
-    rendered_sql = Template(template).render(context)
+    if isinstance(processor, NoOpTemplateProcessor):
+        # Template processing is off, so the SQL will be run as written
+        rendered_sql = sql
+    else:
+        # As `process_template` does: the processor's own context takes precedence
+        # over the template parameters
+        kwargs = dict(template_params or {})
+        kwargs.update(context)
+        rendered_sql = (
+            processor.env.overlay(undefined=Undefined)
+            .from_string(template)
+            .render(validate_template_context(processor.engine, kwargs))
+        )
 
     engine = database.db_engine_spec.engine
     dataset_subqueries: dict[str, DatasetMacroCall] = {}
@@ -1171,7 +1199,7 @@ def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
             )
 
     parsed_query = ParsedQuery(
-        sql_statement=processor.process_template(rendered_sql),
+        sql_statement=rendered_sql,
         engine=engine,
         opaque_subqueries=dataset_subqueries.keys(),
     )

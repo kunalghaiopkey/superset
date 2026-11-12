@@ -2034,3 +2034,48 @@ def test_analyze_jinja_sql_dataset_macro(mocker: MockerFixture) -> None:
     analysis = analyze_jinja_sql(sql="SELECT {{ dataset(3) }}", database=database)
     assert analysis.tables == {Table("t3", "s")}
     assert analysis.dataset_calls == []
+
+
+@mock.patch.dict(
+    "superset.extensions.feature_flag_manager._feature_flags",
+    {"ENABLE_TEMPLATE_PROCESSING": True},
+    clear=True,
+)
+def test_analyze_jinja_sql_template_params(mocker: MockerFixture) -> None:
+    """
+    The SQL is rendered with the template parameters it will be run with, which
+    can't override the processor's own macros.
+    """
+    database = mocker.Mock()
+    database.db_engine_spec.engine = "mysql"
+    sql = "SELECT * FROM a {{ t }} WHERE {{ current_username() is none }}"
+
+    assert analyze_jinja_sql(sql, database).tables == {Table("a")}
+    assert analyze_jinja_sql(sql, database, {"t": ", other.b"}).tables == {
+        Table("a"),
+        Table("b", "other"),
+    }
+    assert analyze_jinja_sql(
+        sql,
+        database,
+        {"current_username": "x"},
+    ).tables == {Table("a")}
+
+
+@mock.patch.dict(
+    "superset.extensions.feature_flag_manager._feature_flags",
+    {"ENABLE_TEMPLATE_PROCESSING": False},
+    clear=True,
+)
+def test_analyze_jinja_sql_template_processing_off(mocker: MockerFixture) -> None:
+    """
+    Without template processing the SQL runs as written, so it's checked as written.
+    """
+    database = mocker.Mock()
+    database.db_engine_spec.engine = "mysql"
+
+    assert analyze_jinja_sql(
+        "SELECT '{{ t }}' FROM a",
+        database,
+        {"t": "x"},
+    ).tables == {Table("a")}

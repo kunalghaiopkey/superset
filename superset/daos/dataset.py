@@ -23,11 +23,18 @@ from typing import Any
 import dateutil.parser
 from sqlalchemy.exc import SQLAlchemyError
 
-from superset.connectors.sqla.models import SqlaTable, SqlMetric, TableColumn
+from superset import security_manager
+from superset.connectors.sqla.models import (
+    DATASET_CONTEXT_FIELDS,
+    SqlaTable,
+    SqlMetric,
+    TableColumn,
+)
 from superset.daos.base import BaseDAO
 from superset.extensions import db
 from superset.models.core import Database
 from superset.models.dashboard import Dashboard
+from superset.models.helpers import json_to_dict
 from superset.models.slice import Slice
 from superset.sql_parse import Table
 from superset.utils.core import DatasourceType
@@ -184,6 +191,8 @@ class DatasetDAO(BaseDAO[SqlaTable]):
         """
 
         if item and attributes:
+            cls.raise_for_expression_access(item, attributes)
+
             if "columns" in attributes:
                 cls.update_columns(
                     item,
@@ -195,6 +204,66 @@ class DatasetDAO(BaseDAO[SqlaTable]):
                 cls.update_metrics(item, attributes.pop("metrics"))
 
         return super().update(item, attributes)
+
+    @staticmethod
+    def raise_for_expression_access(
+        dataset: SqlaTable,
+        attributes: dict[str, Any],
+    ) -> None:
+        """
+        Check that the user may read every table read by the SQL of the calculated
+        columns and metrics an update saves: the new and changed ones, or all of them
+        when the schema, catalog or template parameters they run with change.
+
+        Columns and metrics are written in bulk, which `raise_for_dataset_sql_access`
+        doesn't see, so they're checked here, before anything is written.
+
+        :param dataset: The dataset, before the update
+        :param attributes: The update
+        :raises SupersetSecurityException: If the user may not read a table
+        """
+        context_changed = any(
+            field in attributes and attributes[field] != getattr(dataset, field)
+            for field in DATASET_CONTEXT_FIELDS
+            if field not in ("database", "database_id")  # can't change
+        )
+        catalog = attributes.get("catalog", dataset.catalog)
+        schema = attributes.get("schema", dataset.schema)
+        template_params = (
+            json_to_dict(attributes["template_params"])
+            if "template_params" in attributes
+            else dataset.template_params_dict
+        )
+
+        expressions: list[str | None] = []
+        for key in ("columns", "metrics"):
+            current = {item.id: item.expression for item in getattr(dataset, key)}
+            if key not in attributes:
+                if context_changed:
+                    expressions.extend(current.values())
+                continue
+            for properties in attributes[key]:
+                # Updated in bulk, a column or metric keeps what isn't given
+                expression = properties.get(
+                    "expression",
+                    current.get(properties.get("id")),
+                )
+                if (
+                    context_changed
+                    or properties.get("id") not in current
+                    or expression != current[properties["id"]]
+                ):
+                    expressions.append(expression)
+
+        for expression in expressions:
+            if expression and expression.strip():
+                security_manager.raise_for_access(
+                    database=dataset.database,
+                    sql=f"SELECT {expression}",
+                    catalog=catalog,
+                    schema=schema,
+                    template_params=template_params,
+                )
 
     @classmethod
     def update_columns(

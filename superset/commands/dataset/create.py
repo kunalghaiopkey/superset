@@ -33,6 +33,7 @@ from superset.commands.dataset.exceptions import (
 from superset.daos.dataset import DatasetDAO
 from superset.exceptions import SupersetSecurityException
 from superset.extensions import security_manager
+from superset.models.core import Database
 from superset.sql_parse import Table
 from superset.utils.decorators import on_error, transaction
 
@@ -50,6 +51,35 @@ class CreateDatasetCommand(CreateMixin, BaseCommand):
         dataset = DatasetDAO.create(attributes=self._properties)
         dataset.fetch_metadata()
         return dataset
+
+    @staticmethod
+    def _raise_for_data_access(
+        database: Database,
+        table_name: str,
+        catalog: str | None,
+        schema: str | None,
+        sql: str | None,
+    ) -> None:
+        """
+        Whoever can explore the dataset can read what its SQL or table reads, so its
+        creator must be able to.
+        """
+        if sql:
+            security_manager.raise_for_access(
+                database=database,
+                sql=sql,
+                catalog=catalog,
+                schema=schema,
+            )
+        else:
+            security_manager.raise_for_access(
+                database=database,
+                table=Table(
+                    table_name,
+                    schema or database.get_default_schema(catalog),
+                    catalog,
+                ),
+            )
 
     def validate(self) -> None:
         exceptions: list[ValidationError] = []
@@ -85,14 +115,9 @@ class CreateDatasetCommand(CreateMixin, BaseCommand):
         ):
             exceptions.append(TableNotFoundValidationError(table))
 
-        if sql:
+        if database:
             try:
-                security_manager.raise_for_access(
-                    database=database,
-                    sql=sql,
-                    catalog=catalog,
-                    schema=schema,
-                )
+                self._raise_for_data_access(database, table_name, catalog, schema, sql)
             except SupersetSecurityException as ex:
                 exceptions.append(DatasetDataAccessIsNotAllowed(ex.error.message))
         try:

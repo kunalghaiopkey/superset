@@ -206,7 +206,11 @@ class ExecuteSqlCommand(BaseCommand):
 
     def _validate_access(self, query: Query) -> None:
         try:
-            self._access_validator.validate(query)
+            # The query is rendered with these, so it must be checked with them
+            self._access_validator.validate(
+                query,
+                self._execution_context.template_params,
+            )
         except Exception as ex:
             raise QueryIsForbiddenToAccessException(self._execution_context, ex) from ex
 
@@ -242,7 +246,11 @@ class ExecuteSqlCommand(BaseCommand):
 
 
 class CanAccessQueryValidator:
-    def validate(self, query: Query) -> None:
+    def validate(
+        self,
+        query: Query,
+        template_params: dict[str, Any] | None = None,
+    ) -> None:
         raise NotImplementedError()
 
 

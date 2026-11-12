@@ -2219,6 +2219,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         sql: Optional[str] = None,
         catalog: Optional[str] = None,
         schema: Optional[str] = None,
+        template_params: Optional[dict[str, Any]] = None,
     ) -> None:
         """
         Raise an exception if the user cannot access the resource.
@@ -2232,6 +2233,8 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         :param sql: The SQL string (requires database)
         :param catalog: Optional catalog name
         :param schema: Optional schema name
+        :param template_params: The Jinja template parameters the query or SQL will
+            be run with
         :raises SupersetSecurityException: If the user cannot access the resource
         """
         # pylint: disable=import-outside-toplevel
@@ -2272,7 +2275,7 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                 # from the SQLAlchemy URI if possible; if not, we use the SQLAlchemy
                 # inspector to read it.
                 default_schema = database.get_default_schema_for_query(query)
-                analysis = analyze_jinja_sql(query.sql, database)
+                analysis = analyze_jinja_sql(query.sql, database, template_params)
                 unverifiable_statements = analysis.unverifiable_statements
 
                 # The table check below only works if every table the query reads

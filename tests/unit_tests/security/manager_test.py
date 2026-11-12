@@ -577,6 +577,40 @@ def test_raise_for_access_query_unverifiable_statements(
     assert sm.raise_for_access(query=query) is None
 
 
+@pytest.mark.parametrize(
+    "template_params, denied",
+    [
+        ({}, None),
+        ({"t": ", mosaic.bi_datasheet_runs m"}, "mosaic.bi_datasheet_runs"),
+        ({"t": "JOIN information_schema.tables ON 1 = 1"}, "information_schema.tables"),
+    ],
+)
+def test_raise_for_access_query_template_params(
+    mocker: MockerFixture,
+    tenant_query,
+    template_params: dict[str, str],
+    denied: str | None,
+) -> None:
+    """
+    SQL Lab runs a query rendered with its template parameters, so it's checked
+    rendered with them.
+    """
+    mocker.patch(
+        "superset.jinja_context.feature_flag_manager.is_feature_enabled",
+        return_value=True,
+    )
+    sm, query = tenant_query
+    query.sql = "SELECT * FROM bi_artifact_linking {{ t }}"
+
+    if denied is None:
+        assert sm.raise_for_access(query=query, template_params=template_params) is None
+        return
+
+    with pytest.raises(SupersetSecurityException) as excinfo:
+        sm.raise_for_access(query=query, template_params=template_params)
+    assert excinfo.value.error.extra["tables"] == [denied]
+
+
 @pytest.fixture
 def dataset_macro_query(mocker: MockerFixture, app_context: None):
     """
