@@ -66,7 +66,7 @@ from superset.security.guest_token import (
     GuestTokenUser,
     GuestUser,
 )
-from superset.sql_parse import analyze_jinja_sql, Table
+from superset.sql_parse import analyze_jinja_sql, DatasetMacroCall, Table
 from superset.tasks.utils import get_current_user
 from superset.utils import json
 from superset.utils.core import (
@@ -2147,6 +2147,64 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         """
         return []
 
+    def _dataset_macro_access_covers_tables(
+        self,
+        call: DatasetMacroCall,
+        database: "Database",
+        catalog: Optional[str],
+        default_catalog: Optional[str],
+        schema: Optional[str],
+    ) -> bool:
+        """
+        Whether access to the dataset of a `{{ dataset(id) }}` call covers the
+        tables read by the SQL the call rendered to.
+
+        Superset builds that SQL from the dataset's definition, with the dataset's
+        row level security filters for the current user, as it does when the
+        dataset is explored. So whoever may explore the dataset may read it this way
+        too, without access to its tables, provided that:
+
+        - the dataset is on the database the query runs on;
+        - the columns asked for, if any, are the dataset's own, so no SQL written by
+          the user went into the rendered SQL;
+        - its unqualified table names resolve to the same schema and catalog as
+          when the dataset is explored.
+
+        :param call: The `dataset()` call
+        :param database: The database the query runs on
+        :param catalog: The catalog the query runs in
+        :param default_catalog: The database's default catalog
+        :param schema: The schema the query runs in
+        """
+        # pylint: disable=import-outside-toplevel
+        from superset.daos.dataset import DatasetDAO
+
+        dataset = DatasetDAO.find_by_id(call.dataset_id, skip_base_filter=True)
+        if dataset is None or dataset.database_id != database.id:
+            return False
+
+        if call.columns is not None:
+            if not isinstance(call.columns, (list, tuple)) or not all(
+                isinstance(column, str) for column in call.columns
+            ):
+                return False
+            if not set(call.columns) <= {
+                column.column_name for column in dataset.columns
+            }:
+                return False
+
+        for table_ in call.tables:
+            if table_.schema is None and (
+                dataset.schema is None or dataset.schema != schema
+            ):
+                return False
+            if table_.catalog is None and (
+                (dataset.catalog or default_catalog) != catalog
+            ):
+                return False
+
+        return self.can_access_datasource(dataset)
+
     def raise_for_access(  # noqa: C901
         # pylint: disable=too-many-arguments,too-many-branches,too-many-locals,too-many-statements
         self,
@@ -2214,10 +2272,8 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                 # from the SQLAlchemy URI if possible; if not, we use the SQLAlchemy
                 # inspector to read it.
                 default_schema = database.get_default_schema_for_query(query)
-                referenced_tables, unverifiable_statements = analyze_jinja_sql(
-                    query.sql,
-                    database,
-                )
+                analysis = analyze_jinja_sql(query.sql, database)
+                unverifiable_statements = analysis.unverifiable_statements
 
                 # The table check below only works if every table the query reads
                 # can be found in the SQL. Statements such as SET, USE, SHOW,
@@ -2239,6 +2295,19 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                             level=ErrorLevel.WARNING,
                         )
                     )
+
+                # The tables read by `{{ dataset(id) }}` calls need no access of
+                # their own when the dataset's access covers them.
+                referenced_tables = set(analysis.tables)
+                for call in analysis.dataset_calls:
+                    if not self._dataset_macro_access_covers_tables(
+                        call,
+                        database,
+                        query.catalog or default_catalog,
+                        default_catalog,
+                        default_schema,
+                    ):
+                        referenced_tables |= call.tables
 
                 tables = {
                     Table(

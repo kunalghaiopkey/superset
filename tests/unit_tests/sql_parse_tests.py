@@ -35,6 +35,7 @@ from superset.sql_parse import (
     add_table_name,
     analyze_jinja_sql,
     check_sql_functions_exist,
+    DatasetMacroCall,
     extract_table_references,
     extract_tables_from_jinja_sql,
     get_rls_for_table,
@@ -1966,6 +1967,11 @@ def test_extract_tables_from_jinja_sql_disabled(mocker: MockerFixture) -> None:
         ("USE other; SELECT * FROM t", ["USE"]),
         ("SHOW TABLES FROM other", ["SHOW"]),
         ("CALL other.p()", ["CALL"]),
+        ("SELECT 1 /*! UNION SELECT * FROM other.t */", ["/*! */"]),
+        ("SELECT 1 /*!50000 UNION SELECT * FROM other.t */", ["/*! */"]),
+        ("SELECT 1 /*M! UNION SELECT * FROM other.t */", ["/*! */"]),
+        ("SELECT /*+ MAX_EXECUTION_TIME(1000) */ * FROM t /* note */", []),
+        ("SELECT '/*! not a comment */' FROM t", []),
     ],
 )
 def test_unverifiable_statements(sql: str, expected: list[str]) -> None:
@@ -1982,7 +1988,49 @@ def test_analyze_jinja_sql(mocker: MockerFixture) -> None:
     database = mocker.Mock()
     database.db_engine_spec.engine = "mysql"
 
-    assert analyze_jinja_sql(
+    analysis = analyze_jinja_sql(
         sql="USE other; SELECT * FROM {% if True %}t{% endif %}",
         database=database,
-    ) == ({Table("t")}, ["USE"])
+    )
+    assert analysis.tables == {Table("t")}
+    assert analysis.unverifiable_statements == ["USE"]
+    assert analysis.dataset_calls == []
+
+
+@mock.patch.dict(
+    "superset.extensions.feature_flag_manager._feature_flags",
+    {"ENABLE_TEMPLATE_PROCESSING": True},
+    clear=True,
+)
+def test_analyze_jinja_sql_dataset_macro(mocker: MockerFixture) -> None:
+    """
+    The tables read by the SQL of `dataset()` calls are reported per call, apart
+    from the others; the SQL of a call that isn't found as a subquery isn't.
+    """
+    database = mocker.Mock()
+    database.db_engine_spec.engine = "mysql"
+    mocker.patch(
+        "superset.jinja_context.dataset_macro",
+        side_effect=lambda dataset_id, **kwargs: (
+            f"(\nSELECT a FROM s.t{dataset_id}\n) AS dataset_{dataset_id}"
+        ),
+    )
+
+    analysis = analyze_jinja_sql(
+        sql=(
+            "SELECT * FROM {{ dataset(1, columns=['a']) }} JOIN u ON 1 = 1 "
+            "WHERE a IN (SELECT a FROM {{ dataset(2) }})"
+        ),
+        database=database,
+    )
+    assert analysis.tables == {Table("u")}
+    assert analysis.dataset_calls == [
+        DatasetMacroCall(1, ["a"], {Table("t1", "s")}),
+        DatasetMacroCall(2, None, {Table("t2", "s")}),
+    ]
+    assert analysis.all_tables == {Table("u"), Table("t1", "s"), Table("t2", "s")}
+
+    # In a select list it's not a subquery of its own: `(...) AS dataset_3`
+    analysis = analyze_jinja_sql(sql="SELECT {{ dataset(3) }}", database=database)
+    assert analysis.tables == {Table("t3", "s")}
+    assert analysis.dataset_calls == []

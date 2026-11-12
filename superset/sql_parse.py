@@ -21,14 +21,16 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Iterator
+from collections.abc import Collection, Iterator
+from dataclasses import dataclass, field
 from typing import Any, cast, TYPE_CHECKING
 
 import sqlparse
 from flask_babel import gettext as __
 from jinja2 import nodes, Template
 from sqlalchemy import and_
-from sqlglot import exp
+from sqlglot import exp, tokenize
+from sqlglot.errors import SqlglotError
 from sqlparse import keywords
 from sqlparse.lexer import Lexer
 from sqlparse.sql import (
@@ -205,6 +207,11 @@ def strip_comments_from_sql(statement: str, engine: str = "base") -> str:
 # DESCRIBE/EXPLAIN, and the DML/DDL statements sqlglot can traverse.
 TABLE_VERIFIABLE_STATEMENTS = (exp.Query, exp.Describe, exp.DML, exp.DDL)
 
+# MySQL runs the SQL inside `/*! ... */` (and MariaDB inside `/*M! ... */`) as part
+# of the query, while sqlglot reads it as a comment. sqlglot keeps a comment's text
+# without the `/*` and `*/`.
+EXECUTABLE_COMMENT_PREFIXES = ("!", "M!")
+
 
 class ParsedQuery:
     def __init__(
@@ -212,7 +219,12 @@ class ParsedQuery:
         sql_statement: str,
         strip_comments: bool = False,
         engine: str = "base",
+        opaque_subqueries: Collection[str] = (),
     ):
+        """
+        :param opaque_subqueries: subqueries, as sqlglot writes them, whose tables
+            are left out of `tables`; the ones found are in `hidden_subqueries`
+        """
         if strip_comments:
             sql_statement = sqlparse.format(sql_statement, strip_comments=True)
 
@@ -223,6 +235,8 @@ class ParsedQuery:
         self._alias_names: set[str] = set()
         self._limit: int | None = None
         self._sqlglot_statements: list[Any] | None = None
+        self._opaque_subqueries = set(opaque_subqueries)
+        self.hidden_subqueries: set[str] = set()
 
         logger.debug("Parsing with sqlparse statement: %s", self.sql)
         self._parsed = sqlparse.parse(self.stripped())
@@ -249,9 +263,12 @@ class ParsedQuery:
             USE other_schema;                               -- moves unqualified names
             SHOW TABLES FROM other_schema;
 
-        A permission check based on `tables` can't vouch for these.
+        A permission check based on `tables` can't vouch for these, nor for SQL in
+        MySQL's executable comments, reported as `/*! */`:
+
+            SELECT 1 /*! UNION SELECT secret FROM other_schema.t */
         """
-        return [
+        keywords = [
             (
                 statement.name
                 if isinstance(statement, (exp.Command, exp.Anonymous))
@@ -261,6 +278,20 @@ class ParsedQuery:
             if isinstance(statement, exp.Expression)
             and not isinstance(statement, TABLE_VERIFIABLE_STATEMENTS)
         ]
+        if self._has_executable_comment():
+            keywords.append("/*! */")
+        return keywords
+
+    def _has_executable_comment(self) -> bool:
+        try:
+            tokens = tokenize(self.stripped(), read=self._dialect)
+        except SqlglotError:
+            return True
+        return any(
+            comment.startswith(EXECUTABLE_COMMENT_PREFIXES)
+            for token in tokens
+            for comment in token.comments
+        )
 
     def _get_sqlglot_statements(self) -> list[Any]:
         """
@@ -276,6 +307,9 @@ class ParsedQuery:
                 statement._parsed  # pylint: disable=protected-access
                 for statement in SQLScript(self.stripped(), self._engine).statements
             ]
+            for statement in self._sqlglot_statements:
+                if isinstance(statement, exp.Expression):
+                    self._hide_opaque_subqueries(statement)
         except SupersetParseError as ex:
             logger.warning("Unable to parse SQL (%s): %s", self._dialect, self.sql)
             raise SupersetSecurityException(
@@ -290,6 +324,27 @@ class ParsedQuery:
             ) from ex
 
         return self._sqlglot_statements
+
+    def _hide_opaque_subqueries(self, statement: exp.Expression) -> None:
+        """
+        Replace each of `opaque_subqueries` in the statement with `(SELECT 1)`,
+        keeping its alias.
+        """
+        if not self._opaque_subqueries:
+            return
+
+        for subquery in list(statement.find_all(exp.Subquery)):
+            if subquery.root() is not statement:  # inside one already replaced
+                continue
+            sql = subquery.sql(dialect=self._dialect)
+            if sql in self._opaque_subqueries:
+                subquery.replace(
+                    exp.Subquery(
+                        this=exp.select(exp.Literal.number(1)),
+                        alias=subquery.args.get("alias"),
+                    )
+                )
+                self.hidden_subqueries.add(sql)
 
     def _extract_tables_from_sql(self) -> set[Table]:
         """
@@ -962,17 +1017,69 @@ def extract_table_references(  # noqa: C901
     }
 
 
+@dataclass
+class DatasetMacroCall:
+    """
+    A `{{ dataset(id) }}` call in Jinjafied SQL whose rendered SQL was found intact,
+    as a subquery, in the rendered statement.
+    """
+
+    dataset_id: Any
+    # The `columns` argument of the call, if given
+    columns: Any
+    # The tables the rendered SQL reads, as written in it
+    tables: set[Table]
+
+
+@dataclass
+class JinjaSQLAnalysis:
+    # The tables referenced outside `dataset_calls`
+    tables: set[Table]
+    # See `ParsedQuery.unverifiable_statements`
+    unverifiable_statements: list[str]
+    dataset_calls: list[DatasetMacroCall] = field(default_factory=list)
+
+    @property
+    def all_tables(self) -> set[Table]:
+        return self.tables.union(*(call.tables for call in self.dataset_calls))
+
+
 def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
     """
     Extract all table references in the Jinjafied SQL statement.
 
     See `analyze_jinja_sql`.
     """
-    tables, _ = analyze_jinja_sql(sql, database)
-    return tables
+    return analyze_jinja_sql(sql, database).all_tables
 
 
-def analyze_jinja_sql(sql: str, database: Database) -> tuple[set[Table], list[str]]:
+def _parse_dataset_macro_sql(sql: str, engine: str) -> tuple[str, set[Table]] | None:
+    """
+    Parse the SQL a `dataset()` call rendered to, `(<SELECT>) AS dataset_<id>`.
+
+    :returns: the subquery as sqlglot writes it, and the tables it reads; or None
+        if the SQL isn't just one such subquery
+    """
+    # Only parsed, never run
+    parsed_query = ParsedQuery(f"SELECT * FROM {sql}", engine=engine)  # noqa: S608
+    try:
+        statements = parsed_query._get_sqlglot_statements()  # pylint: disable=protected-access
+        if len(statements) != 1 or parsed_query.unverifiable_statements:
+            return None
+        subquery = statements[0].find(exp.Subquery)
+        if subquery is None:
+            return None
+        dialect = parsed_query._dialect  # pylint: disable=protected-access
+        if statements[0].sql(dialect=dialect) != (
+            exp.select("*").from_(subquery.copy()).sql(dialect=dialect)
+        ):
+            return None
+        return subquery.sql(dialect=dialect), parsed_query.tables
+    except SupersetSecurityException:
+        return None
+
+
+def analyze_jinja_sql(sql: str, database: Database) -> JinjaSQLAnalysis:
     """
     Extract all table references in the Jinjafied SQL statement, and the keywords of
     its statements whose tables can't be determined (see
@@ -986,10 +1093,12 @@ def analyze_jinja_sql(sql: str, database: Database) -> tuple[set[Table], list[st
     expression to help ensure that the resulting SQL statements are parsable by
     SQLGlot.
 
+    The tables read by the SQL of `{{ dataset(id) }}` calls are kept apart, in
+    `dataset_calls`, for callers that authorize them by access to the dataset.
+
     :param sql: The Jinjafied SQL statement
     :param database: The database associated with the SQL statement
-    :returns: The set of tables referenced in the SQL statement, and the keywords of
-        the statements whose tables can't be determined
+    :returns: The analysis
     :raises SupersetSecurityException: If SQLGlot is unable to parse the SQL statement
     :raises jinja2.exceptions.TemplateError: If the Jinjafied SQL could not be rendered
     """
@@ -1027,11 +1136,50 @@ def analyze_jinja_sql(sql: str, database: Database) -> tuple[set[Table], list[st
             node.fields = nodes.TemplateData.fields
             node.data = "NULL"
 
+    # Record the SQL each `dataset()` call renders to
+    context = processor.get_context()
+    dataset_macro_calls: list[tuple[Any, Any, str]] = []
+    if dataset_macro := context.get("dataset"):
+
+        def record_dataset_macro(
+            dataset_id: Any,
+            include_metrics: bool = False,
+            columns: Any = None,
+        ) -> str:
+            rendered = dataset_macro(
+                dataset_id,
+                include_metrics=include_metrics,
+                columns=columns,
+            )
+            dataset_macro_calls.append((dataset_id, columns, rendered))
+            return rendered
+
+        context["dataset"] = record_dataset_macro
+
     # re-render template back into a string
-    rendered_sql = Template(template).render(processor.get_context())
+    rendered_sql = Template(template).render(context)
+
+    engine = database.db_engine_spec.engine
+    dataset_subqueries: dict[str, DatasetMacroCall] = {}
+    for dataset_id, columns, rendered in dataset_macro_calls:
+        if parsed := _parse_dataset_macro_sql(rendered, engine):
+            subquery, subquery_tables = parsed
+            dataset_subqueries[subquery] = DatasetMacroCall(
+                dataset_id,
+                columns,
+                subquery_tables,
+            )
 
     parsed_query = ParsedQuery(
         sql_statement=processor.process_template(rendered_sql),
-        engine=database.db_engine_spec.engine,
+        engine=engine,
+        opaque_subqueries=dataset_subqueries.keys(),
     )
-    return tables | parsed_query.tables, parsed_query.unverifiable_statements
+    return JinjaSQLAnalysis(
+        tables=tables | parsed_query.tables,
+        unverifiable_statements=parsed_query.unverifiable_statements,
+        dataset_calls=[
+            dataset_subqueries[subquery]
+            for subquery in sorted(parsed_query.hidden_subqueries)
+        ],
+    )
