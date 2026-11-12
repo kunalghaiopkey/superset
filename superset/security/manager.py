@@ -2168,7 +2168,8 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         - the columns asked for, if any, are the dataset's own, so no SQL written by
           the user went into the rendered SQL;
         - its unqualified table names resolve to the same schema and catalog as
-          when the dataset is explored.
+          when the dataset is explored, as they always do on databases whose
+          schema can't be changed per query.
 
         :param call: The `dataset()` call
         :param database: The database the query runs on
@@ -2193,9 +2194,14 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
             }:
                 return False
 
+        # Where the schema can't be changed per query, unqualified table names resolve
+        # to the connection's schema both when exploring and in SQL Lab.
+        dynamic_schema = database.db_engine_spec.supports_dynamic_schema
         for table_ in call.tables:
-            if table_.schema is None and (
-                dataset.schema is None or dataset.schema != schema
+            if (
+                table_.schema is None
+                and dynamic_schema
+                and (dataset.schema is None or dataset.schema != schema)
             ):
                 return False
             if table_.catalog is None and (

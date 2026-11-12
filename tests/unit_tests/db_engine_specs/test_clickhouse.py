@@ -225,3 +225,60 @@ def test_connect_make_label_compatible(column_name: str, expected_result: str) -
 
     label = spec.make_label_compatible(column_name)
     assert label == expected_result
+
+
+@pytest.mark.parametrize(
+    "spec_name, sqlalchemy_uri, connect_args, expected",
+    [
+        (
+            "ClickHouseConnectEngineSpec",
+            "clickhousedb://user:pass@host:8123/myqlm",
+            {},
+            "myqlm",
+        ),
+        (
+            "ClickHouseConnectEngineSpec",
+            "clickhousedb://user:pass@host:8123/my%2Ddb",
+            {},
+            "my-db",
+        ),
+        (
+            "ClickHouseConnectEngineSpec",
+            "clickhousedb://user:pass@host:8123/myqlm",
+            {"database": "other"},
+            "other",
+        ),
+        (
+            "ClickHouseConnectEngineSpec",
+            "clickhousedb://user:pass@host:8123",
+            {},
+            None,
+        ),
+        (
+            "ClickHouseEngineSpec",
+            "clickhouse://user:pass@host:8123/myqlm",
+            {},
+            "myqlm",
+        ),
+    ],
+)
+def test_get_schema_from_engine_params(
+    spec_name: str,
+    sqlalchemy_uri: str,
+    connect_args: dict[str, Any],
+    expected: Optional[str],
+) -> None:
+    """
+    The schema unqualified table names resolve to is the database connected to,
+    not the `default` the SQLAlchemy dialects report.
+    """
+    from sqlalchemy.engine.url import make_url
+
+    from superset.db_engine_specs import clickhouse
+
+    spec = getattr(clickhouse, spec_name)
+
+    assert (
+        spec.get_schema_from_engine_params(make_url(sqlalchemy_uri), connect_args)
+        == expected
+    )

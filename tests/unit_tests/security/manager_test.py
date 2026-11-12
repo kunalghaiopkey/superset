@@ -686,6 +686,7 @@ def dataset_macro_query(mocker: MockerFixture, app_context: None):
 
     database = mocker.MagicMock(id=1)
     database.db_engine_spec.engine = "mysql"
+    database.db_engine_spec.supports_dynamic_schema = True
     database.get_default_catalog.return_value = None
     database.get_default_schema_for_query.return_value = "myqlm"
     query = mocker.MagicMock(catalog=None, database=database)
@@ -765,6 +766,42 @@ def test_raise_for_access_query_dataset_macro_denied(
         sm.raise_for_access(query=query)
 
     assert denied in excinfo.value.error.extra["tables"]
+
+
+@pytest.mark.parametrize("dataset_schema", ["myqlm", None])
+def test_raise_for_access_query_dataset_macro_static_schema(
+    dataset_macro_query,
+    mocker: MockerFixture,
+    dataset_schema: str | None,
+) -> None:
+    """
+    On a database whose schema can't be changed per query, like ClickHouse,
+    unqualified table names in a dataset's SQL resolve to the connection's schema
+    both when exploring and in SQL Lab, so access to the dataset covers them.
+    """
+    sm, query = dataset_macro_query
+    query.database.db_engine_spec.engine = "clickhousedb"
+    query.database.db_engine_spec.supports_dynamic_schema = False
+    query.database.get_default_schema_for_query.return_value = "default"
+    mocker.patch(
+        "superset.daos.dataset.DatasetDAO.find_by_id",
+        return_value=mocker.MagicMock(
+            id=104,
+            database_id=1,
+            schema=dataset_schema,
+            catalog=None,
+            columns=[mocker.MagicMock(column_name="id")],
+        ),
+    )
+    query.sql = "SELECT * FROM {{ dataset(104) }}"
+
+    assert sm.raise_for_access(query=query) is None
+
+    # Tables outside the call are still checked
+    query.sql = "SELECT * FROM {{ dataset(104) }} JOIN bi_artifact_linking b ON 1 = 1"
+    with pytest.raises(SupersetSecurityException) as excinfo:
+        sm.raise_for_access(query=query)
+    assert excinfo.value.error.extra["tables"] == ["default.bi_artifact_linking"]
 
 
 def test_raise_for_access_query_dataset_macro_executable_comment(

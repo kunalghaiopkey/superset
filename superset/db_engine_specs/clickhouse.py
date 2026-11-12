@@ -20,6 +20,7 @@ import logging
 import re
 from datetime import datetime
 from typing import Any, cast, TYPE_CHECKING
+from urllib.parse import unquote
 
 from flask import current_app
 from flask_babel import gettext as __
@@ -116,6 +117,26 @@ class ClickHouseBaseEngineSpec(BaseEngineSpec):
             GenericDataType.TEMPORAL,
         ),
     )
+
+    @classmethod
+    def get_schema_from_engine_params(
+        cls,
+        sqlalchemy_uri: URL,
+        connect_args: dict[str, Any],
+    ) -> str | None:
+        """
+        Return the configured schema.
+
+        A ClickHouse database is a SQLAlchemy schema, and unqualified table names
+        resolve to the database the connection is made to. The SQLAlchemy dialects
+        report `default` as the default schema whichever database that is, so it's
+        read from the connection arguments or the URI instead.
+        """
+        if database := connect_args.get("database"):
+            return str(database)
+        if sqlalchemy_uri.database:
+            return unquote(sqlalchemy_uri.database)
+        return None
 
     @classmethod
     def epoch_to_dttm(cls) -> str:
