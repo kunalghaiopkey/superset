@@ -28,6 +28,7 @@ import sqlparse
 from flask_babel import gettext as __
 from jinja2 import nodes, Template
 from sqlalchemy import and_
+from sqlglot import exp
 from sqlparse import keywords
 from sqlparse.lexer import Lexer
 from sqlparse.sql import (
@@ -200,6 +201,11 @@ def strip_comments_from_sql(statement: str, engine: str = "base") -> str:
     )
 
 
+# Statement types whose tables `extract_tables_from_statement` can find: queries,
+# DESCRIBE/EXPLAIN, and the DML/DDL statements sqlglot can traverse.
+TABLE_VERIFIABLE_STATEMENTS = (exp.Query, exp.Describe, exp.DML, exp.DDL)
+
+
 class ParsedQuery:
     def __init__(
         self,
@@ -216,6 +222,7 @@ class ParsedQuery:
         self._tables: set[Table] = set()
         self._alias_names: set[str] = set()
         self._limit: int | None = None
+        self._sqlglot_statements: list[Any] | None = None
 
         logger.debug("Parsing with sqlparse statement: %s", self.sql)
         self._parsed = sqlparse.parse(self.stripped())
@@ -228,14 +235,44 @@ class ParsedQuery:
             self._tables = self._extract_tables_from_sql()
         return self._tables
 
-    def _extract_tables_from_sql(self) -> set[Table]:
+    @property
+    def unverifiable_statements(self) -> list[str]:
         """
-        Extract all table references in a query.
+        The statements whose tables can't be found by reading the SQL, by keyword.
+
+        `tables` only sees the tables of queries, DML and DDL. Other statements
+        read data without naming a table where the parser can find it, e.g. in
+        MySQL:
+
+            SET @x = (SELECT secret FROM other_schema.t);   -- then SELECT @x
+            PREPARE s FROM @sql; EXECUTE s;                 -- SQL built at runtime
+            USE other_schema;                               -- moves unqualified names
+            SHOW TABLES FROM other_schema;
+
+        A permission check based on `tables` can't vouch for these.
+        """
+        return [
+            (
+                statement.name
+                if isinstance(statement, (exp.Command, exp.Anonymous))
+                else statement.key
+            ).upper()
+            for statement in self._get_sqlglot_statements()
+            if isinstance(statement, exp.Expression)
+            and not isinstance(statement, TABLE_VERIFIABLE_STATEMENTS)
+        ]
+
+    def _get_sqlglot_statements(self) -> list[Any]:
+        """
+        Parse the SQL with sqlglot, once.
 
         Note: this uses sqlglot, since it's better at catching more edge cases.
         """
+        if self._sqlglot_statements is not None:
+            return self._sqlglot_statements
+
         try:
-            statements = [
+            self._sqlglot_statements = [
                 statement._parsed  # pylint: disable=protected-access
                 for statement in SQLScript(self.stripped(), self._engine).statements
             ]
@@ -252,9 +289,15 @@ class ParsedQuery:
                 )
             ) from ex
 
+        return self._sqlglot_statements
+
+    def _extract_tables_from_sql(self) -> set[Table]:
+        """
+        Extract all table references in a query.
+        """
         return {
             table
-            for statement in statements
+            for statement in self._get_sqlglot_statements()
             for table in extract_tables_from_statement(statement, self._dialect)
             if statement
         }
@@ -923,6 +966,18 @@ def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
     """
     Extract all table references in the Jinjafied SQL statement.
 
+    See `analyze_jinja_sql`.
+    """
+    tables, _ = analyze_jinja_sql(sql, database)
+    return tables
+
+
+def analyze_jinja_sql(sql: str, database: Database) -> tuple[set[Table], list[str]]:
+    """
+    Extract all table references in the Jinjafied SQL statement, and the keywords of
+    its statements whose tables can't be determined (see
+    `ParsedQuery.unverifiable_statements`).
+
     Due to Jinja templating, a multiphase approach is necessary as the Jinjafied SQL
     statement may represent invalid SQL which is non-parsable by SQLGlot.
 
@@ -933,7 +988,8 @@ def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
 
     :param sql: The Jinjafied SQL statement
     :param database: The database associated with the SQL statement
-    :returns: The set of tables referenced in the SQL statement
+    :returns: The set of tables referenced in the SQL statement, and the keywords of
+        the statements whose tables can't be determined
     :raises SupersetSecurityException: If SQLGlot is unable to parse the SQL statement
     :raises jinja2.exceptions.TemplateError: If the Jinjafied SQL could not be rendered
     """
@@ -974,10 +1030,8 @@ def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
     # re-render template back into a string
     rendered_sql = Template(template).render(processor.get_context())
 
-    return (
-        tables
-        | ParsedQuery(
-            sql_statement=processor.process_template(rendered_sql),
-            engine=database.db_engine_spec.engine,
-        ).tables
+    parsed_query = ParsedQuery(
+        sql_statement=processor.process_template(rendered_sql),
+        engine=database.db_engine_spec.engine,
     )
+    return tables | parsed_query.tables, parsed_query.unverifiable_statements

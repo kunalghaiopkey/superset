@@ -66,7 +66,7 @@ from superset.security.guest_token import (
     GuestTokenUser,
     GuestUser,
 )
-from superset.sql_parse import extract_tables_from_jinja_sql, Table
+from superset.sql_parse import analyze_jinja_sql, Table
 from superset.tasks.utils import get_current_user
 from superset.utils import json
 from superset.utils.core import (
@@ -2214,13 +2214,39 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                 # from the SQLAlchemy URI if possible; if not, we use the SQLAlchemy
                 # inspector to read it.
                 default_schema = database.get_default_schema_for_query(query)
+                referenced_tables, unverifiable_statements = analyze_jinja_sql(
+                    query.sql,
+                    database,
+                )
+
+                # The table check below only works if every table the query reads
+                # can be found in the SQL. Statements such as SET, USE, SHOW,
+                # PREPARE/EXECUTE or CALL can read any table the connection's login
+                # can, without naming it where the parser sees it. Only users with
+                # access to the whole database, who returned above, may run them.
+                if unverifiable_statements:
+                    raise SupersetSecurityException(
+                        SupersetError(
+                            error_type=SupersetErrorType.QUERY_SECURITY_ACCESS_ERROR,
+                            message=_(
+                                "Statements of type %(statements)s can't be checked "
+                                "against your table permissions. Only users with "
+                                "access to the whole database can run them.",
+                                statements=", ".join(
+                                    sorted(set(unverifiable_statements))
+                                ),
+                            ),
+                            level=ErrorLevel.WARNING,
+                        )
+                    )
+
                 tables = {
                     Table(
                         table_.table,
                         table_.schema or default_schema,
                         table_.catalog or query.catalog or default_catalog,
                     )
-                    for table_ in extract_tables_from_jinja_sql(query.sql, database)
+                    for table_ in referenced_tables
                 }
             elif table:
                 # Make sure table has the default catalog, if not specified.

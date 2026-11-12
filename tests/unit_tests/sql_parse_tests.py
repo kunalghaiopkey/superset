@@ -33,6 +33,7 @@ from superset.exceptions import (
 from superset.sql.parse import Table
 from superset.sql_parse import (
     add_table_name,
+    analyze_jinja_sql,
     check_sql_functions_exist,
     extract_table_references,
     extract_tables_from_jinja_sql,
@@ -1949,3 +1950,39 @@ def test_extract_tables_from_jinja_sql_disabled(mocker: MockerFixture) -> None:
         sql="SELECT 1 FROM t",
         database=database,
     ) == {Table("t")}
+
+
+@pytest.mark.parametrize(
+    "sql, expected",
+    [
+        ("SELECT * FROM t", []),
+        ("WITH a AS (SELECT * FROM t) SELECT * FROM a", []),
+        ("SELECT 1 UNION SELECT 2", []),
+        ("DESCRIBE t", []),
+        ("EXPLAIN SELECT * FROM t", []),
+        ("INSERT INTO t SELECT * FROM u", []),
+        ("SET @x = (SELECT secret FROM other.t)", ["SET"]),
+        ("SET @q = 'x'; PREPARE s FROM @q; EXECUTE s", ["SET", "PREPARE", "EXECUTE"]),
+        ("USE other; SELECT * FROM t", ["USE"]),
+        ("SHOW TABLES FROM other", ["SHOW"]),
+        ("CALL other.p()", ["CALL"]),
+    ],
+)
+def test_unverifiable_statements(sql: str, expected: list[str]) -> None:
+    """
+    Statements whose tables can't be found in the SQL are reported by keyword.
+    """
+    assert ParsedQuery(sql, engine="mysql").unverifiable_statements == expected
+
+
+def test_analyze_jinja_sql(mocker: MockerFixture) -> None:
+    """
+    Tables and unverifiable statements come from the rendered SQL.
+    """
+    database = mocker.Mock()
+    database.db_engine_spec.engine = "mysql"
+
+    assert analyze_jinja_sql(
+        sql="USE other; SELECT * FROM {% if True %}t{% endif %}",
+        database=database,
+    ) == ({Table("t")}, ["USE"])

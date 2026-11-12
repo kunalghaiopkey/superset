@@ -441,6 +441,140 @@ def test_raise_for_access_jinja_sql(mocker: MockerFixture, app_context: None) ->
     get_table_access_error_object.assert_called_with({Table("ab_user", "public", None)})
 
 
+@pytest.fixture
+def tenant_query(mocker: MockerFixture, app_context: None):
+    """
+    A security manager and a SQL Lab query for a tenant user who can read only the
+    `vulcan` schema of the `vulcan` MySQL database, which is the schema selected in
+    SQL Lab.
+    """
+    sm = SupersetSecurityManager(appbuilder)
+    mocker.patch.object(sm, "can_access_database", return_value=False)
+    mocker.patch.object(sm, "is_guest_user", return_value=False)
+    mocker.patch.object(sm, "get_catalog_perm", return_value=None)
+    mocker.patch.object(
+        sm,
+        "get_schema_perm",
+        side_effect=lambda database, catalog, schema: f"[vulcan].[{schema}]",
+    )
+    mocker.patch.object(
+        sm,
+        "can_access",
+        side_effect=lambda permission, view: (permission, view)
+        == ("schema_access", "[vulcan].[vulcan]"),
+    )
+    SqlaTable = mocker.patch("superset.connectors.sqla.models.SqlaTable")  # noqa: N806
+    SqlaTable.query_datasources_by_name.return_value = []
+
+    database = mocker.MagicMock()
+    database.db_engine_spec.engine = "mysql"
+    database.get_default_catalog.return_value = None
+    database.get_default_schema_for_query.return_value = "vulcan"
+    query = mocker.MagicMock()
+    query.catalog = None
+    query.database = database
+
+    return sm, query
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT * FROM bi_artifact_linking",
+        "SELECT * FROM vulcan.bi_artifact_linking",
+        "WITH t AS (SELECT * FROM bi_artifact_linking) SELECT * FROM t",
+        "DESCRIBE bi_artifact_linking",
+    ],
+)
+def test_raise_for_access_query_own_tenant_schema(tenant_query, sql: str) -> None:
+    """
+    A tenant user can query the tables of the schema they were granted.
+    """
+    sm, query = tenant_query
+    query.sql = sql
+
+    assert sm.raise_for_access(query=query) is None
+
+
+@pytest.mark.parametrize(
+    "sql, denied",
+    [
+        ("SELECT * FROM information_schema.tables", "information_schema.tables"),
+        ("SELECT * FROM mosaic.bi_datasheet_runs", "mosaic.bi_datasheet_runs"),
+        ("SELECT * FROM superset.ab_user", "superset.ab_user"),
+        (
+            "SELECT * FROM bi_artifact_linking a "
+            "JOIN mosaic.bi_datasheet_runs b ON a.id = b.id",
+            "mosaic.bi_datasheet_runs",
+        ),
+        (
+            "SELECT * FROM bi_artifact_linking "
+            "WHERE id IN (SELECT id FROM mosaic.bi_datasheet_runs)",
+            "mosaic.bi_datasheet_runs",
+        ),
+        (
+            "SELECT * FROM bi_artifact_linking; SELECT * FROM mosaic.bi_datasheet_runs",
+            "mosaic.bi_datasheet_runs",
+        ),
+    ],
+)
+def test_raise_for_access_query_other_tenant_schema(
+    tenant_query,
+    sql: str,
+    denied: str,
+) -> None:
+    """
+    A tenant user can't query a table outside their granted schema: another
+    tenant's table, `information_schema` (which lists every tenant's tables), or
+    Superset's own metadata, however the reference is placed in the SQL.
+    """
+    sm, query = tenant_query
+    query.sql = sql
+
+    with pytest.raises(SupersetSecurityException) as excinfo:
+        sm.raise_for_access(query=query)
+
+    assert excinfo.value.error.extra["tables"] == [denied]
+
+
+@pytest.mark.parametrize(
+    "sql, statements",
+    [
+        ("SET @x = (SELECT secret FROM mosaic.bi_datasheet_runs LIMIT 1)", "SET"),
+        (
+            "SET @q = CONCAT('SELECT * FROM mo', 'saic.bi_datasheet_runs'); "
+            "PREPARE s FROM @q; EXECUTE s",
+            "EXECUTE, PREPARE, SET",
+        ),
+        ("USE mosaic; SELECT * FROM bi_datasheet_runs", "USE"),
+        ("SHOW TABLES FROM mosaic", "SHOW"),
+        ("SHOW DATABASES", "SHOW"),
+        ("CALL mosaic.some_procedure()", "CALL"),
+    ],
+)
+def test_raise_for_access_query_unverifiable_statements(
+    tenant_query,
+    sql: str,
+    statements: str,
+) -> None:
+    """
+    Statements whose tables can't be found in the SQL are refused to a user
+    without access to the whole database, since they could read any schema the
+    connection's login can. A user with access to the whole database may run them.
+    """
+    sm, query = tenant_query
+    query.sql = sql
+
+    with pytest.raises(SupersetSecurityException) as excinfo:
+        sm.raise_for_access(query=query)
+    assert excinfo.value.error.message.startswith(
+        f"Statements of type {statements} can't be checked"
+    )
+
+    sm.can_access_database.return_value = True
+    assert sm.raise_for_access(query=query) is None
+
+
 def test_raise_for_access_chart_for_datasource_permission(
     mocker: MockerFixture,
     app_context: None,
